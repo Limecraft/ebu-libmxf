@@ -1,0 +1,128 @@
+/*
+ * MXF labels, keys, track numbers, etc.
+ *
+ * Copyright (C) 2006, British Broadcasting Corporation
+ * All Rights Reserved.
+ *
+ * Author: Philip de Nier
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ *     * Redistributions of source code must retain the above copyright notice,
+ *       this list of conditions and the following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright
+ *       notice, this list of conditions and the following disclaimer in the
+ *       documentation and/or other materials provided with the distribution.
+ *     * Neither the name of the British Broadcasting Corporation nor the names
+ *       of its contributors may be used to endorse or promote products derived
+ *       from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#include <stdlib.h>
+#include <string.h>
+
+#include <mxf/mxf.h>
+
+
+
+mxfKey g_KLVFill_key = /* g_LegacyKLVFill_key */
+    {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x01, 0x03, 0x01, 0x02, 0x10, 0x01, 0x00, 0x00, 0x00};
+
+
+
+int is_op_atom(const mxfUL *label)
+{
+    static const mxfUL opAtomPrefix = MXF_ATOM_OP_L(0);
+
+    return memcmp(label, &opAtomPrefix, 13) == 0;
+}
+
+int is_op_1a(const mxfUL *label)
+{
+    static const mxfUL op1APrefix = MXF_1A_OP_L(0);
+
+    return memcmp(label, &op1APrefix, 13) == 0;
+}
+
+int is_op_1b(const mxfUL *label)
+{
+    static const mxfUL op1BPrefix = MXF_1B_OP_L(0);
+
+    return memcmp(label, &op1BPrefix, 13) == 0;
+}
+
+
+
+int mxf_is_picture(const mxfUL *label)
+{
+    return memcmp(label, &MXF_DDEF_L(Picture), sizeof(mxfUL)) == 0 ||
+           memcmp(label, &MXF_DDEF_L(LegacyPicture), sizeof(mxfUL)) == 0;
+}
+
+int mxf_is_sound(const mxfUL *label)
+{
+    return memcmp(label, &MXF_DDEF_L(Sound), sizeof(mxfUL)) == 0 ||
+           memcmp(label, &MXF_DDEF_L(LegacySound), sizeof(mxfUL)) == 0;
+}
+
+int mxf_is_timecode(const mxfUL *label)
+{
+    return memcmp(label, &MXF_DDEF_L(Timecode), sizeof(mxfUL)) == 0 ||
+           memcmp(label, &MXF_DDEF_L(LegacyTimecode), sizeof(mxfUL)) == 0;
+}
+
+int mxf_is_data(const mxfUL *label)
+{
+    return memcmp(label, &MXF_DDEF_L(Data), sizeof(mxfUL)) == 0;
+}
+
+int mxf_is_descriptive_metadata(const mxfUL *label)
+{
+    return memcmp(label, &MXF_DDEF_L(DescriptiveMetadata), sizeof(mxfUL)) == 0;
+}
+
+
+
+int mxf_is_generic_container_label(const mxfUL *label)
+{
+    static const mxfUL gcLabel = MXF_GENERIC_CONTAINER_LABEL(0x00, 0x00, 0x00, 0x00, 0x00);
+
+    /* compare first 7 bytes, skip the registry version and compare another 4 bytes */
+    return memcmp(label, &gcLabel, 7) == 0 &&
+           memcmp(&label->octet8, &gcLabel.octet8, 4) == 0;
+}
+
+
+
+void mxf_complete_essence_element_key(mxfKey *key, uint8_t count, uint8_t type, uint8_t num)
+{
+    key->octet13 = count;
+    key->octet14 = type;
+    key->octet15 = num;
+}
+
+void mxf_complete_essence_element_track_num(uint32_t *trackNum, uint8_t count, uint8_t type, uint8_t num)
+{
+    *trackNum &= 0xFF000000;
+    *trackNum |= ((uint32_t)count) << 16;
+    *trackNum |= ((uint32_t)type)  << 8;
+    *trackNum |=  (uint32_t)(num);
+}
+

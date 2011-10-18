@@ -1,0 +1,33 @@
+#!/bin/sh
+
+if command -v md5sum \&>/dev/null; then
+  MD5TOOL=md5sum
+elif command -v md5 \&>/dev/null; then
+  MD5TOOL=md5
+else
+  echo "ERROR: require md5/md5sum tool"
+  exit 1
+fi
+
+
+if ! ./test_indextable /tmp/libmxf_test.mxf
+then
+  rm -f /tmp/libmxf_test.mxf
+  exit 1
+fi
+
+
+$MD5TOOL < /tmp/libmxf_test.mxf | sed 's/\([a-f0-9]\)$/\1\ \ -/g'  > /tmp/libmxf_test.mxf.md5
+if diff /tmp/libmxf_test.mxf.md5 ${srcdir}/test_indextable.md5
+then
+	RESULT=0
+else
+	RESULT=1
+fi
+
+
+rm -f /tmp/libmxf_test.mxf /tmp/libmxf_test.mxf.md5
+
+
+exit $RESULT
+

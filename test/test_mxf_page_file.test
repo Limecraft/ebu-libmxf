@@ -1,0 +1,4 @@
+#!/bin/sh
+
+./test_mxf_page_file
+

@@ -1,0 +1,12 @@
+#!/bin/sh
+
+if [ "$1" != "" ]; then
+  COMMAND=$1/create.sh
+  MD5DIR=$1
+else
+  COMMAND=${srcdir}/check.sh
+  MD5DIR=${srcdir}
+fi
+
+$COMMAND $MD5DIR/test_1080_29i_8b.md5 --num-audio 6 --format 1080i29 --16by9 --crc32
+

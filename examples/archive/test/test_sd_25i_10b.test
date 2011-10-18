@@ -1,0 +1,12 @@
+#!/bin/sh
+
+if [ "$1" != "" ]; then
+  COMMAND=$1/create.sh
+  MD5DIR=$1
+else
+  COMMAND=${srcdir}/check.sh
+  MD5DIR=${srcdir}
+fi
+
+$COMMAND $MD5DIR/test_sd_25i_10b.md5 --num-audio 6 --format 625i25 --10bit --16by9 --crc32
+
