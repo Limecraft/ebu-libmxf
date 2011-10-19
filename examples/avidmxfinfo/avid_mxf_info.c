@@ -777,6 +777,7 @@ int ami_read_info(const char *filename, AvidMXFInfo *info, int printDebugError)
     char *tracksStringPtr;
     size_t strLen;
     uint32_t arrayElementLen;
+    uint16_t fpRoundedTimecodeBase;
 
     memset(info, 0, sizeof(AvidMXFInfo));
     info->frameLayout = 0xff; /* unknown (0 is known) */
@@ -1279,9 +1280,23 @@ int ami_read_info(const char *filename, AvidMXFInfo *info, int printDebugError)
             DCHECK(mxf_get_uint16_item(timecodeComponentSet, &MXF_ITEM_K(TimecodeComponent, RoundedTimecodeBase), &roundedTimecodeBase));
 
             /* convert the physical package start timecode to a start position in the file source package */
-            startPosition = filePackageStartPosition +
-                (int64_t)(startTimecode *
-                    filePackageEditRate.numerator / (double)(filePackageEditRate.denominator * roundedTimecodeBase) + 0.5);
+            startPosition = filePackageStartPosition;
+            if (startTimecode > 0) {
+                fpRoundedTimecodeBase = (uint16_t)(filePackageEditRate.numerator / (double)filePackageEditRate.denominator + 0.5);
+                if (fpRoundedTimecodeBase == roundedTimecodeBase)
+                {
+                    startPosition += startTimecode;
+                }
+                else if (fpRoundedTimecodeBase == 2 * roundedTimecodeBase)
+                {
+                    startPosition += 2 * startTimecode;
+                }
+                else
+                {
+                    mxf_log_warn("Ignoring non-zero TimecodeComponent::StartTimecode because edit rate combination not supported\n");
+                    /* TODO: complete support for different timecode and track edit rates */
+                }
+            }
 
             /* convert the start position to material package track edit rate units */
             info->startTimecode = (int64_t)(startPosition *
