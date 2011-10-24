@@ -253,6 +253,61 @@ static int create_tracks_string(MXFReader *reader)
     return 1;
 }
 
+static mxfPosition timecode_to_offset(const MXFTimecode *timecode, uint16_t roundedTCBase)
+{
+    int64_t offset = timecode->hour * 60 * 60 * roundedTCBase +
+                     timecode->min * 60 * roundedTCBase +
+                     timecode->sec * roundedTCBase +
+                     timecode->frame;
+    if (timecode->isDropFrame)
+    {
+        /* first 2 frame numbers shall be omitted at the start of each minute,
+           except minutes 0, 10, 20, 30, 40 and 50 */
+
+        /* calculate number frames skipped */
+        offset -= (60-6) * 2 * timecode->hour;  /* every whole hour */
+        offset -= (timecode->min / 10) * 9 * 2; /* every whole 10 min */
+        offset -= (timecode->min % 10) * 2;     /* every whole min, except min 0 */
+    }
+
+    return offset;
+}
+
+static void offset_to_timecode(mxfPosition offset, uint16_t roundedTCBase, int dropFrame, MXFTimecode* timecode)
+{
+    int64_t count = offset;
+
+    if (dropFrame)
+    {
+        // first 2 frame numbers shall be omitted at the start of each minute,
+        //   except minutes 0, 10, 20, 30, 40 and 50
+
+        int hour, min;
+        int64_t prev_skipped_count = -1;
+        int64_t skipped_count = 0;
+        while (prev_skipped_count != skipped_count)
+        {
+            prev_skipped_count = skipped_count;
+
+            hour = (int)((count + skipped_count) / (60 * 60 * roundedTCBase));
+            min = (int)(((count + skipped_count) % (60 * 60 * roundedTCBase)) / (60 * roundedTCBase));
+
+            // add frames skipped
+            skipped_count  = (60-6) * 2 * hour;      // every whole hour
+            skipped_count += (min / 10) * 9 * 2;    // every whole 10 min
+            skipped_count += (min % 10) * 2;        // every whole min, except min 0
+        }
+
+        count += skipped_count;
+    }
+
+    timecode->isDropFrame = dropFrame;
+    timecode->hour        = (int)(  count / (60 * 60 * roundedTCBase));
+    timecode->min         = (int)(( count % (60 * 60 * roundedTCBase)) / (60 * roundedTCBase));
+    timecode->sec         = (int)(((count % (60 * 60 * roundedTCBase)) % (60 * roundedTCBase)) / roundedTCBase);
+    timecode->frame       = (int)(((count % (60 * 60 * roundedTCBase)) % (60 * roundedTCBase)) % roundedTCBase);
+}
+
 static int convert_timecode_to_position(TimecodeIndex *index, MXFTimecode *timecode, mxfPosition *position)
 {
     TimecodeSegment *segment;
@@ -261,20 +316,7 @@ static int convert_timecode_to_position(TimecodeIndex *index, MXFTimecode *timec
     int64_t frameCount;
 
     /* calculate the frame count */
-    frameCount = timecode->hour * 60 * 60 * index->roundedTimecodeBase +
-        timecode->min * 60 * index->roundedTimecodeBase +
-        timecode->sec * index->roundedTimecodeBase +
-        timecode->frame;
-    if (index->isDropFrame)
-    {
-        /* first 2 frame numbers shall be omitted at the start of each minute,
-           except minutes 0, 10, 20, 30, 40 and 50 */
-
-        /* calculate number frames skipped */
-        frameCount -= (60-6) * 2 * timecode->hour; /* every whole hour */
-        frameCount -= (timecode->min / 10) * 9 * 2; /* every whole 10 min */
-        frameCount -= (timecode->min % 10) * 2; /* every whole min, except min 0 */
-    }
+    frameCount = timecode_to_offset(timecode, index->roundedTimecodeBase);
 
     /* find the segment that contains the given timecode and set the position */
     segmentStartPosition = 0;
@@ -304,10 +346,6 @@ static int convert_position_to_timecode(TimecodeIndex *index, mxfPosition positi
     mxfPosition segmentStartPosition;
     int64_t frameCount = 0;
     int foundTimecodeSegment;
-    int hour, min;
-    int64_t prev_skipped_count = -1;
-    int64_t skipped_count = 0;
-    int64_t work_frame_count;
 
     CHK_ORET(position >= 0);
 
@@ -333,34 +371,7 @@ static int convert_position_to_timecode(TimecodeIndex *index, mxfPosition positi
     CHK_ORET(foundTimecodeSegment);
 
 
-    work_frame_count = frameCount;
-
-    timecode->isDropFrame = index->isDropFrame;
-    if (index->isDropFrame)
-    {
-        // first 2 frame numbers shall be omitted at the start of each minute,
-        //   except minutes 0, 10, 20, 30, 40 and 50
-
-        while (prev_skipped_count != skipped_count)
-        {
-            prev_skipped_count = skipped_count;
-
-            hour = (int)((frameCount + skipped_count) / (60 * 60 * index->roundedTimecodeBase));
-            min = (int)(((frameCount + skipped_count) % (60 * 60 * index->roundedTimecodeBase)) / (60 * index->roundedTimecodeBase));
-
-            // add frames skipped
-            skipped_count = (60-6) * 2 * hour;      // every whole hour
-            skipped_count += (min / 10) * 9 * 2;    // every whole 10 min
-            skipped_count += (min % 10) * 2;        // every whole min, except min 0
-        }
-
-        work_frame_count += skipped_count;
-    }
-
-    timecode->hour = (int)(work_frame_count / (60 * 60 * index->roundedTimecodeBase));
-    timecode->min = (int)((work_frame_count % (60 * 60 * index->roundedTimecodeBase)) / (60 * index->roundedTimecodeBase));
-    timecode->sec = (int)(((work_frame_count % (60 * 60 * index->roundedTimecodeBase)) % (60 * index->roundedTimecodeBase)) / index->roundedTimecodeBase);
-    timecode->frame = (int)(((work_frame_count % (60 * 60 * index->roundedTimecodeBase)) % (60 * index->roundedTimecodeBase)) % index->roundedTimecodeBase);
+    offset_to_timecode(frameCount, index->roundedTimecodeBase, index->isDropFrame, timecode);
 
     return 1;
 }
@@ -1566,12 +1577,8 @@ int initialise_source_timecodes(MXFReader *reader, MXFMetadataSet *sourcePackage
 
             /* modify the timecode index with the file source package's start timecode */
             CHK_OFAIL(convert_position_to_timecode(timecodeIndexRef, toStartPosition, &timecode));
-            startTimecode = timecode.hour * 60 * 60 * roundedTimecodeBase +
-                timecode.min * 60 * roundedTimecodeBase +
-                timecode.sec * roundedTimecodeBase +
-                timecode.frame;
             segment = (TimecodeSegment*)mxf_get_first_list_element(&timecodeIndexRef->segments);
-            segment->startTimecode = startTimecode;
+            segment->startTimecode = timecode_to_offset(&timecode, roundedTimecodeBase);
 
             continueAvidTimecodeSearch = 0;
             break;
