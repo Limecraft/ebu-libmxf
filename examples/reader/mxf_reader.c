@@ -271,9 +271,9 @@ static int convert_timecode_to_position(TimecodeIndex *index, MXFTimecode *timec
            except minutes 0, 10, 20, 30, 40 and 50 */
 
         /* calculate number frames skipped */
-        frameCount += (60-6) * 2 * timecode->hour; /* every whole hour */
-        frameCount += (timecode->min / 10) * 9 * 2; /* every whole 10 min */
-        frameCount += (timecode->min % 10) * 2; /* every whole min, except min 0 */
+        frameCount -= (60-6) * 2 * timecode->hour; /* every whole hour */
+        frameCount -= (timecode->min / 10) * 9 * 2; /* every whole 10 min */
+        frameCount -= (timecode->min % 10) * 2; /* every whole min, except min 0 */
     }
 
     /* find the segment that contains the given timecode and set the position */
