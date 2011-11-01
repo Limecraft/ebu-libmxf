@@ -338,7 +338,15 @@ int process_cdci_descriptor(MXFMetadataSet *descriptorSet, MXFTrack *track, Esse
         track->video.displayYOffset = 0;
         track->video.horizSubsampling = 2;
         track->video.vertSubsampling = 1;
-        essenceTrack->frameSize = 576000;
+        if (mxf_equals_ul(&track->essenceContainerLabel, &MXF_EC_L(DVBased_100_1080_50_I_ClipWrapped)) ||
+            mxf_equals_ul(&track->essenceContainerLabel, &MXF_EC_L(DVBased_100_1080_50_I_FrameWrapped)))
+        {
+            essenceTrack->frameSize = 576000;
+        }
+        else
+        {
+            essenceTrack->frameSize = 480000;
+        }
     }
     else if (mxf_equals_ul(&track->essenceContainerLabel, &MXF_EC_L(DVBased_100_720_50_P_ClipWrapped)) ||
              mxf_equals_ul(&track->essenceContainerLabel, &MXF_EC_L(DVBased_100_720_50_P_FrameWrapped)) ||
@@ -353,7 +361,15 @@ int process_cdci_descriptor(MXFMetadataSet *descriptorSet, MXFTrack *track, Esse
         track->video.displayYOffset = 0;
         track->video.horizSubsampling = 2;
         track->video.vertSubsampling = 1;
-        essenceTrack->frameSize = 288000;
+        if (mxf_equals_ul(&track->essenceContainerLabel, &MXF_EC_L(DVBased_100_720_50_P_ClipWrapped)) ||
+            mxf_equals_ul(&track->essenceContainerLabel, &MXF_EC_L(DVBased_100_720_50_P_FrameWrapped)))
+        {
+            essenceTrack->frameSize = 288000;
+        }
+        else
+        {
+            essenceTrack->frameSize = 240000;
+        }
     }
     else if (mxf_equals_ul(&track->essenceContainerLabel, &MXF_EC_L(DNxHD1080i1242ClipWrapped)))
     {
