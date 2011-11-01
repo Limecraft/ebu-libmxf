@@ -330,7 +330,6 @@ int process_cdci_descriptor(MXFMetadataSet *descriptorSet, MXFTrack *track, Esse
              mxf_equals_ul(&track->essenceContainerLabel, &MXF_EC_L(DVBased_100_1080_60_I_ClipWrapped)) ||
              mxf_equals_ul(&track->essenceContainerLabel, &MXF_EC_L(DVBased_100_1080_60_I_FrameWrapped)))
     {
-        track->video.frameWidth = 1440;
         track->video.frameHeight = 540 * 2;
         track->video.displayWidth = 1920;
         track->video.displayHeight = 540 * 2;
@@ -341,10 +340,12 @@ int process_cdci_descriptor(MXFMetadataSet *descriptorSet, MXFTrack *track, Esse
         if (mxf_equals_ul(&track->essenceContainerLabel, &MXF_EC_L(DVBased_100_1080_50_I_ClipWrapped)) ||
             mxf_equals_ul(&track->essenceContainerLabel, &MXF_EC_L(DVBased_100_1080_50_I_FrameWrapped)))
         {
+            track->video.frameWidth = 1440;
             essenceTrack->frameSize = 576000;
         }
         else
         {
+            track->video.frameWidth = 1280;
             essenceTrack->frameSize = 480000;
         }
     }
