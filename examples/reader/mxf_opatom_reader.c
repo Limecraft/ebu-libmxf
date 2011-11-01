@@ -811,7 +811,9 @@ int opa_is_supported(MXFPartition *headerPartition)
         mxf_equals_ul(label, &MXF_EC_L(DVBased_50_525_60_ClipWrapped)) ||
         mxf_equals_ul(label, &MXF_EC_L(DVBased_50_625_50_ClipWrapped)) ||
         mxf_equals_ul(label, &MXF_EC_L(DVBased_100_1080_50_I_ClipWrapped)) ||
-        mxf_equals_ul(label, &MXF_EC_L(DVBased_100_720_50_P_ClipWrapped)))
+        mxf_equals_ul(label, &MXF_EC_L(DVBased_100_1080_60_I_ClipWrapped)) ||
+        mxf_equals_ul(label, &MXF_EC_L(DVBased_100_720_50_P_ClipWrapped)) ||
+        mxf_equals_ul(label, &MXF_EC_L(DVBased_100_720_60_P_ClipWrapped)))
     {
         return 1;
     }

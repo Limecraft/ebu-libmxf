@@ -1048,7 +1048,9 @@ int op1a_is_supported(MXFPartition *headerPartition)
                  mxf_equals_ul(label, &MXF_EC_L(DVBased_50_525_60_FrameWrapped)) ||
                  mxf_equals_ul(label, &MXF_EC_L(DVBased_50_625_50_FrameWrapped)) ||
                  mxf_equals_ul(label, &MXF_EC_L(DVBased_100_1080_50_I_FrameWrapped)) ||
-                 mxf_equals_ul(label, &MXF_EC_L(DVBased_100_720_50_P_FrameWrapped)))
+                 mxf_equals_ul(label, &MXF_EC_L(DVBased_100_1080_60_I_FrameWrapped)) ||
+                 mxf_equals_ul(label, &MXF_EC_L(DVBased_100_720_50_P_FrameWrapped)) ||
+                 mxf_equals_ul(label, &MXF_EC_L(DVBased_100_720_60_P_FrameWrapped)))
         {
             supportCount++;
         }
