@@ -356,7 +356,7 @@ int process_cdci_descriptor(MXFMetadataSet *descriptorSet, MXFTrack *track, Esse
     {
         track->video.frameWidth = 960;
         track->video.frameHeight = 720;
-        track->video.displayWidth = 1290;
+        track->video.displayWidth = 1280;
         track->video.displayHeight = 720;
         track->video.displayXOffset = 0;
         track->video.displayYOffset = 0;
