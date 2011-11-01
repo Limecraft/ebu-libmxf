@@ -1690,8 +1690,6 @@ static int create_track_writer(AvidClipWriter *clipWriter, PackageDefinitions *p
                     newTrackWriter->videoLineMapLen = 2;
                     newTrackWriter->videoLineMap[0] = 21;
                     newTrackWriter->videoLineMap[1] = 584;
-                    newTrackWriter->storedHeight = 540;
-                    newTrackWriter->storedWidth = 1920; /* this differs from Avid, which sets this to 1440 */
                     newTrackWriter->displayHeight = 540;
                     newTrackWriter->displayWidth = 1920;
                     newTrackWriter->sampledHeight = 540;
@@ -1700,12 +1698,16 @@ static int create_track_writer(AvidClipWriter *clipWriter, PackageDefinitions *p
                     newTrackWriter->essenceElementKey = MXF_EE_K(DVClipWrapped);
                     if (clipWriter->projectFormat == PAL_25i)
                     {
+                        newTrackWriter->storedHeight = 540;
+                        newTrackWriter->storedWidth = 1440;
                         newTrackWriter->frameSize = 576000;
                         newTrackWriter->essenceContainerLabel = MXF_EC_L(DVBased_100_1080_50_I_ClipWrapped);
                         newTrackWriter->pictureEssenceCoding = MXF_CMDEF_L(DVBased_100_1080_50_I);
                     }
                     else
                     {
+                        newTrackWriter->storedHeight = 540;
+                        newTrackWriter->storedWidth = 1280;
                         newTrackWriter->frameSize = 480000;
                         newTrackWriter->essenceContainerLabel = MXF_EC_L(DVBased_100_1080_60_I_ClipWrapped);
                         newTrackWriter->pictureEssenceCoding = MXF_CMDEF_L(DVBased_100_1080_60_I);
@@ -1716,7 +1718,7 @@ static int create_track_writer(AvidClipWriter *clipWriter, PackageDefinitions *p
                     newTrackWriter->videoLineMap[0] = 26;
                     newTrackWriter->videoLineMap[1] = 0;
                     newTrackWriter->storedHeight = 720;
-                    newTrackWriter->storedWidth = 1280; /* this differs from Avid, which sets this to 960 */
+                    newTrackWriter->storedWidth = 960;
                     newTrackWriter->displayHeight = 720;
                     newTrackWriter->displayWidth = 1280;
                     newTrackWriter->sampledHeight = 720;
