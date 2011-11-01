@@ -2234,7 +2234,21 @@ int main(int argc, const char *argv[])
         }
         else if (inputs[i].essenceType == PCM)
         {
-            if (isPAL)
+            if (isFilm24)
+            {
+                inputs[i].frameSize = 2000 * inputs[i].bytesPerSample;
+                inputs[i].minFrameSize = inputs[i].frameSize;
+                inputs[i].frameSizeSeq[0] = inputs[i].frameSize;
+                inputs[i].frameSeqLen = 1;
+            }
+            else if (isFilm23_976)
+            {
+                inputs[i].frameSize = 2002 * inputs[i].bytesPerSample;
+                inputs[i].minFrameSize = inputs[i].frameSize;
+                inputs[i].frameSizeSeq[0] = inputs[i].frameSize;
+                inputs[i].frameSeqLen = 1;
+            }
+            else if (isPAL)
             {
                 if (haveProgressive2Video)
                 {
