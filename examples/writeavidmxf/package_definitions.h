@@ -56,10 +56,8 @@ typedef enum
     IECDV25,
     DVBased25,
     DVBased50,
-    DV1080i50,
-    /* DV1080i60 not yet supported */
-    DV720p50,
-    /* DV720p60 not yet supported */
+    DV1080i,
+    DV720p,
     IMX30,
     IMX40,
     IMX50,
