@@ -542,9 +542,9 @@ int process_cdci_descriptor(MXFMetadataSet *descriptorSet, MXFTrack *track, Esse
             {
                 /* Only support 10-bit UYVY 4:2:2 */
                 CHK_ORET(mxf_equals_ul(&track->pictureEssenceCodingLabel, &MXF_CMDEF_L(UNC_10B_422_INTERLEAVED)));
-                CHK_ORET((fieldWidth / 6) * 6 == fieldWidth);
 
-                essenceTrack->frameSize = (uint32_t)((fieldWidth + 5) / 6 * 16 * fieldHeight);
+                CHK_ORET(fieldWidth % 48 == 0);
+                essenceTrack->frameSize = (uint32_t)(fieldWidth * 8 / 3 * fieldHeight);
             }
         }
     }
@@ -636,9 +636,9 @@ int process_cdci_descriptor(MXFMetadataSet *descriptorSet, MXFTrack *track, Esse
             {
                 /* Only support 10-bit UYVY 4:2:2 */
                 CHK_ORET(mxf_equals_ul(&track->pictureEssenceCodingLabel, &MXF_CMDEF_L(UNC_10B_422_INTERLEAVED)));
-                CHK_ORET((fieldWidth / 6) * 6 == fieldWidth);
 
-                essenceTrack->frameSize = (uint32_t)((fieldWidth + 5) / 6 * 16 * fieldHeight);
+                CHK_ORET(fieldWidth % 48 == 0);
+                essenceTrack->frameSize = (uint32_t)(fieldWidth * 8 / 3 * fieldHeight);
             }
         }
     }
@@ -725,9 +725,9 @@ int process_cdci_descriptor(MXFMetadataSet *descriptorSet, MXFTrack *track, Esse
             {
                 /* Only support 10-bit UYVY 4:2:2 */
                 CHK_ORET(mxf_equals_ul(&track->pictureEssenceCodingLabel, &MXF_CMDEF_L(UNC_10B_422_INTERLEAVED)));
-                CHK_ORET((fieldWidth / 6) * 6 == fieldWidth);
 
-                essenceTrack->frameSize = (uint32_t)((fieldWidth + 5) / 6 * 16 * fieldHeight);
+                CHK_ORET(fieldWidth % 48 == 0);
+                essenceTrack->frameSize = (uint32_t)(fieldWidth * 8 / 3 * fieldHeight);
             }
         }
     }

@@ -1101,7 +1101,7 @@ int prepare_archive_mxf_file_2(MXFFile **mxfFile, const char *filename, const mx
     }
     else
     {
-        CHK_OFAIL(mxf_set_uint32_item(newOutput->cdciDescriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, StoredWidth), (VIDEO_FORMATS[formatIndex].width + 5) / 6 * 6));
+        CHK_OFAIL(mxf_set_uint32_item(newOutput->cdciDescriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, StoredWidth), (VIDEO_FORMATS[formatIndex].width + 47) / 48 * 48));
     }
     CHK_OFAIL(mxf_set_uint32_item(newOutput->cdciDescriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, StoredHeight), VIDEO_FORMATS[formatIndex].height));
     CHK_OFAIL(mxf_set_uint32_item(newOutput->cdciDescriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, DisplayWidth), VIDEO_FORMATS[formatIndex].width));
@@ -2329,7 +2329,7 @@ uint32_t get_video_frame_size(const mxfRational *frameRate, uint8_t signalStanda
     if (componentDepth == 8)
         return width * height * 2;
     else
-        return (width + 5) / 6 * 16 * height;
+        return (width + 47) / 48 * 128 * height;
 }
 
 uint32_t get_audio_frame_size(uint32_t numSamples, uint32_t audioQuantBits)

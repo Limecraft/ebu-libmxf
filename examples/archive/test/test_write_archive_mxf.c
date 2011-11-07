@@ -127,7 +127,7 @@ static void create_colour_bars(unsigned char *video_buffer, uint32_t component_d
         };
 
         unsigned short uyvy_group[12];
-        int line_stride = (width + 5) / 6 * 16;
+        int line_stride = (width + 47) / 48 * 128;
 
         for (j = 0; j < height; j++)
         {
@@ -145,6 +145,10 @@ static void create_colour_bars(unsigned char *video_buffer, uint32_t component_d
                         break;
                     }
                 }
+            }
+            if (line_stride > width/6*16)
+            {
+                memset(&video_buffer[j*line_stride + width/6*16], 0, line_stride - width/6*16);
             }
         }
     }
