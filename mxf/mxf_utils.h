@@ -43,7 +43,7 @@ extern "C"
 
 
 /* strdup was deprecated in Visual C++ 2005 */
-#if (_MSC_VER >= 1400)
+#if defined(_MSC_VER) && (_MSC_VER >= 1400)
 #define strdup _strdup
 #endif
 
