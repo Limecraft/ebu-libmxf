@@ -89,33 +89,33 @@ mxf_get_platform_wstring_func   mxf_get_platform_wstring = mxf_default_get_platf
 
 
 
-const mxfProductVersion* mxf_default_get_version()
+const mxfProductVersion* mxf_default_get_version(void)
 {
     return &g_libmxfVersion;
 }
 
-const char* mxf_default_get_platform_string()
+const char* mxf_default_get_platform_string(void)
 {
     return g_libmxfPlatformString;
 }
 
-const mxfUTF16Char* mxf_default_get_platform_wstring()
+const mxfUTF16Char* mxf_default_get_platform_wstring(void)
 {
     return g_libmxfPlatformWString;
 }
 
 
-const mxfProductVersion* mxf_regtest_get_version()
+const mxfProductVersion* mxf_regtest_get_version(void)
 {
     return &g_regtestVersion;
 }
 
-const char* mxf_regtest_get_platform_string()
+const char* mxf_regtest_get_platform_string(void)
 {
     return g_regtestPlatformString;
 }
 
-const mxfUTF16Char* mxf_regtest_get_platform_wstring()
+const mxfUTF16Char* mxf_regtest_get_platform_wstring(void)
 {
     return g_regtestPlatformWString;
 }

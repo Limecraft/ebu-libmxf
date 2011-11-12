@@ -86,7 +86,7 @@ void mxf_default_get_timestamp_now(mxfTimestamp *now);
 void mxf_default_generate_umid(mxfUMID *umid);
 void mxf_default_generate_key(mxfKey *key);
 
-void mxf_set_regtest_funcs();
+void mxf_set_regtest_funcs(void);
 void mxf_regtest_generate_uuid(mxfUUID *uuid);
 void mxf_regtest_get_timestamp_now(mxfTimestamp *now);
 void mxf_regtest_generate_umid(mxfUMID *umid);

@@ -55,22 +55,22 @@ extern "C"
 #define LIBMXF_LIBRARY_WNAME   L"libMXF"
 
 
-typedef const mxfProductVersion* (*mxf_get_version_func)();
-typedef const char* (*mxf_get_platform_string_func)();
-typedef const mxfUTF16Char* (*mxf_get_platform_wstring_func)();
+typedef const mxfProductVersion* (*mxf_get_version_func)(void);
+typedef const char* (*mxf_get_platform_string_func)(void);
+typedef const mxfUTF16Char* (*mxf_get_platform_wstring_func)(void);
 
 extern mxf_get_version_func mxf_get_version;
 extern mxf_get_platform_string_func mxf_get_platform_string;
 extern mxf_get_platform_wstring_func mxf_get_platform_wstring;
 
 
-const mxfProductVersion* mxf_default_get_version();
-const char* mxf_default_get_platform_string();
-const mxfUTF16Char* mxf_default_get_platform_wstring();
+const mxfProductVersion* mxf_default_get_version(void);
+const char* mxf_default_get_platform_string(void);
+const mxfUTF16Char* mxf_default_get_platform_wstring(void);
 
-const mxfProductVersion* mxf_regtest_get_version();
-const char* mxf_regtest_get_platform_string();
-const mxfUTF16Char* mxf_regtest_get_platform_wstring();
+const mxfProductVersion* mxf_regtest_get_version(void);
+const char* mxf_regtest_get_platform_string(void);
+const mxfUTF16Char* mxf_regtest_get_platform_wstring(void);
 
 
 

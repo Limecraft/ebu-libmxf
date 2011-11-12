@@ -86,7 +86,7 @@ extern mxf_generate_old_aafsdk_umid_func mxf_generate_old_aafsdk_umid;
 void mxf_default_generate_aafsdk_umid(mxfUMID *umid);
 void mxf_default_generate_old_aafsdk_umid(mxfUMID *umid);
 
-void mxf_avid_set_regtest_funcs();
+void mxf_avid_set_regtest_funcs(void);
 void mxf_regtest_generate_aafsdk_umid(mxfUMID *umid);
 void mxf_regtest_generate_old_aafsdk_umid(mxfUMID *umid);
 

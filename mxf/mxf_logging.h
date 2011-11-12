@@ -70,8 +70,8 @@ void mxf_log_default(MXFLogLevel level, const char *format, ...);
 /* sets mxf_log to log to the file 'filename' */
 int mxf_log_file_open(const char *filename);
 
-void mxf_log_file_flush();
-void mxf_log_file_close();
+void mxf_log_file_flush(void);
+void mxf_log_file_close(void);
 
 
 /* log level in function name */

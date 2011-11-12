@@ -736,7 +736,7 @@ void mxf_default_generate_old_aafsdk_umid(mxfUMID *umid)
 
 }
 
-void mxf_avid_set_regtest_funcs()
+void mxf_avid_set_regtest_funcs(void)
 {
     mxf_generate_aafsdk_umid = mxf_regtest_generate_aafsdk_umid;
     mxf_generate_old_aafsdk_umid = mxf_regtest_generate_old_aafsdk_umid;

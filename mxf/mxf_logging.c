@@ -147,7 +147,7 @@ int mxf_log_file_open(const char *filename)
     return 1;
 }
 
-void mxf_log_file_flush()
+void mxf_log_file_flush(void)
 {
     if (g_mxfFileLog != NULL)
     {
@@ -155,7 +155,7 @@ void mxf_log_file_flush()
     }
 }
 
-void mxf_log_file_close()
+void mxf_log_file_close(void)
 {
     if (g_mxfFileLog != NULL)
     {

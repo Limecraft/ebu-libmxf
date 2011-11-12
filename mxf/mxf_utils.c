@@ -432,7 +432,7 @@ void mxf_default_generate_key(mxfKey *key)
     memcpy(&key->octet8, &uuid.octet0, 8);
 }
 
-void mxf_set_regtest_funcs()
+void mxf_set_regtest_funcs(void)
 {
     mxf_get_version = mxf_regtest_get_version;
     mxf_get_platform_string = mxf_regtest_get_platform_string;
