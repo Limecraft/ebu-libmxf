@@ -775,21 +775,22 @@ fail:
 
 void mxf_file_close(MXFFile **mxfFile)
 {
-    if (*mxfFile == NULL)
-    {
+    return mxf_file_close_2(mxfFile, free);
+}
+
+void mxf_file_close_2(MXFFile **mxfFile, void (*free_func)(void*))
+{
+    if (!(*mxfFile))
         return;
-    }
 
-    if ((*mxfFile)->sysData != NULL)
-    {
+    if ((*mxfFile)->sysData) {
         (*mxfFile)->close((*mxfFile)->sysData);
-        if ((*mxfFile)->free_sys_data != NULL)
-        {
+        if ((*mxfFile)->free_sys_data)
             (*mxfFile)->free_sys_data((*mxfFile)->sysData);
-        }
     }
 
-    SAFE_FREE(mxfFile);
+    free_func(*mxfFile);
+    *mxfFile = NULL;
 }
 
 uint32_t mxf_file_read(MXFFile *mxfFile, uint8_t *data, uint32_t count)

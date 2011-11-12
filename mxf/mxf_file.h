@@ -84,6 +84,7 @@ int mxf_byte_array_wrap_modify(uint8_t *byteArray, int64_t size, MXFFile **mxfFi
 
 
 void mxf_file_close(MXFFile **mxfFile);
+void mxf_file_close_2(MXFFile **mxfFile, void (*free_func)(void*));
 uint32_t mxf_file_read(MXFFile *mxfFile, uint8_t *data, uint32_t count);
 uint32_t mxf_file_write(MXFFile *mxfFile, const uint8_t *data, uint32_t count);
 int mxf_file_getc(MXFFile *mxfFile);
