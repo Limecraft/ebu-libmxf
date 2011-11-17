@@ -58,9 +58,10 @@ extern "C"
 
 
 
-/* ? not sure this label is correct */
+/* 10-bit uncompressed */
 
-static const mxfUL MXF_CMDEF_L(AvidMJPEG1110B_NTSC) = MXF_AVID_LABEL(0x03, 0x01, 0x01, 0x03, 0x01, 0x00);
+static const mxfUL MXF_CMDEF_L(AvidUncSD10Bit)  = MXF_AVID_LABEL(0x03, 0x01, 0x01, 0x03, 0x01, 0x00);
+static const mxfUL MXF_CMDEF_L(AvidUncHD10Bit)  = MXF_AVID_LABEL(0x03, 0x01, 0x01, 0x03, 0x02, 0x00);
 
 
 /* MJPEG */
@@ -174,6 +175,14 @@ static const mxfUL MXF_EC_L(DNxHD720p1251ClipWrapped)   = MXF_AVID_DNXHD_EC_L(0x
 static const mxfUL MXF_EC_L(DNxHD720p1252ClipWrapped)   = MXF_AVID_DNXHD_EC_L(0x03, 0x03);
 
 
+/* 10-bit uncompressed */
+
+static const mxfUL MXF_EC_L(AvidUnc10Bit625ClipWrapped)     = MXF_AVID_EC_L(0x07, 0x01, 0x0a);
+static const mxfUL MXF_EC_L(AvidUnc10Bit525ClipWrapped)     = MXF_AVID_EC_L(0x07, 0x01, 0x09);
+static const mxfUL MXF_EC_L(AvidUnc10Bit1080iClipWrapped)   = MXF_AVID_EC_L(0x07, 0x02, 0x01);
+static const mxfUL MXF_EC_L(AvidUnc10Bit720pClipWrapped)    = MXF_AVID_EC_L(0x07, 0x02, 0x03);
+
+
 
 /*
  *
@@ -222,12 +231,10 @@ static const mxfKey MXF_EE_K(AES3ClipWrapped) = MXF_AES3BWF_EE_K(0x01, MXF_AES3_
 
 /* Uncompressed */
 
-static const mxfKey MXF_EE_K(UncClipWrapped) = MXF_UNC_EE_K(0x01, MXF_UNC_CLIP_WRAPPED_EE_TYPE, 0x01);
+static const mxfKey MXF_EE_K(UncClipWrapped)            = MXF_UNC_EE_K(0x01, MXF_UNC_CLIP_WRAPPED_EE_TYPE, 0x01);
+static const mxfKey MXF_EE_K(AvidUnc10BitClipWrapped)   = MXF_AVID_EE_K(0x15, 0x01, 0x07, 0x01);
 
-/* Label observed in file produced by media Composer 3.0 */
-static const mxfKey MXF_EE_K(AvidUnc10BitClipWrapped) = MXF_AVID_EE_K(0x15, 0x01, 0x07, 0x01);
-
-#define MXF_AVID_UNC_10BIT_PICT_TRACK_NUM  MXF_TRACK_NUM(0x15, 0x01, 0x07, 0x01)
+#define MXF_AVID_UNC_10BIT_PICT_TRACK_NUM   MXF_TRACK_NUM(0x15, 0x01, 0x07, 0x01)
 
 
 
@@ -241,9 +248,11 @@ static const mxfKey MXF_EE_K(AvidUnc10BitClipWrapped) = MXF_AVID_EE_K(0x15, 0x01
     static const uint32_t g_##name##_ResolutionID = id
 
 
-/* ? not sure these 2 are correct */
-AVID_RESOLUTION_ID(AvidMJPEG1110B_NTSC, 0x07e5);
-AVID_RESOLUTION_ID(AvidMJPEG118B_NTSC,  0xaa);
+AVID_RESOLUTION_ID(AvidUnc10Bit_1080i,  0x07d0);
+AVID_RESOLUTION_ID(AvidUnc10Bit_720p,   0x07d4);
+AVID_RESOLUTION_ID(AvidUnc10Bit_PAL,    0x07e6);
+AVID_RESOLUTION_ID(AvidUnc10Bit_NTSC,   0x07e5);
+AVID_RESOLUTION_ID(AvidUnc8Bit,         0x00aa);
 
 AVID_RESOLUTION_ID(AvidMJPEG101,    0x4b);
 AVID_RESOLUTION_ID(AvidMJPEG21,     0x4c);
