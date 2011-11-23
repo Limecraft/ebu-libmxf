@@ -180,6 +180,7 @@ static const mxfUL MXF_EC_L(DNxHD720p1252ClipWrapped)   = MXF_AVID_DNXHD_EC_L(0x
 static const mxfUL MXF_EC_L(AvidUnc10Bit625ClipWrapped)     = MXF_AVID_EC_L(0x07, 0x01, 0x0a);
 static const mxfUL MXF_EC_L(AvidUnc10Bit525ClipWrapped)     = MXF_AVID_EC_L(0x07, 0x01, 0x09);
 static const mxfUL MXF_EC_L(AvidUnc10Bit1080iClipWrapped)   = MXF_AVID_EC_L(0x07, 0x02, 0x01);
+static const mxfUL MXF_EC_L(AvidUnc10Bit1080pClipWrapped)   = MXF_AVID_EC_L(0x07, 0x02, 0x02);
 static const mxfUL MXF_EC_L(AvidUnc10Bit720pClipWrapped)    = MXF_AVID_EC_L(0x07, 0x02, 0x03);
 
 
@@ -249,6 +250,7 @@ static const mxfKey MXF_EE_K(AvidUnc10BitClipWrapped)   = MXF_AVID_EE_K(0x15, 0x
 
 
 AVID_RESOLUTION_ID(AvidUnc10Bit_1080i,  0x07d0);
+AVID_RESOLUTION_ID(AvidUnc10Bit_1080p,  0x07d3);
 AVID_RESOLUTION_ID(AvidUnc10Bit_720p,   0x07d4);
 AVID_RESOLUTION_ID(AvidUnc10Bit_PAL,    0x07e6);
 AVID_RESOLUTION_ID(AvidUnc10Bit_NTSC,   0x07e5);
