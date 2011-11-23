@@ -1245,7 +1245,7 @@ int mxf_avid_read_index_table_segment_2(MXFFile *mxfFile, uint64_t segmentLen,
                 SAFE_FREE(&posTable);
                 break;
             default:
-                mxf_log_warn("Unknown local item (%u) in index table segment", localTag);
+                mxf_log_warn("Unknown local item (%u) in index table segment\n", localTag);
                 CHK_OFAIL(mxf_skip(mxfFile, localLen));
         }
 
