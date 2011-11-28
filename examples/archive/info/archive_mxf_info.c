@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006, British Broadcasting Corporation
+ * Copyright (C) 2011, British Broadcasting Corporation
  * All Rights Reserved.
  *
  * Author: Philip de Nier, Jim Easterbrook
@@ -82,7 +82,7 @@ typedef struct
     uint32_t componentDepth;
     mxfRational aspectRatio;
     int numAudioTracks;
-    mxfLength duration;
+    int64_t duration;
     int64_t contentPackageLen;
 
     MXFList pseFailures;
@@ -355,7 +355,7 @@ static int initialise_timecode_reader(Reader *reader)
     return 1;
 }
 
-static int read_timecode_at_position(Reader *reader, mxfPosition position,
+static int read_timecode_at_position(Reader *reader, int64_t position,
     ArchiveTimecode *vitc, ArchiveTimecode *ltc)
 {
     mxfKey key;
@@ -419,7 +419,7 @@ static int read_timecode_at_position(Reader *reader, mxfPosition position,
     return 1;
 }
 
-static int read_time_string_at_position(Reader *reader, mxfPosition position,
+static int read_time_string_at_position(Reader *reader, int64_t position,
                                         char *vitcStr, size_t vitcStrSize, char *ltcStr, size_t ltcStrSize)
 {
     ArchiveTimecode vitc;
@@ -642,7 +642,7 @@ static int get_info(Reader *reader, int showPSEFailures, int showVTRErrors, int 
     MXFArrayItemIterator arrayIter;
     MXFArrayItemIterator arrayIter2;
     mxfUL dataDef;
-    mxfLength duration;
+    int64_t duration;
     mxfRational palEditRate = {25, 1};
     uint32_t sequenceComponentCount;
     uint8_t *arrayElement;
