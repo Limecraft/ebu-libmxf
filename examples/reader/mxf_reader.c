@@ -55,6 +55,16 @@ typedef struct
     uint32_t last;
 } TrackNumberRange;
 
+typedef struct
+{
+    uint32_t framesPerMin;
+    uint32_t nonDropFramesPerMin;
+    uint32_t framesPer10Min;
+    uint32_t framesPerHour;
+    int64_t maxOffset;
+    int16_t dropCount;
+} TimecodeInfo;
+
 
 
 static void insert_track_number(TrackNumberRange *trackNumbers, uint32_t trackNumber, int *numTrackNumberRanges)
@@ -253,59 +263,93 @@ static int create_tracks_string(MXFReader *reader)
     return 1;
 }
 
+static void get_timecode_info(int dropFrame, uint16_t roundedTCBase, TimecodeInfo *info)
+{
+    if (dropFrame && (roundedTCBase == 30 || roundedTCBase == 60)) {
+        // first 2 frame numbers shall be omitted at the start of each minute,
+        // except minutes 0, 10, 20, 30, 40 and 50
+        info->dropCount = 2;
+        if (roundedTCBase == 60)
+            info->dropCount *= 2;
+        info->framesPerMin = roundedTCBase * 60 - info->dropCount;
+        info->framesPer10Min = info->framesPerMin * 10 + info->dropCount;
+    } else {
+        info->dropCount = 0;
+        info->framesPerMin = roundedTCBase * 60;
+        info->framesPer10Min = info->framesPerMin * 10;
+    }
+    info->framesPerHour = info->framesPer10Min * 6;
+    info->nonDropFramesPerMin = roundedTCBase * 60;
+
+    info->maxOffset = 24 * info->framesPerHour;
+}
+
 static mxfPosition timecode_to_offset(const MXFTimecode *timecode, uint16_t roundedTCBase)
 {
-    int64_t offset = timecode->hour * 60 * 60 * roundedTCBase +
-                     timecode->min * 60 * roundedTCBase +
-                     timecode->sec * roundedTCBase +
-                     timecode->frame;
-    if (timecode->isDropFrame)
-    {
-        /* first 2 frame numbers shall be omitted at the start of each minute,
-           except minutes 0, 10, 20, 30, 40 and 50 */
+    TimecodeInfo info;
+    int64_t offset;
 
-        /* calculate number frames skipped */
-        offset -= (60-6) * 2 * timecode->hour;  /* every whole hour */
-        offset -= (timecode->min / 10) * 9 * 2; /* every whole 10 min */
-        offset -= (timecode->min % 10) * 2;     /* every whole min, except min 0 */
+    get_timecode_info(timecode->isDropFrame, roundedTCBase, &info);
+
+    offset = timecode->hour * info.framesPerHour;
+    if (info.dropCount > 0) {
+        offset += (timecode->min / 10) * info.framesPer10Min;
+        offset += (timecode->min % 10) * info.framesPerMin;
+    } else {
+        offset += timecode->min * info.framesPerMin;
     }
+    offset += timecode->sec * roundedTCBase;
+    if (info.dropCount > 0 && timecode->sec == 0 && (timecode->min % 10) && timecode->frame < info.dropCount)
+        offset += info.dropCount;
+    else
+        offset += timecode->frame;
 
     return offset;
 }
 
-static void offset_to_timecode(mxfPosition offset, uint16_t roundedTCBase, int dropFrame, MXFTimecode* timecode)
+static void offset_to_timecode(mxfPosition offset_in, uint16_t roundedTCBase, int dropFrame, MXFTimecode* timecode)
 {
-    int64_t count = offset;
+    int64_t offset = offset_in;
+    int frames_dropped = 0;
+    TimecodeInfo info;
 
-    if (dropFrame)
-    {
-        // first 2 frame numbers shall be omitted at the start of each minute,
-        //   except minutes 0, 10, 20, 30, 40 and 50
+    get_timecode_info(dropFrame, roundedTCBase, &info);
 
-        int hour, min;
-        int64_t prev_skipped_count = -1;
-        int64_t skipped_count = 0;
-        while (prev_skipped_count != skipped_count)
-        {
-            prev_skipped_count = skipped_count;
+    offset %= info.maxOffset;
+    if (offset < 0)
+        offset += info.maxOffset;
 
-            hour = (int)((count + skipped_count) / (60 * 60 * roundedTCBase));
-            min = (int)(((count + skipped_count) % (60 * 60 * roundedTCBase)) / (60 * roundedTCBase));
-
-            // add frames skipped
-            skipped_count  = (60-6) * 2 * hour;      // every whole hour
-            skipped_count += (min / 10) * 9 * 2;    // every whole 10 min
-            skipped_count += (min % 10) * 2;        // every whole min, except min 0
-        }
-
-        count += skipped_count;
+    timecode->isDropFrame = (info.dropCount > 0);
+    timecode->hour = (int16_t)(offset / info.framesPerHour);
+    offset = offset % info.framesPerHour;
+    timecode->min = (int16_t)(offset / info.framesPer10Min * 10);
+    offset = offset % info.framesPer10Min;
+    if (offset >= info.nonDropFramesPerMin) {
+        offset -= info.nonDropFramesPerMin;
+        timecode->min += (int16_t)((offset / info.framesPerMin) + 1);
+        offset = offset % info.framesPerMin;
+        frames_dropped = timecode->isDropFrame;
     }
+    timecode->sec = (int16_t)(offset / roundedTCBase);
+    timecode->frame = (int16_t)(offset % roundedTCBase);
 
-    timecode->isDropFrame = dropFrame;
-    timecode->hour        = (int)(  count / (60 * 60 * roundedTCBase));
-    timecode->min         = (int)(( count % (60 * 60 * roundedTCBase)) / (60 * roundedTCBase));
-    timecode->sec         = (int)(((count % (60 * 60 * roundedTCBase)) % (60 * roundedTCBase)) / roundedTCBase);
-    timecode->frame       = (int)(((count % (60 * 60 * roundedTCBase)) % (60 * roundedTCBase)) % roundedTCBase);
+    if (frames_dropped) {
+        timecode->frame += info.dropCount;
+        if (timecode->frame >= roundedTCBase) {
+            timecode->frame -= roundedTCBase;
+            timecode->sec++;
+            if (timecode->sec >= 60) {
+                timecode->sec = 0;
+                timecode->min++;
+                if (timecode->min >= 60) {
+                    timecode->min = 0;
+                    timecode->hour++;
+                    if (timecode->hour >= 24)
+                        timecode->hour = 0;
+                }
+            }
+        }
+    }
 }
 
 static int convert_timecode_to_position(TimecodeIndex *index, MXFTimecode *timecode, mxfPosition *position)
