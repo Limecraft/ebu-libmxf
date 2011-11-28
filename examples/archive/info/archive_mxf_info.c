@@ -319,9 +319,9 @@ static int check_can_read_rip(Reader *reader)
 static void convert_12m_to_timecode(uint8_t *t12m, ArchiveTimecode *t)
 {
     t->frame = ((t12m[0] >> 4) & 0x03) * 10 + (t12m[0] & 0xf);
-    t->sec = ((t12m[1] >> 4) & 0x07) * 10 + (t12m[1] & 0xf);
-    t->min = ((t12m[2] >> 4) & 0x07) * 10 + (t12m[2] & 0xf);
-    t->hour = ((t12m[3] >> 4) & 0x03) * 10 + (t12m[3] & 0xf);
+    t->sec   = ((t12m[1] >> 4) & 0x07) * 10 + (t12m[1] & 0xf);
+    t->min   = ((t12m[2] >> 4) & 0x07) * 10 + (t12m[2] & 0xf);
+    t->hour  = ((t12m[3] >> 4) & 0x03) * 10 + (t12m[3] & 0xf);
 }
 
 static int initialise_timecode_reader(Reader *reader)
@@ -356,7 +356,7 @@ static int initialise_timecode_reader(Reader *reader)
 }
 
 static int read_timecode_at_position(Reader *reader, int64_t position,
-    ArchiveTimecode *vitc, ArchiveTimecode *ltc)
+                                     ArchiveTimecode *vitc, ArchiveTimecode *ltc)
 {
     mxfKey key;
     uint8_t llen;
@@ -370,8 +370,8 @@ static int read_timecode_at_position(Reader *reader, int64_t position,
 
     /* position at frame */
     CHK_ORET(mxf_file_seek(reader->mxfFile,
-        reader->essenceDataStart + position * reader->contentPackageLen,
-        SEEK_SET));
+                           reader->essenceDataStart + position * reader->contentPackageLen,
+                           SEEK_SET));
 
     /* read and check the kl */
     CHK_ORET(mxf_read_kl(reader->mxfFile, &key, &llen, &len));
@@ -420,7 +420,8 @@ static int read_timecode_at_position(Reader *reader, int64_t position,
 }
 
 static int read_time_string_at_position(Reader *reader, int64_t position,
-                                        char *vitcStr, size_t vitcStrSize, char *ltcStr, size_t ltcStrSize)
+                                        char *vitcStr, size_t vitcStrSize,
+                                        char *ltcStr, size_t ltcStrSize)
 {
     ArchiveTimecode vitc;
     ArchiveTimecode ltc;
@@ -428,7 +429,7 @@ static int read_time_string_at_position(Reader *reader, int64_t position,
     CHK_ORET(read_timecode_at_position(reader, position, &vitc, &ltc));
 
     snprintf(vitcStr, vitcStrSize, "%02d:%02d:%02d:%02d", vitc.hour, vitc.min, vitc.sec, vitc.frame);
-    snprintf(ltcStr, ltcStrSize, "%02d:%02d:%02d:%02d", ltc.hour, ltc.min, ltc.sec, ltc.frame);
+    snprintf(ltcStr,  ltcStrSize,  "%02d:%02d:%02d:%02d", ltc.hour, ltc.min, ltc.sec, ltc.frame);
 
     return 1;
 }
@@ -632,7 +633,8 @@ static int get_infax_data(Reader *reader, InfaxData *infaxData)
     return 1;
 }
 
-static int get_info(Reader *reader, int showPSEFailures, int showVTRErrors, int showDigiBetaDropouts, int showTimecodeBreaks)
+static int get_info(Reader *reader, int showPSEFailures, int showVTRErrors, int showDigiBetaDropouts,
+                    int showTimecodeBreaks)
 {
     mxfKey key;
     uint8_t llen;
@@ -1045,12 +1047,12 @@ static void write_vtr_errors(Reader *reader, int noSourceTimecode)
         if (noSourceTimecode)
         {
             printf("    %10s:%10s %10s    %s\n",
-                "num", "frame", "code", "description");
+                   "num", "frame", "code", "description");
         }
         else
         {
             printf("    %10s:%10s%16s%16s %10s    %s\n",
-                "num", "frame", "vitc", "ltc", "code", "description");
+                   "num", "frame", "vitc", "ltc", "code", "description");
         }
 
         count = 0;
@@ -1136,12 +1138,12 @@ static void write_digibeta_dropouts(Reader *reader, int noSourceTimecode)
         if (noSourceTimecode)
         {
             printf("    %10s:%10s %10s\n",
-                "num", "frame", "strength");
+                   "num", "frame", "strength");
         }
         else
         {
             printf("    %10s:%10s%16s%16s %10s\n",
-                "num", "frame", "vitc", "ltc", "strength");
+                   "num", "frame", "vitc", "ltc", "strength");
         }
 
         count = 0;
@@ -1177,12 +1179,12 @@ static void write_timecode_breaks(Reader *reader, int noSourceTimecode)
         if (noSourceTimecode)
         {
             printf("    %10s:%10s %10s\n",
-                "num", "frame", "type");
+                   "num", "frame", "type");
         }
         else
         {
             printf("    %10s:%10s%16s%16s %10s\n",
-                "num", "frame", "vitc", "ltc", "type");
+                   "num", "frame", "vitc", "ltc", "type");
         }
 
         count = 0;
@@ -1209,23 +1211,23 @@ static void write_infax_data(InfaxData *infaxData)
     printf("    Programme title: %s\n", infaxData->progTitle);
     printf("    Episode title: %s\n", infaxData->epTitle);
     printf("    Transmission date: %04u-%02u-%02u\n",
-        infaxData->txDate.year,
-        infaxData->txDate.month,
-        infaxData->txDate.day);
+           infaxData->txDate.year,
+           infaxData->txDate.month,
+           infaxData->txDate.day);
     printf("    Magazine prefix: %s\n", infaxData->magPrefix);
     printf("    Programme number: %s\n", infaxData->progNo);
     printf("    Production code: %s\n", infaxData->prodCode);
     printf("    Spool status: %s\n", infaxData->spoolStatus);
     printf("    Stock date: %04u-%02u-%02u\n",
-        infaxData->stockDate.year,
-        infaxData->stockDate.month,
-        infaxData->stockDate.day);
+           infaxData->stockDate.year,
+           infaxData->stockDate.month,
+           infaxData->stockDate.day);
     printf("    Spool descriptor: %s\n", infaxData->spoolDesc);
     printf("    Memo: %s\n", infaxData->memo);
     printf("    Duration: %02"PRId64":%02"PRId64":%02"PRId64"\n",
-        infaxData->duration / (60 * 60),
-        (infaxData->duration % (60 * 60)) / 60,
-        (infaxData->duration % (60 * 60)) % 60);
+           infaxData->duration / (60 * 60),
+           (infaxData->duration % (60 * 60)) / 60,
+           (infaxData->duration % (60 * 60)) % 60);
     printf("    Spool number: %s\n", infaxData->spoolNo);
     printf("    Accession number: %s\n", infaxData->accNo);
     printf("    Catalogue detail: %s\n", infaxData->catDetail);
@@ -1256,35 +1258,36 @@ static int write_info(Reader *reader, int showPSEFailures, int showVTRErrors, in
         if (i == 0)
         {
             printf("%d) Created on %04d-%02u-%02u %02u:%02u:%02u.%03u UTC using ", i,
-            writerIdent->modificationDate.year, writerIdent->modificationDate.month,
-            writerIdent->modificationDate.day, writerIdent->modificationDate.hour,
-            writerIdent->modificationDate.min, writerIdent->modificationDate.sec,
-            writerIdent->modificationDate.qmsec * 4);
+                   writerIdent->modificationDate.year, writerIdent->modificationDate.month,
+                   writerIdent->modificationDate.day, writerIdent->modificationDate.hour,
+                   writerIdent->modificationDate.min, writerIdent->modificationDate.sec,
+                   writerIdent->modificationDate.qmsec * 4);
         }
         else
         {
             printf("%d) Modified %04d-%02u-%02u %02u:%02u:%02u.%03u UTC using ", i,
-                writerIdent->modificationDate.year, writerIdent->modificationDate.month,
-                writerIdent->modificationDate.day, writerIdent->modificationDate.hour,
-                writerIdent->modificationDate.min, writerIdent->modificationDate.sec,
-                writerIdent->modificationDate.qmsec * 4);
+                   writerIdent->modificationDate.year, writerIdent->modificationDate.month,
+                   writerIdent->modificationDate.day, writerIdent->modificationDate.hour,
+                   writerIdent->modificationDate.min, writerIdent->modificationDate.sec,
+                   writerIdent->modificationDate.qmsec * 4);
         }
         printf("%ls '%ls' ('%ls')\n", writerIdent->companyName,
-            writerIdent->productName, writerIdent->versionString);
+               writerIdent->productName, writerIdent->versionString);
         i++;
     }
 
 
     printf("\nAV contents:\n");
     printf("    %d video tracks (%d-bit uncompressed UYVY 4:2:2, aspect ratio %d:%d, 25 fps), %d audio tracks (20-bit PCM at 48kHz) \n",
-        reader->numVideoTracks, reader->componentDepth, reader->aspectRatio.numerator, reader->aspectRatio.denominator,
-        reader->numAudioTracks);
+           reader->numVideoTracks, reader->componentDepth,
+           reader->aspectRatio.numerator, reader->aspectRatio.denominator,
+           reader->numAudioTracks);
     printf("    duration is %"PRId64" frames at 25 fps (%02u:%02u:%02u:%02u)\n",
-        reader->duration,
-        (uint8_t)(reader->duration / (25 * 60 * 60)),
-        (uint8_t)((reader->duration % (25 * 60 * 60)) / (25 * 60)),
-        (uint8_t)(((reader->duration % (25 * 60 * 60)) % (25 * 60)) / 25),
-        (uint8_t)(((reader->duration % (25 * 60 * 60)) % (25 * 60)) % 25));
+           reader->duration,
+           (uint8_t)(reader->duration / (25 * 60 * 60)),
+           (uint8_t)((reader->duration % (25 * 60 * 60)) / (25 * 60)),
+           (uint8_t)(((reader->duration % (25 * 60 * 60)) % (25 * 60)) / 25),
+           (uint8_t)(((reader->duration % (25 * 60 * 60)) % (25 * 60)) % 25));
 
 
     printf("\nSource videotape information:\n");
@@ -1336,12 +1339,12 @@ static int write_info(Reader *reader, int showPSEFailures, int showVTRErrors, in
             if (noSourceTimecode)
             {
                 printf("    %10s: %10s%10s%10s%10s%10s\n",
-                    "num", "frame", "red", "spatial", "lumin", "ext");
+                       "num", "frame", "red", "spatial", "lumin", "ext");
             }
             else
             {
                 printf("    %10s: %10s%16s%16s%10s%10s%10s%10s\n",
-                    "num", "frame", "vitc", "ltc", "red", "spatial", "lumin", "ext");
+                       "num", "frame", "vitc", "ltc", "red", "spatial", "lumin", "ext");
             }
 
             count = 0;
@@ -1452,9 +1455,9 @@ static int write_summary(Reader *reader, int showPSEFailures, int showVTRErrors,
     printf("Programme number: %s\n", infaxData->progNo);
     printf("Production code: %s\n", infaxData->prodCode);
     printf("Duration: %02"PRId64":%02"PRId64":%02"PRId64"\n",
-        infaxData->duration / (60 * 60),
-        (infaxData->duration % (60 * 60)) / 60,
-        (infaxData->duration % (60 * 60)) % 60);
+           infaxData->duration / (60 * 60),
+           (infaxData->duration % (60 * 60)) / 60,
+           (infaxData->duration % (60 * 60)) % 60);
     printf("Spool number: %s\n", infaxData->spoolNo);
     printf("Accession number: %s\n", infaxData->accNo);
     printf("Catalogue detail: %s\n", infaxData->catDetail);
@@ -1624,37 +1627,37 @@ int main(int argc, const char *argv[])
             return 0;
         }
         else if (strcmp(argv[cmdlnIndex], "-v") == 0 ||
-            strcmp(argv[cmdlnIndex], "--show-vtr-errors") == 0)
+                 strcmp(argv[cmdlnIndex], "--show-vtr-errors") == 0)
         {
             showVTRErrors = 1;
             cmdlnIndex += 1;
         }
         else if (strcmp(argv[cmdlnIndex], "-p") == 0 ||
-            strcmp(argv[cmdlnIndex], "--show-pse-failures") == 0)
+                 strcmp(argv[cmdlnIndex], "--show-pse-failures") == 0)
         {
             showPSEFailures = 1;
             cmdlnIndex += 1;
         }
         else if (strcmp(argv[cmdlnIndex], "-d") == 0 ||
-            strcmp(argv[cmdlnIndex], "--show-digi-dropouts") == 0)
+                 strcmp(argv[cmdlnIndex], "--show-digi-dropouts") == 0)
         {
             showDigiBetaDropouts = 1;
             cmdlnIndex += 1;
         }
         else if (strcmp(argv[cmdlnIndex], "-b") == 0 ||
-            strcmp(argv[cmdlnIndex], "--show-tc-breaks") == 0)
+                 strcmp(argv[cmdlnIndex], "--show-tc-breaks") == 0)
         {
             showTimecodeBreaks = 1;
             cmdlnIndex += 1;
         }
         else if (strcmp(argv[cmdlnIndex], "-s") == 0 ||
-            strcmp(argv[cmdlnIndex], "--summary-info") == 0)
+                 strcmp(argv[cmdlnIndex], "--summary-info") == 0)
         {
             summary = 1;
             cmdlnIndex += 1;
         }
         else if (strcmp(argv[cmdlnIndex], "-t") == 0 ||
-            strcmp(argv[cmdlnIndex], "--no-src-tc") == 0)
+                 strcmp(argv[cmdlnIndex], "--no-src-tc") == 0)
         {
             noSourceTimecode = 1;
             cmdlnIndex += 1;
