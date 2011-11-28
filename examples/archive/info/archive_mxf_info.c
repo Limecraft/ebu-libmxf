@@ -79,9 +79,15 @@ typedef struct
     uint32_t timecodeBreakCount;
 
     int numVideoTracks;
+    uint32_t videoWidth;
+    uint32_t videoHeight;
     uint32_t componentDepth;
     mxfRational aspectRatio;
+    int isProgressive;
     int numAudioTracks;
+    mxfRational audioSamplingRate;
+    uint32_t audioQuantizationBits;
+    mxfRational editRate;
     int64_t duration;
     int64_t contentPackageLen;
 
@@ -645,7 +651,6 @@ static int get_info(Reader *reader, int showPSEFailures, int showVTRErrors, int 
     MXFArrayItemIterator arrayIter2;
     mxfUL dataDef;
     int64_t duration;
-    mxfRational palEditRate = {25, 1};
     uint32_t sequenceComponentCount;
     uint8_t *arrayElement;
     uint32_t arrayElementLen;
@@ -657,6 +662,8 @@ static int get_info(Reader *reader, int showPSEFailures, int showVTRErrors, int 
     uint64_t headerByteCount;
     MXFListIterator setsIter;
     int fileIsComplete;
+    mxfRational editRate;
+    uint8_t frameLayout;
 
 
     /* read the header partition pack */
@@ -795,7 +802,65 @@ static int get_info(Reader *reader, int showPSEFailures, int showVTRErrors, int 
     mxf_free_list(&reader->list);
 
 
-    /* process file SourcePackage CDCIDescriptor for aspect ratio and component depth */
+    /* process the MaterialPackage for edit rate and duration */
+
+    CHK_ORET(mxf_find_singular_set_by_key(reader->headerMetadata, &MXF_SET_K(MaterialPackage), &reader->materialPackageSet));
+    CHK_ORET(mxf_uu_get_package_tracks(reader->materialPackageSet, &arrayIter));
+    while (mxf_uu_next_track(reader->headerMetadata, &arrayIter, &reader->materialPackageTrackSet))
+    {
+        CHK_ORET(mxf_uu_get_track_datadef(reader->materialPackageTrackSet, &dataDef));
+
+        if (!mxf_is_picture(&dataDef) && !mxf_is_sound(&dataDef))
+        {
+            continue;
+        }
+
+        /* edit rate and duration */
+        CHK_ORET(mxf_get_rational_item(reader->materialPackageTrackSet, &MXF_ITEM_K(Track, EditRate), &editRate));
+        CHK_ORET(mxf_uu_get_track_duration(reader->materialPackageTrackSet, &duration));
+
+        if (reader->editRate.numerator == 0)
+        {
+            reader->editRate = editRate;
+            reader->duration = duration;
+        }
+        else if (reader->numVideoTracks == 0 && mxf_is_picture(&dataDef))
+        {
+            /* swap duration and edit rate to that the video edit rate is used as the package edit rate */
+            int64_t tmpDuration;
+            mxfRational tmpEditRate;
+
+            tmpEditRate = reader->editRate;
+            reader->editRate = editRate;
+            editRate = tmpEditRate;
+            tmpDuration = reader->duration;
+            reader->duration = duration;
+            duration = tmpDuration;
+        }
+
+        /* package duration is the minimum track duration */
+        if (editRate.numerator   != reader->editRate.numerator ||
+            editRate.denominator != reader->editRate.denominator)
+        {
+            duration = duration * reader->editRate.numerator * editRate.denominator /
+                            (reader->editRate.denominator * editRate.numerator);
+        }
+        if (duration < reader->duration)
+        {
+            reader->duration = duration;
+        }
+
+        if (mxf_is_picture(&dataDef))
+        {
+            reader->numVideoTracks++;
+        }
+        else
+        {
+            reader->numAudioTracks++;
+        }
+    }
+
+    /* process file SourcePackage CDCIDescriptor and WAVEAudioDescriptor */
 
     CHK_ORET(mxf_uu_get_top_file_package(reader->headerMetadata, &reader->fileSourcePackageSet));
 
@@ -804,11 +869,26 @@ static int get_info(Reader *reader, int showPSEFailures, int showVTRErrors, int 
     mxf_initialise_array_item_iterator(reader->descriptorSet, &MXF_ITEM_K(MultipleDescriptor, SubDescriptorUIDs), &arrayIter);
     while (mxf_next_array_item_element(&arrayIter, &arrayElement, &arrayElementLen))
     {
-        CHK_ORET(mxf_get_strongref(reader->headerMetadata, arrayElement, &reader->cdciDescriptorSet));
-        if (mxf_is_subclass_of(reader->headerMetadata->dataModel, &reader->cdciDescriptorSet->key, &MXF_SET_K(CDCIEssenceDescriptor)))
+        CHK_ORET(mxf_get_strongref(reader->headerMetadata, arrayElement, &reader->descriptorSet));
+        if (mxf_is_subclass_of(reader->headerMetadata->dataModel, &reader->descriptorSet->key, &MXF_SET_K(CDCIEssenceDescriptor)))
         {
-            CHK_ORET(mxf_get_rational_item(reader->cdciDescriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, AspectRatio), &reader->aspectRatio));
-            CHK_ORET(mxf_get_uint32_item(reader->cdciDescriptorSet, &MXF_ITEM_K(CDCIEssenceDescriptor, ComponentDepth), &reader->componentDepth));
+            CHK_ORET(mxf_get_rational_item(reader->descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, AspectRatio), &reader->aspectRatio));
+            CHK_ORET(mxf_get_uint32_item(reader->descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, DisplayWidth), &reader->videoWidth));
+            CHK_ORET(mxf_get_uint32_item(reader->descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, DisplayHeight), &reader->videoHeight));
+            CHK_ORET(mxf_get_uint32_item(reader->descriptorSet, &MXF_ITEM_K(CDCIEssenceDescriptor, ComponentDepth), &reader->componentDepth));
+            if (mxf_have_item(reader->descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, FrameLayout)))
+            {
+                CHK_ORET(mxf_get_uint8_item(reader->descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, FrameLayout), &frameLayout));
+                if (frameLayout == MXF_FULL_FRAME || frameLayout == MXF_SEGMENTED_FRAME)
+                {
+                    reader->isProgressive = 1;
+                }
+            }
+        }
+        if (mxf_is_subclass_of(reader->headerMetadata->dataModel, &reader->descriptorSet->key, &MXF_SET_K(GenericSoundEssenceDescriptor)))
+        {
+            CHK_ORET(mxf_get_rational_item(reader->descriptorSet, &MXF_ITEM_K(GenericSoundEssenceDescriptor, AudioSamplingRate), &reader->audioSamplingRate));
+            CHK_ORET(mxf_get_uint32_item(reader->descriptorSet, &MXF_ITEM_K(GenericSoundEssenceDescriptor, QuantizationBits), &reader->audioQuantizationBits));
         }
     }
 
@@ -818,40 +898,6 @@ static int get_info(Reader *reader, int showPSEFailures, int showVTRErrors, int 
     while (mxf_uu_next_track(reader->headerMetadata, &arrayIter, &reader->sourcePackageTrackSet))
     {
         CHK_ORET(mxf_uu_get_track_datadef(reader->sourcePackageTrackSet, &dataDef));
-
-        /* AV contents info */
-
-        if (mxf_is_picture(&dataDef) || mxf_is_sound(&dataDef))
-        {
-            if (mxf_is_picture(&dataDef))
-            {
-                reader->numVideoTracks++;
-            }
-            else
-            {
-                reader->numAudioTracks++;
-            }
-
-            CHK_ORET(mxf_uu_get_track_duration_at_rate(reader->sourcePackageTrackSet, &palEditRate, &duration));
-            if (reader->duration == 0)
-            {
-                reader->duration = duration;
-            }
-            else
-            {
-                if (reader->duration != duration)
-                {
-                    /* warn when durations differ - always choose the largest */
-                    mxf_log_warn("Track durations differ: found %"PRId64" after %"PRId64
-                        " - will output the largest duration\n", reader->duration, duration);
-                    if (reader->duration < duration)
-                    {
-                        reader->duration = duration;
-                    }
-                }
-            }
-        }
-
 
         /* PSE analysis, VTR error, digibeta dropout, timecode break and BBC DMS */
 
@@ -1242,8 +1288,35 @@ static int write_info(Reader *reader, int showPSEFailures, int showVTRErrors, in
     int i;
     PSEFailure *pseFailure = NULL;
     uint64_t count;
+    uint16_t roundedRate = (uint16_t)(reader->editRate.numerator + reader->editRate.denominator/2) / reader->editRate.denominator;
     char vitcStr[12];
     char ltcStr[12];
+    char rateStr[16];
+    char audioSamplingRateStr[16];
+
+    if (reader->editRate.denominator == 1)
+    {
+        snprintf(rateStr, sizeof(rateStr), "%d", reader->editRate.numerator);
+    }
+    else
+    {
+        snprintf(rateStr, sizeof(rateStr), "%.2f",
+                 reader->editRate.numerator / (float)reader->editRate.denominator);
+    }
+
+    if (reader->audioSamplingRate.numerator == 48000 && reader->audioSamplingRate.denominator == 1)
+    {
+        snprintf(audioSamplingRateStr, sizeof(audioSamplingRateStr), "48kHz");
+    }
+    else if (reader->audioSamplingRate.denominator > 0)
+    {
+        snprintf(audioSamplingRateStr, sizeof(audioSamplingRateStr), "%.2fkHz",
+                 reader->audioSamplingRate.numerator / (float)(1000 * reader->audioSamplingRate.denominator));
+    }
+    else
+    {
+        audioSamplingRateStr[0] = 0;
+    }
 
 
     printf("BBC Archive MXF file information\n");
@@ -1278,16 +1351,36 @@ static int write_info(Reader *reader, int showPSEFailures, int showVTRErrors, in
 
 
     printf("\nAV contents:\n");
-    printf("    %d video tracks (%d-bit uncompressed UYVY 4:2:2, aspect ratio %d:%d, 25 fps), %d audio tracks (20-bit PCM at 48kHz) \n",
-           reader->numVideoTracks, reader->componentDepth,
-           reader->aspectRatio.numerator, reader->aspectRatio.denominator,
-           reader->numAudioTracks);
-    printf("    duration is %"PRId64" frames at 25 fps (%02u:%02u:%02u:%02u)\n",
+    printf("    %d video tracks", reader->numVideoTracks);
+    if (reader->numVideoTracks == 0)
+    {
+        printf("\n");
+    }
+    else
+    {
+        printf(" (size: %ux%u, depth: %d-bit, aspect ratio: %d:%d, rate: %s fps, %s)\n",
+               reader->videoWidth, reader->videoHeight,
+               reader->componentDepth,
+               reader->aspectRatio.numerator, reader->aspectRatio.denominator,
+               rateStr,
+               (reader->isProgressive ? "progressive" : "interlaced"));
+    }
+    printf("    %d audio tracks", reader->numAudioTracks);
+    if (reader->numAudioTracks == 0)
+    {
+        printf("\n");
+    }
+    else
+    {
+        printf(" (bits: %d, rate: %s)\n", reader->audioQuantizationBits, audioSamplingRateStr);
+    }
+    printf("    duration is %"PRId64" frames at %s fps (%02u:%02u:%02u:%02u)\n",
            reader->duration,
-           (uint8_t)(reader->duration / (25 * 60 * 60)),
-           (uint8_t)((reader->duration % (25 * 60 * 60)) / (25 * 60)),
-           (uint8_t)(((reader->duration % (25 * 60 * 60)) % (25 * 60)) / 25),
-           (uint8_t)(((reader->duration % (25 * 60 * 60)) % (25 * 60)) % 25));
+           rateStr,
+           (uint16_t)(  reader->duration / (roundedRate * 60 * 60)),
+           (uint16_t)(( reader->duration % (roundedRate * 60 * 60)) / (roundedRate * 60)),
+           (uint16_t)(((reader->duration % (roundedRate * 60 * 60)) % (roundedRate * 60)) / roundedRate),
+           (uint16_t)(((reader->duration % (roundedRate * 60 * 60)) % (roundedRate * 60)) % roundedRate));
 
 
     printf("\nSource videotape information:\n");
