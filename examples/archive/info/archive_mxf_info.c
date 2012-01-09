@@ -873,8 +873,22 @@ static int get_info(Reader *reader, int showPSEFailures, int showVTRErrors, int 
         if (mxf_is_subclass_of(reader->headerMetadata->dataModel, &reader->descriptorSet->key, &MXF_SET_K(CDCIEssenceDescriptor)))
         {
             CHK_ORET(mxf_get_rational_item(reader->descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, AspectRatio), &reader->aspectRatio));
-            CHK_ORET(mxf_get_uint32_item(reader->descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, DisplayWidth), &reader->videoWidth));
-            CHK_ORET(mxf_get_uint32_item(reader->descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, DisplayHeight), &reader->videoHeight));
+            if (mxf_have_item(reader->descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, DisplayWidth)))
+            {
+                CHK_ORET(mxf_get_uint32_item(reader->descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, DisplayWidth), &reader->videoWidth));
+            }
+            else
+            {
+                CHK_ORET(mxf_get_uint32_item(reader->descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, StoredWidth), &reader->videoWidth));
+            }
+            if (mxf_have_item(reader->descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, DisplayHeight)))
+            {
+                CHK_ORET(mxf_get_uint32_item(reader->descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, DisplayHeight), &reader->videoHeight));
+            }
+            else
+            {
+                CHK_ORET(mxf_get_uint32_item(reader->descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, StoredHeight), &reader->videoHeight));
+            }
             CHK_ORET(mxf_get_uint32_item(reader->descriptorSet, &MXF_ITEM_K(CDCIEssenceDescriptor, ComponentDepth), &reader->componentDepth));
             if (mxf_have_item(reader->descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, FrameLayout)))
             {
