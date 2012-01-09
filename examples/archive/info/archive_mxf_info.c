@@ -1294,6 +1294,11 @@ static int write_info(Reader *reader, int showPSEFailures, int showVTRErrors, in
     char rateStr[16];
     char audioSamplingRateStr[16];
 
+    if (reader->contentPackageLen > 0)
+    {
+        CHK_ORET(initialise_timecode_reader(reader));
+    }
+
     if (reader->editRate.denominator == 1)
     {
         snprintf(rateStr, sizeof(rateStr), "%d", reader->editRate.numerator);
@@ -1383,6 +1388,13 @@ static int write_info(Reader *reader, int showPSEFailures, int showVTRErrors, in
            (uint16_t)(((reader->duration % (roundedRate * 60 * 60)) % (roundedRate * 60)) % roundedRate));
 
 
+    if (reader->contentPackageLen > 0)
+    {
+        read_time_string_at_position(reader, 0, vitcStr, sizeof(vitcStr), ltcStr, sizeof(ltcStr));
+        printf("    start VITC: %s\n", vitcStr);
+        printf("    start LTC: %s\n", ltcStr);
+    }
+
     printf("\nSource videotape information:\n");
     write_infax_data(&reader->sourceInfaxData);
 
@@ -1409,12 +1421,6 @@ static int write_info(Reader *reader, int showPSEFailures, int showVTRErrors, in
 
     printf("\nTimecode break results summary:\n");
     printf("    %d breaks detected/stored\n", reader->timecodeBreakCount);
-
-    /* initialise the timecode reading if showing source vitc and ltc */
-    if (!noSourceTimecode)
-    {
-        CHK_ORET(initialise_timecode_reader(reader));
-    }
 
 
     if (showPSEFailures)
@@ -1529,6 +1535,11 @@ static int write_summary(Reader *reader, int showPSEFailures, int showVTRErrors,
     char vitcStr[12];
     char ltcStr[12];
 
+    if (reader->contentPackageLen > 0)
+    {
+        CHK_ORET(initialise_timecode_reader(reader));
+    }
+
     mxf_initialise_list_iter(&iter, &reader->writerIdents);
     if (mxf_next_list_iter_element(&iter))
     {
@@ -1556,10 +1567,11 @@ static int write_summary(Reader *reader, int showPSEFailures, int showVTRErrors,
     printf("Catalogue detail: %s\n", infaxData->catDetail);
     printf("Item number: %d\n", infaxData->itemNo);
 
-    /* initialise the timecode reading if showing source vitc and ltc */
-    if (!noSourceTimecode)
+    if (reader->contentPackageLen > 0)
     {
-        CHK_ORET(initialise_timecode_reader(reader));
+        read_time_string_at_position(reader, 0, vitcStr, sizeof(vitcStr), ltcStr, sizeof(ltcStr));
+        printf("Start VITC: %s\n", vitcStr);
+        printf("Start LTC: %s\n", ltcStr);
     }
 
     if (showPSEFailures)
