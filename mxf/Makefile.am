@@ -44,7 +44,6 @@ library_include_HEADERS = \
 	mxf_list.h \
 	mxf_logging.h \
 	mxf_macros.h \
-	mxf_p2.h \
 	mxf_page_file.h \
 	mxf_partition.h \
 	mxf_primer.h \

@@ -42,7 +42,6 @@ extern "C"
 
 #include <mxf/mxf.h>
 #include <mxf/mxf_avid.h>
-#include <mxf/mxf_p2.h>
 
 
 typedef void (*progress_callback) (float percentCompleted);
