@@ -43,7 +43,7 @@ extern "C"
 
 /* P2 AVC-Intra: Version byte is incorrectly set to 0x01. It should be 0x0a */
 
-static const mxfUL MXF_EC_L(P2AVCIClipWrapped) = MXF_MPEG_EC_L(0x01, 0x10, 0x60, 0x02);
+static const mxfUL MXF_EC_L(P2AVCIClipWrapped) = MXF_GENERIC_CONTAINER_LABEL(0x01, 0x10, 0x60, 0x02);
 
 
 

@@ -399,25 +399,21 @@ static const mxfUL MXF_EC_L(ALawClipWrapped)   = MXF_ALAW_EC_L(0x02);
 static const mxfUL MXF_EC_L(ALawCustomWrapped) = MXF_ALAW_EC_L(0x03);
 
 
-/* MPEG mapping */
-
-#define MXF_MPEG_EC_L(regver, eckind, byte15, byte16) \
-    MXF_GENERIC_CONTAINER_LABEL(regver, eckind, byte15, byte16)
-
+/* MPEG mappings */
 
 /* AVC Intra-Frame Coding */
 
-static const mxfUL MXF_EC_L(AVCIFrameWrapped) = MXF_MPEG_EC_L(0x0a, 0x10, 0x60, 0x01);
-static const mxfUL MXF_EC_L(AVCIClipWrapped)  = MXF_MPEG_EC_L(0x0a, 0x10, 0x60, 0x02);
+static const mxfUL MXF_EC_L(AVCIFrameWrapped) = MXF_GENERIC_CONTAINER_LABEL(0x0a, 0x10, 0x60, 0x01);
+static const mxfUL MXF_EC_L(AVCIClipWrapped)  = MXF_GENERIC_CONTAINER_LABEL(0x0a, 0x10, 0x60, 0x02);
+
+int mxf_is_mpeg_video_ec(const mxfUL *label, int frame_wrapped);
 
 
 /* MPEG ES VideoStream-0 SID */
 
-static const mxfUL MXF_EC_L(MPEGES0FrameWrapped) = MXF_MPEG_EC_L(0x02, 0x04, 0x60, 0x01);
-static const mxfUL MXF_EC_L(MPEGES0ClipWrapped)  = MXF_MPEG_EC_L(0x02, 0x04, 0x60, 0x02);
+static const mxfUL MXF_EC_L(MPEGES0FrameWrapped) = MXF_GENERIC_CONTAINER_LABEL(0x02, 0x04, 0x60, 0x01);
+static const mxfUL MXF_EC_L(MPEGES0ClipWrapped)  = MXF_GENERIC_CONTAINER_LABEL(0x02, 0x04, 0x60, 0x02);
 
-
-int mxf_is_mpeg_video_ec(const mxfUL *label, int frame_wrapped);
 int mxf_is_avc_ec(const mxfUL *label, int frame_wrapped);
 
 
