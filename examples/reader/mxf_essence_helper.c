@@ -762,8 +762,8 @@ int process_cdci_descriptor(MXFMetadataSet *descriptorSet, MXFTrack *track, Esse
 
         essenceTrack->frameSize = -1; /* variable */
     }
-    else if (mxf_equals_ul_mod_regver(&track->essenceContainerLabel, &MXF_EC_L(AVCIFrameWrapped)) ||
-             mxf_equals_ul_mod_regver(&track->essenceContainerLabel, &MXF_EC_L(AVCIClipWrapped)))
+    else if (mxf_is_avc_ec(&track->essenceContainerLabel, 0) ||
+             mxf_is_avc_ec(&track->essenceContainerLabel, 1))
     {
         CHK_ORET(mxf_get_uint32_item(descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, StoredHeight), &fieldHeight));
         CHK_ORET(mxf_get_uint32_item(descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, StoredWidth), &fieldWidth));

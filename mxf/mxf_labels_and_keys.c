@@ -111,6 +111,29 @@ int mxf_is_generic_container_label(const mxfUL *label)
 
 
 
+int mxf_is_mpeg_video_ec(const mxfUL *label, int frame_wrapped)
+{
+    return mxf_is_generic_container_label(label) &&
+           label->octet12 == 0x02 &&                         /* generic container */
+           label->octet13 == 0x04 &&                         /* MPEG elementary stream */
+           (label->octet14 & 0xf0) == 0x60 &&                /* video stream */
+           ((frame_wrapped && label->octet15 == 0x01) ||     /* frame wrapped or */
+               (!frame_wrapped && label->octet15 == 0x02));  /*   clip wrapped */
+}
+
+int mxf_is_avc_ec(const mxfUL *label, int frame_wrapped)
+{
+    return mxf_is_generic_container_label(label) &&
+           label->octet12 == 0x02 &&                         /* generic container */
+           label->octet13 == 0x10 &&                         /* AVC byte stream */
+           (label->octet14 & 0xf0) == 0x60 &&                /* video stream */
+           ((frame_wrapped && label->octet15 == 0x01) ||     /* frame wrapped or */
+               (!frame_wrapped && label->octet15 == 0x02));  /*   clip wrapped */
+}
+
+
+
+
 void mxf_complete_essence_element_key(mxfKey *key, uint8_t count, uint8_t type, uint8_t num)
 {
     key->octet13 = count;

@@ -864,7 +864,7 @@ int opa_is_supported(MXFPartition *headerPartition)
     {
         return 1;
     }
-    else if (mxf_equals_ul_mod_regver(label, &MXF_EC_L(AVCIClipWrapped)))
+    else if (mxf_is_avc_ec(label, 0))
     {
         return 1;
     }

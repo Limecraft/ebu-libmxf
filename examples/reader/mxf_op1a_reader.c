@@ -1074,7 +1074,7 @@ int op1a_is_supported(MXFPartition *headerPartition)
         {
             supportCount++;
         }
-        else if (mxf_equals_ul_mod_regver(label, &MXF_EC_L(AVCIFrameWrapped)))
+        else if (mxf_is_avc_ec(label, 1))
         {
             supportCount++;
         }

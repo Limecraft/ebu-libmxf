@@ -417,6 +417,10 @@ static const mxfUL MXF_EC_L(MPEGES0FrameWrapped) = MXF_MPEG_EC_L(0x02, 0x04, 0x6
 static const mxfUL MXF_EC_L(MPEGES0ClipWrapped)  = MXF_MPEG_EC_L(0x02, 0x04, 0x60, 0x02);
 
 
+int mxf_is_mpeg_video_ec(const mxfUL *label, int frame_wrapped);
+int mxf_is_avc_ec(const mxfUL *label, int frame_wrapped);
+
+
 /* VC-3 */
 
 #define MXF_VC3_EC_L(byte15) \
