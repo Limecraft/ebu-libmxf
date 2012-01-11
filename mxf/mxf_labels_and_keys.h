@@ -261,8 +261,8 @@ static const mxfUL MXF_CMDEF_L(UNC_10B_422_INTERLEAVED) =
 #define MXF_EC_L(name)  g_##name##_esscont_label
 
 
-#define MXF_GENERIC_CONTAINER_LABEL(regver, eckind, mappingkind, byte15, byte16) \
-    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, regver, 0x0d, 0x01, 0x03, 0x01, eckind, mappingkind, byte15, byte16}
+#define MXF_GENERIC_CONTAINER_LABEL(regver, mappingkind, byte15, byte16) \
+    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, regver, 0x0d, 0x01, 0x03, 0x01, 0x02, mappingkind, byte15, byte16}
 
 
 int mxf_is_generic_container_label(const mxfUL *label);
@@ -272,13 +272,13 @@ int mxf_is_generic_container_label(const mxfUL *label);
 /* Multiple wrappings for interleaved essence */
 
 static const mxfUL MXF_EC_L(MultipleWrappings) =
-    MXF_GENERIC_CONTAINER_LABEL(0x03, 0x02, 0x7f, 0x01, 0x00);
+    MXF_GENERIC_CONTAINER_LABEL(0x03, 0x7f, 0x01, 0x00);
 
 
 /* AES3/BWF mappings */
 
 #define MXF_AES3BWF_EC_L(regver, byte15) \
-    MXF_GENERIC_CONTAINER_LABEL(regver, 0x02, 0x06, byte15, 0x00)
+    MXF_GENERIC_CONTAINER_LABEL(regver, 0x06, byte15, 0x00)
 
 static const mxfUL MXF_EC_L(BWFFrameWrapped)   = MXF_AES3BWF_EC_L(0x01, 0x01);
 static const mxfUL MXF_EC_L(BWFClipWrapped)    = MXF_AES3BWF_EC_L(0x01, 0x02);
@@ -291,7 +291,7 @@ static const mxfUL MXF_EC_L(AES3CustomWrapped) = MXF_AES3BWF_EC_L(0x05, 0x09);
 /* IEC-DV and DV-based mappings */
 
 #define MXF_DV_EC_L(regver, byte15, byte16) \
-    MXF_GENERIC_CONTAINER_LABEL(regver, 0x02, 0x02, byte15, byte16)
+    MXF_GENERIC_CONTAINER_LABEL(regver, 0x02, byte15, byte16)
 
 static const mxfUL MXF_EC_L(IECDV_25_525_60_FrameWrapped)       = MXF_DV_EC_L(0x01, 0x01, 0x01);
 static const mxfUL MXF_EC_L(IECDV_25_525_60_ClipWrapped)        = MXF_DV_EC_L(0x01, 0x01, 0x02);
@@ -318,7 +318,7 @@ static const mxfUL MXF_EC_L(DVBased_100_720_50_P_ClipWrapped)   = MXF_DV_EC_L(0x
 /* Uncompressed mappings */
 
 #define MXF_UNC_EC_L(regver, byte15, byte16) \
-    MXF_GENERIC_CONTAINER_LABEL(regver, 0x02, 0x05, byte15, byte16)
+    MXF_GENERIC_CONTAINER_LABEL(regver, 0x05, byte15, byte16)
 
 /* SD */
 
@@ -367,7 +367,7 @@ static const mxfUL MXF_EC_L(HD_Unc_720_60p_422_ClipWrapped)    = MXF_UNC_EC_L(0x
 /* D-10 mapping */
 
 #define MXF_D10_EC_L(regver, byte15, byte16) \
-    MXF_GENERIC_CONTAINER_LABEL(regver, 0x02, 0x01, byte15, byte16)
+    MXF_GENERIC_CONTAINER_LABEL(regver, 0x01, byte15, byte16)
 
 static const mxfUL MXF_EC_L(D10_50_625_50_defined_template)  = MXF_D10_EC_L(0x01, 0x01, 0x01);
 static const mxfUL MXF_EC_L(D10_50_625_50_extended_template) = MXF_D10_EC_L(0x01, 0x01, 0x02);
@@ -392,7 +392,7 @@ static const mxfUL MXF_EC_L(D10_30_525_60_picture_only)      = MXF_D10_EC_L(0x02
 /* A-law mapping */
 
 #define MXF_ALAW_EC_L(byte15) \
-    MXF_GENERIC_CONTAINER_LABEL(0x03, 0x02, 0x0a, byte15, 0x00)
+    MXF_GENERIC_CONTAINER_LABEL(0x03, 0x0a, byte15, 0x00)
 
 static const mxfUL MXF_EC_L(ALawFrameWrapped)  = MXF_ALAW_EC_L(0x01);
 static const mxfUL MXF_EC_L(ALawClipWrapped)   = MXF_ALAW_EC_L(0x02);
@@ -402,7 +402,7 @@ static const mxfUL MXF_EC_L(ALawCustomWrapped) = MXF_ALAW_EC_L(0x03);
 /* MPEG mapping */
 
 #define MXF_MPEG_EC_L(regver, eckind, byte15, byte16) \
-    MXF_GENERIC_CONTAINER_LABEL(regver, 0x02, eckind, byte15, byte16)
+    MXF_GENERIC_CONTAINER_LABEL(regver, eckind, byte15, byte16)
 
 
 /* AVC Intra-Frame Coding */
@@ -424,7 +424,7 @@ int mxf_is_avc_ec(const mxfUL *label, int frame_wrapped);
 /* VC-3 */
 
 #define MXF_VC3_EC_L(byte15) \
-    MXF_GENERIC_CONTAINER_LABEL(0x0a, 0x02, 0x11, byte15, 0x00)
+    MXF_GENERIC_CONTAINER_LABEL(0x0a, 0x11, byte15, 0x00)
 
 static const mxfUL MXF_EC_L(VC3FrameWrapped) = MXF_VC3_EC_L(0x01);
 static const mxfUL MXF_EC_L(VC3ClipWrapped)  = MXF_VC3_EC_L(0x02);

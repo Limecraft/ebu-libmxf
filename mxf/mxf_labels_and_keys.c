@@ -102,7 +102,7 @@ int mxf_is_descriptive_metadata(const mxfUL *label)
 
 int mxf_is_generic_container_label(const mxfUL *label)
 {
-    static const mxfUL gcLabel = MXF_GENERIC_CONTAINER_LABEL(0x00, 0x00, 0x00, 0x00, 0x00);
+    static const mxfUL gcLabel = MXF_GENERIC_CONTAINER_LABEL(0x00, 0x00, 0x00, 0x00);
 
     /* compare first 7 bytes, skip the registry version and compare another 4 bytes */
     return memcmp(label, &gcLabel, 7) == 0 &&
