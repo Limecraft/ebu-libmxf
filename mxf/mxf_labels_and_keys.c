@@ -104,9 +104,9 @@ int mxf_is_generic_container_label(const mxfUL *label)
 {
     static const mxfUL gcLabel = MXF_GENERIC_CONTAINER_LABEL(0x00, 0x00, 0x00, 0x00);
 
-    /* compare first 7 bytes, skip the registry version and compare another 4 bytes */
+    /* compare first 7 bytes, skip the registry version and compare another 5 bytes */
     return memcmp(label, &gcLabel, 7) == 0 &&
-           memcmp(&label->octet8, &gcLabel.octet8, 4) == 0;
+           memcmp(&label->octet8, &gcLabel.octet8, 5) == 0;
 }
 
 
@@ -114,7 +114,6 @@ int mxf_is_generic_container_label(const mxfUL *label)
 int mxf_is_mpeg_video_ec(const mxfUL *label, int frame_wrapped)
 {
     return mxf_is_generic_container_label(label) &&
-           label->octet12 == 0x02 &&                         /* generic container */
            label->octet13 == 0x04 &&                         /* MPEG elementary stream */
            (label->octet14 & 0xf0) == 0x60 &&                /* video stream */
            ((frame_wrapped && label->octet15 == 0x01) ||     /* frame wrapped or */
@@ -124,7 +123,6 @@ int mxf_is_mpeg_video_ec(const mxfUL *label, int frame_wrapped)
 int mxf_is_avc_ec(const mxfUL *label, int frame_wrapped)
 {
     return mxf_is_generic_container_label(label) &&
-           label->octet12 == 0x02 &&                         /* generic container */
            label->octet13 == 0x10 &&                         /* AVC byte stream */
            (label->octet14 & 0xf0) == 0x60 &&                /* video stream */
            ((frame_wrapped && label->octet15 == 0x01) ||     /* frame wrapped or */
