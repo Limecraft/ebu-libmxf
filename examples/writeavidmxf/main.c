@@ -582,6 +582,17 @@ static int prepare_wave_file(const char *filename, WAVInput *input)
         }
     }
 
+    if (!haveFormatData)
+    {
+        fprintf(stderr, "Missing 'fmt ' chunk in wav file\n");
+        return 0;
+    }
+    if (!haveWAVEData)
+    {
+        fprintf(stderr, "Missing 'data' chunk in wav file\n");
+        return 0;
+    }
+
     /* position at wave data */
     if (rf_seek(input->file, input->dataOffset, SEEK_SET) < 0)
     {
