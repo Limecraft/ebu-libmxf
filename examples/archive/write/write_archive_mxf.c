@@ -2299,7 +2299,7 @@ mxfUMID get_tape_package_uid(ArchiveMXFWriter *writer)
 
 uint32_t get_video_frame_size(const mxfRational *frameRate, uint8_t signalStandard, uint32_t componentDepth)
 {
-    uint32_t width, height;
+    uint32_t width = 0, height = 0;
     switch (signalStandard)
     {
         case MXF_SIGNAL_STANDARD_ITU601:
