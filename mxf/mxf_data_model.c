@@ -59,7 +59,7 @@ static void clear_type(MXFItemType *type)
         SAFE_FREE(&type->name);
         if (type->category == MXF_COMPOUND_TYPE_CAT)
         {
-            for (i = 0; i < sizeof(type->info.compound.members) / sizeof(MXFCompoundTypeMemberInfo); i++)
+            for (i = 0; i < ARRAY_SIZE(type->info.compound.members); i++)
             {
                 SAFE_FREE(&type->info.compound.members[i].name);
             }
@@ -156,7 +156,7 @@ static unsigned int get_type_id(MXFDataModel *dataModel)
     unsigned int typeId = 0;
 
     if (dataModel->lastTypeId == 0 ||
-        dataModel->lastTypeId >= sizeof(dataModel->types) / sizeof(MXFItemType))
+        dataModel->lastTypeId >= ARRAY_SIZE(dataModel->types))
     {
         lastTypeId = MXF_EXTENSION_TYPE;
     }
@@ -166,7 +166,7 @@ static unsigned int get_type_id(MXFDataModel *dataModel)
     }
 
     /* try from the last type id to the end of the list */
-    for (i = lastTypeId; i < sizeof(dataModel->types) / sizeof(MXFItemType); i++)
+    for (i = lastTypeId; i < ARRAY_SIZE(dataModel->types); i++)
     {
         if (dataModel->types[i].typeId == 0)
         {
@@ -332,7 +332,7 @@ void mxf_free_data_model(MXFDataModel **dataModel)
     mxf_clear_list(&(*dataModel)->setDefs);
     mxf_clear_list(&(*dataModel)->itemDefs);
 
-    for (i = 0; i < sizeof((*dataModel)->types) / sizeof(MXFItemType); i++)
+    for (i = 0; i < ARRAY_SIZE((*dataModel)->types); i++)
     {
         clear_type(&(*dataModel)->types[i]);
     }
@@ -398,7 +398,7 @@ MXFItemType* mxf_register_basic_type(MXFDataModel *dataModel, const char *name, 
     CHK_ORET(typeId > 0 && typeId < MXF_EXTENSION_TYPE);
 
     /* check the type id is valid and free */
-    CHK_ORET(typeId < sizeof(dataModel->types) / sizeof(MXFItemType) &&
+    CHK_ORET(typeId < ARRAY_SIZE(dataModel->types) &&
              dataModel->types[typeId].typeId == 0);
 
     type = &dataModel->types[typeId];
@@ -430,7 +430,7 @@ MXFItemType* mxf_register_array_type(MXFDataModel *dataModel, const char *name, 
     else
     {
         /* check the type id is valid and free */
-        CHK_ORET(typeId < sizeof(dataModel->types) / sizeof(MXFItemType) &&
+        CHK_ORET(typeId < ARRAY_SIZE(dataModel->types) &&
                  dataModel->types[typeId].typeId == 0);
         actualTypeId = typeId;
     }
@@ -464,7 +464,7 @@ MXFItemType* mxf_register_compound_type(MXFDataModel *dataModel, const char *nam
     else
     {
         /* check the type id is valid and free */
-        CHK_ORET(typeId < sizeof(dataModel->types) / sizeof(MXFItemType) &&
+        CHK_ORET(typeId < ARRAY_SIZE(dataModel->types) &&
                  dataModel->types[typeId].typeId == 0);
         actualTypeId = typeId;
     }
@@ -488,7 +488,7 @@ fail:
 int mxf_register_compound_type_member(MXFItemType *type, const char *memberName, unsigned int memberTypeId)
 {
     size_t memberIndex;
-    size_t maxMembers = sizeof(type->info.compound.members) / sizeof(MXFCompoundTypeMemberInfo) - 1;
+    size_t maxMembers = ARRAY_SIZE(type->info.compound.members) - 1;
 
     /* find null terminator (eg. typeId == 0) */
     for (memberIndex = 0; memberIndex < maxMembers; memberIndex++)
@@ -526,7 +526,7 @@ MXFItemType* mxf_register_interpret_type(MXFDataModel *dataModel, const char *na
     else
     {
         /* check the type id is valid and free */
-        CHK_ORET(typeId < sizeof(dataModel->types) / sizeof(MXFItemType) &&
+        CHK_ORET(typeId < ARRAY_SIZE(dataModel->types) &&
                  dataModel->types[typeId].typeId == 0);
         actualTypeId = typeId;
     }
@@ -720,7 +720,7 @@ int mxf_find_item_def_in_set_def(const mxfKey *key, const MXFSetDef *setDef, MXF
 
 MXFItemType* mxf_get_item_def_type(MXFDataModel *dataModel, unsigned int typeId)
 {
-    if (typeId == 0 || typeId >= sizeof(dataModel->types) / sizeof(MXFItemType))
+    if (typeId == 0 || typeId >= ARRAY_SIZE(dataModel->types))
     {
         return NULL;
     }

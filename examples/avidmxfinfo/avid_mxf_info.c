@@ -131,8 +131,6 @@ static const char* ESSENCE_TYPE_STRINGS[] =
     "PCM"
 };
 
-#define ESSENCE_TYPE_STRINGS_SIZE   (sizeof(ESSENCE_TYPE_STRINGS) / sizeof(char*))
-
 
 typedef struct
 {
@@ -192,8 +190,6 @@ static const DNxHDTypeString DNXHD_TYPE_STRINGS[] =
     {DNXHD_1251_ESSENCE_TYPE,   {60000, 1001},    "DNxHD 220 (1251)"},
     {DNXHD_1252_ESSENCE_TYPE,   {60000, 1001},    "DNxHD 145 (1252)"},
 };
-
-#define DNXHD_TYPE_STRINGS_SIZE   (sizeof(DNXHD_TYPE_STRINGS) / sizeof(DNxHDTypeString))
 
 
 typedef struct
@@ -304,8 +300,6 @@ static const EssenceTypeMap ESSENCE_TYPE_MAP[] =
     {PCM_ESSENCE_TYPE,  &MXF_EC_L(BWFClipWrapped),  0, 0},
 };
 
-#define ESSENCE_TYPE_MAP_SIZE   (sizeof(ESSENCE_TYPE_MAP) / sizeof(EssenceTypeMap))
-
 
 static const char *FRAME_LAYOUT_STRINGS[] =
 {
@@ -317,8 +311,6 @@ static const char *FRAME_LAYOUT_STRINGS[] =
     "segmented frame",
 };
 
-#define FRAME_LAYOUT_STRINGS_SIZE   (sizeof(FRAME_LAYOUT_STRINGS) / sizeof(char*))
-
 
 
 static AvidEssenceType get_essence_type(mxfUL *essenceContainerLabel, mxfUL *pictureCodingLabel,
@@ -328,7 +320,7 @@ static AvidEssenceType get_essence_type(mxfUL *essenceContainerLabel, mxfUL *pic
        use a different registry version byte */
 
     size_t i;
-    for (i = 0; i < ESSENCE_TYPE_MAP_SIZE; i++)
+    for (i = 0; i < ARRAY_SIZE(ESSENCE_TYPE_MAP); i++)
     {
         if (mxf_equals_ul_mod_regver(essenceContainerLabel, ESSENCE_TYPE_MAP[i].essenceContainerLabel) &&
             (!pictureCodingLabel || !ESSENCE_TYPE_MAP[i].pictureCodingLabel ||
@@ -346,7 +338,7 @@ static AvidEssenceType get_essence_type(mxfUL *essenceContainerLabel, mxfUL *pic
 static const char* get_dnxhd_type_string(AvidEssenceType essenceType, mxfRational editRate)
 {
     size_t i;
-    for (i = 0; i < DNXHD_TYPE_STRINGS_SIZE; i++) {
+    for (i = 0; i < ARRAY_SIZE(DNXHD_TYPE_STRINGS); i++) {
         if (essenceType == DNXHD_TYPE_STRINGS[i].essenceType &&
             memcmp(&editRate, &DNXHD_TYPE_STRINGS[i].editRate, sizeof(editRate)) == 0)
         {
@@ -359,8 +351,8 @@ static const char* get_dnxhd_type_string(AvidEssenceType essenceType, mxfRationa
 
 static const char* get_essence_type_string(AvidEssenceType essenceType, mxfRational editRate)
 {
-    assert(essenceType < ESSENCE_TYPE_STRINGS_SIZE);
-    assert(PCM_ESSENCE_TYPE + 1 == ESSENCE_TYPE_STRINGS_SIZE);
+    assert(essenceType < ARRAY_SIZE(ESSENCE_TYPE_STRINGS));
+    assert(PCM_ESSENCE_TYPE + 1 == ARRAY_SIZE(ESSENCE_TYPE_STRINGS));
 
     if (essenceType == DNXHD_1235_ESSENCE_TYPE ||
         essenceType == DNXHD_1237_ESSENCE_TYPE ||
@@ -381,7 +373,7 @@ static const char* get_essence_type_string(AvidEssenceType essenceType, mxfRatio
 
 static const char* frame_layout_string(uint8_t frameLayout)
 {
-    if ((size_t)frameLayout + 1 < FRAME_LAYOUT_STRINGS_SIZE)
+    if ((size_t)frameLayout + 1 < ARRAY_SIZE(FRAME_LAYOUT_STRINGS))
     {
         return FRAME_LAYOUT_STRINGS[frameLayout + 1];
     }

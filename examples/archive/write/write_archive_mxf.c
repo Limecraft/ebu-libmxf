@@ -204,8 +204,6 @@ static const VideoFormat VIDEO_FORMATS[] =
     {&MXF_EC_L(HD_Unc_720_5994p_422_FrameWrapped),      {60000, 1001},  MXF_SIGNAL_STANDARD_SMPTE296M,  MXF_FULL_FRAME,    1280,   720,   {26, 0}},
 };
 
-#define VIDEO_FORMATS_SIZE  (sizeof(VIDEO_FORMATS) / sizeof(VideoFormat))
-
 
 typedef struct
 {
@@ -220,8 +218,6 @@ static const AudioSequence AUDIO_SEQUENCES[] =
     {{30000, 1001},  {1602, 1601, 1602, 1601, 1602, 0}},
     {{60000, 1001},  {801, 801, 800, 801, 801, 0}},
 };
-
-#define AUDIO_SEQUENCES_SIZE   (sizeof(AUDIO_SEQUENCES) / sizeof(AudioSequence))
 
 
 
@@ -289,7 +285,7 @@ static int check_supported_formats(const mxfRational *frameRate, uint8_t signalS
                                    size_t *index)
 {
     size_t i;
-    for (i = 0; i < VIDEO_FORMATS_SIZE; i++)
+    for (i = 0; i < ARRAY_SIZE(VIDEO_FORMATS); i++)
     {
         if (memcmp(frameRate, &VIDEO_FORMATS[i].frameRate, sizeof(*frameRate)) == 0 &&
             signalStandard == VIDEO_FORMATS[i].signalStandard &&
@@ -306,7 +302,7 @@ static int check_supported_formats(const mxfRational *frameRate, uint8_t signalS
 static int init_audio_sequence(ArchiveMXFWriter *output, const mxfRational *frameRate)
 {
     size_t i;
-    for (i = 0; i < AUDIO_SEQUENCES_SIZE; i++)
+    for (i = 0; i < ARRAY_SIZE(AUDIO_SEQUENCES); i++)
     {
         if (memcmp(frameRate, &AUDIO_SEQUENCES[i].frameRate, sizeof(*frameRate)) == 0)
         {
@@ -327,14 +323,14 @@ static int init_audio_sequence(ArchiveMXFWriter *output, const mxfRational *fram
 static uint32_t get_audio_element_size(const mxfRational *frameRate, uint32_t audioQuantBits)
 {
     size_t i;
-    for (i = 0; i < AUDIO_SEQUENCES_SIZE; i++)
+    for (i = 0; i < ARRAY_SIZE(AUDIO_SEQUENCES); i++)
     {
         if (memcmp(frameRate, &AUDIO_SEQUENCES[i].frameRate, sizeof(*frameRate)) == 0)
         {
             break;
         }
     }
-    if (i >= AUDIO_SEQUENCES_SIZE)
+    if (i >= ARRAY_SIZE(AUDIO_SEQUENCES))
     {
         mxf_log_error("Unsupported frame rate for audio sample sequence" LOG_LOC_FORMAT, LOG_LOC_PARAMS);
         return 0;
@@ -2341,7 +2337,7 @@ int get_audio_sample_sequence(const mxfRational *frameRate, uint8_t maxSequenceS
                               uint8_t *sequenceSize)
 {
     size_t i;
-    for (i = 0; i < AUDIO_SEQUENCES_SIZE; i++)
+    for (i = 0; i < ARRAY_SIZE(AUDIO_SEQUENCES); i++)
     {
         if (memcmp(frameRate, &AUDIO_SEQUENCES[i].frameRate, sizeof(*frameRate)) == 0)
         {
