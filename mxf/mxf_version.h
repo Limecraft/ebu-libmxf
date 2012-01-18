@@ -51,6 +51,8 @@ extern "C"
                                        4 = Pre-release beta version
                                        5 = Private version not intended for general release */
 
+#define LIBMXF_VERSION          (LIBMXF_VERSION_MAJOR << 16 | LIBMXF_VERSION_MINOR << 8 | LIBMXF_VERSION_MICRO)
+
 #define LIBMXF_LIBRARY_NAME     "libMXF"
 #define LIBMXF_LIBRARY_WNAME   L"libMXF"
 
