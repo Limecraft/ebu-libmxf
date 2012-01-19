@@ -149,7 +149,7 @@ static int disk_file_putchar(MXFFileSysData *sysData, int c)
     {
         return EOF;
     }
-    return c;
+    return cbyte;
 #else
     return fputc(c, sysData->file);
 #endif
@@ -453,7 +453,7 @@ static int byte_array_file_putchar(MXFFileSysData *sysData, int c)
 
     sysData->data[sysData->pos++] = (uint8_t)c;
 
-    return c;
+    return (uint8_t)c;
 }
 
 static int byte_array_file_eof(MXFFileSysData *sysData)

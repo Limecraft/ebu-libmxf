@@ -649,7 +649,7 @@ static int page_file_putchar(MXFFileSysData *sysData, int c)
         return EOF;
     }
 
-    return c;
+    return data;
 }
 
 static int page_file_eof(MXFFileSysData *sysData)
