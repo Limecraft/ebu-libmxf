@@ -630,22 +630,21 @@ static uint32_t page_file_write(MXFFileSysData *sysData, const uint8_t *data, ui
 
 static int page_file_getchar(MXFFileSysData *sysData)
 {
-    uint8_t data[1];
+    uint8_t data;
 
-    if (read_from_page(sysData, &data[0], 1) == 0)
+    if (read_from_page(sysData, &data, 1) == 0)
     {
         return EOF;
     }
 
-    return (int)data[0];
+    return data;
 }
 
 static int page_file_putchar(MXFFileSysData *sysData, int c)
 {
-    uint8_t data[1];
-    data[0] = (char)c;
+    uint8_t data = (uint8_t)c;
 
-    if (write_to_page(sysData, &data[0], 1) == 0)
+    if (write_to_page(sysData, &data, 1) == 0)
     {
         return EOF;
     }
