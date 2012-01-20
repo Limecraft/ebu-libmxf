@@ -334,6 +334,10 @@ int mxf_write_partition(MXFFile *mxfFile, MXFPartition *partition)
 
     CHK_ORET((filePos = mxf_file_tell(mxfFile)) >= 0);
     partition->thisPartition = filePos - mxf_get_runin_len(mxfFile);
+    if (mxf_is_footer_partition_pack(&partition->key))
+    {
+        partition->footerPartition = partition->thisPartition;
+    }
 
     CHK_ORET(mxf_write_kl(mxfFile, &partition->key, packLen));
 
