@@ -7,11 +7,11 @@ dnl extract package name and version from mxf_version.h
 m4_define([m4_LIBMXF_LIBRARY_NAME],
 	m4_esyscmd([(sed -n 's/^.*LIBMXF_LIBRARY_NAME[^\"]*\"\([^\"]*\)\"/\1/p' mxf/mxf_version.h | tr -d '\n')]))
 m4_define([m4_LIBMXF_VERSION_MAJOR],
-	m4_esyscmd([(sed -n 's/^.*LIBMXF_VERSION_MAJOR[^0-9]*\([0-9]*\)/\1/p' mxf/mxf_version.h | tr -d '\n')]))
+	m4_esyscmd([(sed -n 's/^.*LIBMXF_VERSION_MAJOR\ *\([0-9][0-9]*\)/\1/p' mxf/mxf_version.h | tr -d '\n')]))
 m4_define([m4_LIBMXF_VERSION_MINOR],
-	m4_esyscmd([(sed -n 's/^.*LIBMXF_VERSION_MINOR[^0-9]*\([0-9]*\)/\1/p' mxf/mxf_version.h | tr -d '\n')]))
+	m4_esyscmd([(sed -n 's/^.*LIBMXF_VERSION_MINOR\ *\([0-9][0-9]*\)/\1/p' mxf/mxf_version.h | tr -d '\n')]))
 m4_define([m4_LIBMXF_VERSION_MICRO],
-	m4_esyscmd([(sed -n 's/^.*LIBMXF_VERSION_MICRO[^0-9]*\([0-9]*\)/\1/p' mxf/mxf_version.h | tr -d '\n')]))
+	m4_esyscmd([(sed -n 's/^.*LIBMXF_VERSION_MICRO\ *\([0-9][0-9]*\)/\1/p' mxf/mxf_version.h | tr -d '\n')]))
 m4_define([m4_LIBMXF_VERSION],
 	m4_defn([m4_LIBMXF_VERSION_MAJOR]).m4_defn([m4_LIBMXF_VERSION_MINOR]).m4_defn([m4_LIBMXF_VERSION_MICRO]))
 
