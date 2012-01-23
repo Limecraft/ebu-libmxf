@@ -82,9 +82,6 @@ struct MXFFileSysData
     int haveTestedIsSeekable;
     int isFIFO;
     int64_t position;
-
-    /* used for stdin only */
-    int64_t byteCount;
 };
 
 
@@ -315,7 +312,7 @@ static void stdin_file_close(MXFFileSysData *sysData)
 #else
     sysData->file = NULL;
 #endif
-    sysData->byteCount = -1;
+    sysData->position = -1;
 }
 
 static uint32_t stdin_file_read(MXFFileSysData *sysData, uint8_t *data, uint32_t count)
@@ -323,7 +320,7 @@ static uint32_t stdin_file_read(MXFFileSysData *sysData, uint8_t *data, uint32_t
     uint32_t numRead;
 
     /* fail if reading the bytes will cause the byte count to exceed the maximum and wrap around */
-    if (sysData->byteCount + count < 0)
+    if (sysData->position + count < 0)
     {
         return 0;
     }
@@ -334,7 +331,7 @@ static uint32_t stdin_file_read(MXFFileSysData *sysData, uint8_t *data, uint32_t
     numRead = (uint32_t)fread(data, 1, count, sysData->file);
 #endif
 
-    sysData->byteCount += numRead;
+    sysData->position += numRead;
 
     return numRead;
 }
@@ -358,7 +355,7 @@ static int stdin_file_getchar(MXFFileSysData *sysData)
 #endif
 
     /* fail if reading the bytes will cause the byte count to exceed the maximum and wrap around */
-    if (sysData->byteCount + 1 < 0)
+    if (sysData->position + 1 < 0)
     {
         return 0;
     }
@@ -368,14 +365,14 @@ static int stdin_file_getchar(MXFFileSysData *sysData)
     {
         return EOF;
     }
-    sysData->byteCount++;
+    sysData->position++;
     return c;
 #else
     if ((c = fgetc(sysData->file)) == EOF)
     {
         return EOF;
     }
-    sysData->byteCount++;
+    sysData->position++;
     return c;
 #endif
 }
@@ -410,7 +407,7 @@ static int stdin_file_seek(MXFFileSysData *sysData, int64_t offset, int whence)
 
 static int64_t stdin_file_tell(MXFFileSysData *sysData)
 {
-    return sysData->byteCount;
+    return sysData->position;
 }
 
 static void free_stdin_file(MXFFileSysData *sysData)
