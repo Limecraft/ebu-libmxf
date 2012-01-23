@@ -66,6 +66,8 @@ int main()
     memset(data, 122, DATA_SIZE);
 
 
+    /* new */
+
     CHECK(mxf_mem_file_open_new(CHUNK_SIZE, 0, &mxfMemFile));
     mxfFile = mxf_mem_file_get_file(mxfMemFile);
 
@@ -88,6 +90,25 @@ int main()
     CHECK(mxf_file_seek(mxfFile, 0, SEEK_SET));
     CHECK(mxf_file_tell(mxfFile) == 0);
     CHECK(mxf_file_write(mxfFile, data, DATA_SIZE) == DATA_SIZE);
+
+    mxf_file_close(&mxfFile);
+
+
+    /* read */
+
+    CHECK(mxf_mem_file_open_read(data, DATA_SIZE, 0, &mxfMemFile));
+    mxfFile = mxf_mem_file_get_file(mxfMemFile);
+
+    numChunks = mxf_mem_file_get_num_chunks(mxfMemFile);
+    CHECK(numChunks == 1);
+    CHECK(mxf_mem_file_get_chunk_size(mxfMemFile, 0) == DATA_SIZE);
+    CHECK(mxf_mem_file_get_chunk_data(mxfMemFile, 0)[DATA_SIZE - 1] == 122);
+
+    CHECK(mxf_file_seek(mxfFile, 0, SEEK_SET));
+    CHECK(mxf_file_size(mxfFile) == DATA_SIZE);
+    CHECK(mxf_file_read(mxfFile, data, DATA_SIZE) == DATA_SIZE);
+    CHECK(mxf_file_eof(mxfFile));
+    CHECK(mxf_file_tell(mxfFile) == DATA_SIZE);
 
     mxf_file_close(&mxfFile);
 

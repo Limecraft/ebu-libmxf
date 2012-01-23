@@ -78,11 +78,6 @@ int mxf_disk_file_open_modify(const char *filename, MXFFile **mxfFile);
 /* wrap standard input in an MXF file */
 int mxf_stdin_wrap_read(MXFFile **mxfFile);
 
-/* wrap a byte array */
-int mxf_byte_array_wrap_read(const uint8_t *byteArray, int64_t size, MXFFile **mxfFile);
-int mxf_byte_array_wrap_modify(uint8_t *byteArray, int64_t size, MXFFile **mxfFile);
-
-
 void mxf_file_close(MXFFile **mxfFile);
 void mxf_file_close_2(MXFFile **mxfFile, void (*free_func)(void*));
 uint32_t mxf_file_read(MXFFile *mxfFile, uint8_t *data, uint32_t count);

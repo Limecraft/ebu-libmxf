@@ -153,40 +153,6 @@ int test_read(const char *filename)
     mxf_file_close(&mxfFile);
 
 
-    /* test reading from a byte buffer */
-
-    const uint8_t data[5] = {1, 2, 3, 4, 5};
-
-    if (!mxf_byte_array_wrap_read(data, sizeof(data), &mxfFile))
-    {
-        mxf_log_error("Failed to open byte array as MXF file" LOG_LOC_FORMAT, LOG_LOC_PARAMS);
-        return 0;
-    }
-
-    CHK_OFAIL(mxf_file_tell(mxfFile) == 0);
-    CHK_OFAIL(mxf_file_getc(mxfFile) == 1);
-    CHK_OFAIL(mxf_file_tell(mxfFile) == 1);
-    CHK_OFAIL(mxf_file_read(mxfFile, indata, 4));
-    CHK_OFAIL(indata[0] == 2 && indata[1] == 3 && indata[2] == 4 && indata[3] == 5);
-    CHK_OFAIL(mxf_file_tell(mxfFile) == 5);
-    CHK_OFAIL(mxf_file_eof(mxfFile));
-    CHK_OFAIL(mxf_file_getc(mxfFile) == EOF);
-    CHK_OFAIL(mxf_file_seek(mxfFile, 0, SEEK_SET));
-    CHK_OFAIL(mxf_file_tell(mxfFile) == 0);
-    CHK_OFAIL(mxf_file_getc(mxfFile) == 1);
-    CHK_OFAIL(mxf_file_seek(mxfFile, 2, SEEK_CUR));
-    CHK_OFAIL(mxf_file_tell(mxfFile) == 3);
-    CHK_OFAIL(mxf_file_getc(mxfFile) == 4);
-    CHK_OFAIL(mxf_file_seek(mxfFile, 0, SEEK_END));
-    CHK_OFAIL(mxf_file_tell(mxfFile) == 4);
-    CHK_OFAIL(mxf_file_getc(mxfFile) == 5);
-    CHK_OFAIL(!mxf_file_seek(mxfFile, 5, SEEK_END)); /* should fail */
-    CHK_OFAIL(mxf_file_tell(mxfFile) == 5);
-
-
-    mxf_file_close(&mxfFile);
-
-
     return 1;
 
 fail:

@@ -63,6 +63,7 @@ struct MXFFileSysData
     MXFMemoryFile mxfMemFile;
     uint32_t chunkSize;
     int contiguous;
+    int readOnly;
     int64_t virtualStartPos;
     Chunk *chunks;
     int64_t numChunks;
@@ -103,6 +104,8 @@ static int extend_mem_file(MXFFileSysData *sysData, uint32_t minSize)
     Chunk *newChunks;
     uint32_t numExtendChunks;
 
+    assert(!sysData->readOnly);
+
     numExtendChunks = (minSize + sysData->chunkSize - 1) / sysData->chunkSize;
     if (numExtendChunks == 0)
         numExtendChunks = 1;
@@ -135,9 +138,11 @@ static void mem_file_close(MXFFileSysData *sysData)
     if (!sysData)
         return;
 
-    int64_t i;
-    for (i = 0; i < sysData->numChunks; i++)
-        free(sysData->chunks[i].data);
+    if (!sysData->readOnly) {
+        int64_t i;
+        for (i = 0; i < sysData->numChunks; i++)
+            free(sysData->chunks[i].data);
+    }
     free(sysData->chunks);
     sysData->chunks = NULL;
     sysData->numChunks = 0;
@@ -191,7 +196,7 @@ static uint32_t mem_file_write(MXFFileSysData *sysData, const uint8_t *data, uin
     int64_t posChunkPos;
     int64_t numWrite;
 
-    if (count == 0)
+    if (count == 0 || sysData->readOnly)
         return 0;
 
     if (sysData->numChunks == 0 && !extend_mem_file(sysData, count))
@@ -321,6 +326,51 @@ int mxf_mem_file_open_new(uint32_t chunkSize, int64_t virtualStartPos, MXFMemory
     newMXFFile->sysData->chunkSize          = (chunkSize == 0 ? DEFAULT_CHUNK_SIZE : chunkSize);
     newMXFFile->sysData->virtualStartPos    = virtualStartPos;
     newMXFFile->sysData->mxfMemFile.mxfFile = newMXFFile;
+
+
+    *mxfMemFile = &newMXFFile->sysData->mxfMemFile;
+    return 1;
+
+fail:
+    if (newMXFFile)
+        mxf_file_close(&newMXFFile);
+    return 0;
+}
+
+int mxf_mem_file_open_read(const unsigned char *data, int64_t size, int64_t virtualStartPos, MXFMemoryFile **mxfMemFile)
+{
+    MXFFile *newMXFFile = NULL;
+
+    CHK_MALLOC_ORET(newMXFFile, MXFFile);
+    memset(newMXFFile, 0, sizeof(*newMXFFile));
+
+    newMXFFile->close           = mem_file_close;
+    newMXFFile->read            = mem_file_read;
+    newMXFFile->write           = mem_file_write;
+    newMXFFile->get_char        = mem_file_getchar;
+    newMXFFile->put_char        = mem_file_putchar;
+    newMXFFile->eof             = mem_file_eof;
+    newMXFFile->seek            = mem_file_seek;
+    newMXFFile->tell            = mem_file_tell;
+    newMXFFile->is_seekable     = mem_file_is_seekable;
+    newMXFFile->size            = mem_file_size;
+    newMXFFile->free_sys_data   = free_mem_file;
+
+
+    CHK_MALLOC_OFAIL(newMXFFile->sysData, MXFFileSysData);
+    memset(newMXFFile->sysData, 0, sizeof(*newMXFFile->sysData));
+
+    newMXFFile->sysData->virtualStartPos    = virtualStartPos;
+    newMXFFile->sysData->readOnly           = 1;
+    newMXFFile->sysData->mxfMemFile.mxfFile = newMXFFile;
+
+
+    CHK_MALLOC_OFAIL(newMXFFile->sysData->chunks, Chunk);
+
+    newMXFFile->sysData->chunks->data      = (unsigned char*)data;
+    newMXFFile->sysData->chunks->allocSize = size;
+    newMXFFile->sysData->chunks->size      = size;
+    newMXFFile->sysData->numChunks++;
 
 
     *mxfMemFile = &newMXFFile->sysData->mxfMemFile;

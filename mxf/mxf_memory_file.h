@@ -47,6 +47,7 @@ typedef struct MXFMemoryFile MXFMemoryFile;
 
 
 int mxf_mem_file_open_new(uint32_t chunkSize, int64_t virtualStartPos, MXFMemoryFile **mxfMemFile);
+int mxf_mem_file_open_read(const unsigned char *data, int64_t size, int64_t virtualStartPos, MXFMemoryFile **mxfMemFile);
 
 MXFFile* mxf_mem_file_get_file(MXFMemoryFile *mxfMemFile);
 
