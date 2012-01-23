@@ -55,12 +55,13 @@
 #if defined(_MSC_VER)
 #if (_MSC_VER < 1400)
 /* use low-level file I/O */
-#   define USE_LOW_LEVEL_IO 1
+#   define USE_MSC_LOW_LEVEL_IO
+#   define fseeko   fseek
+#   define ftello   ftell
 #else
 /* 64-bit ftell and fseek were introduced in Visual C++ 2005 */
-#   define fseeko _fseeki64
-#   define ftello _ftelli64
-#   define fstat64 _fstati64
+#   define fseeko   _fseeki64
+#   define ftello   _ftelli64
 #endif
 #endif
 
@@ -72,20 +73,19 @@
 
 struct MXFFileSysData
 {
-    /* Disk file system data */
-#if defined(USE_LOW_LEVEL_IO)
+#if defined(USE_MSC_LOW_LEVEL_IO)
     int fileId;
-#else
-    FILE *file;
 #endif
+    FILE *file;
+
     int isSeekable;
     int haveTestedIsSeekable;
-    int isFIFO;
-    int64_t position;
+    int isStream;
+    int64_t streamPosition;
 };
 
 
-static int check_file_is_fifo(int fileId)
+static int check_file_is_stream(int fileId)
 {
     struct stat buf;
     if (fstat(fileId, &buf) != 0)
@@ -101,139 +101,183 @@ static int check_file_is_fifo(int fileId)
 }
 
 
-static void disk_file_close(MXFFileSysData *sysData)
+#if defined(USE_MSC_LOW_LEVEL_IO)
+
+static void disk_file_close_ll(MXFFileSysData *sysData)
 {
-#if defined(USE_LOW_LEVEL_IO)
-    if (sysData->fileId != -1)
+    /* 0 = stdin, 1 = stdout, 2 = stderr */
+    if (sysData->fileId > 2)
     {
         close(sysData->fileId);
-        sysData->fileId = -1;
     }
-#else
-    if (sysData->file != NULL)
+    sysData->fileId = -1;
+}
+
+static uint32_t disk_file_read_ll(MXFFileSysData *sysData, uint8_t *data, uint32_t count)
+{
+    uint32_t result = read(sysData->fileId, data, count);
+    sysData->streamPosition += result;
+    return result;
+}
+
+static uint32_t disk_file_write_ll(MXFFileSysData *sysData, const uint8_t *data, uint32_t count)
+{
+    uint32_t result = write(sysData->fileId, data, count);
+    sysData->streamPosition += result;
+    return result;
+}
+
+static int disk_file_getchar_ll(MXFFileSysData *sysData)
+{
+    uint8_t c;
+    if (read(sysData->fileId, &c, 1) != 1)
+    {
+        return EOF;
+    }
+    sysData->streamPosition++;
+    return c;
+}
+
+static int disk_file_putchar_ll(MXFFileSysData *sysData, int c)
+{
+    uint8_t cbyte = (uint8_t)c;
+    if (write(sysData->fileId, &cbyte, 1) != 1)
+    {
+        return EOF;
+    }
+    sysData->streamPosition++;
+    return cbyte;
+}
+
+static int disk_file_eof_ll(MXFFileSysData *sysData)
+{
+    return eof(sysData->fileId);
+}
+
+static int disk_file_seek_ll(MXFFileSysData *sysData, int64_t offset, int whence)
+{
+    if (sysData->isStream)
+    {
+        return (whence == SEEK_CUR && offset == 0) ||
+               (whence == SEEK_SET && offset == sysData->streamPosition);
+    }
+
+    return _lseeki64(sysData->fileId, offset, whence) != -1;
+}
+
+static int64_t disk_file_tell_ll(MXFFileSysData *sysData)
+{
+    if (sysData->isStream)
+    {
+        return sysData->streamPosition;
+    }
+
+    return _telli64(sysData->fileId);
+}
+
+static int disk_file_is_seekable_ll(MXFFileSysData *sysData)
+{
+    if (sysData == NULL)
+    {
+        return 0;
+    }
+
+    if (!sysData->haveTestedIsSeekable)
+    {
+        sysData->isSeekable = (_lseek(sysData->fileId, 0, SEEK_CUR) != -1);
+        sysData->haveTestedIsSeekable = 1;
+    }
+
+    return sysData->isSeekable;
+}
+
+static int64_t disk_file_size_ll(MXFFileSysData *sysData)
+{
+    struct _stati64 statBuf;
+
+    if (sysData == NULL)
+    {
+        return -1;
+    }
+
+    if (_fstati64(sysData->fileId, &statBuf) != 0)
+    {
+        return -1;
+    }
+    return statBuf.st_size;
+}
+
+#endif /* USE_MSC_LOW_LEVEL_IO */
+
+
+static void disk_file_close(MXFFileSysData *sysData)
+{
+    if (sysData->file != NULL &&
+        sysData->file != stdin && sysData->file != stdout && sysData->file != stderr)
     {
         fclose(sysData->file);
-        sysData->file = NULL;
     }
-#endif
+    sysData->file = NULL;
 }
 
 static uint32_t disk_file_read(MXFFileSysData *sysData, uint8_t *data, uint32_t count)
 {
-    uint32_t result;
-#if defined(USE_LOW_LEVEL_IO)
-    result = read(sysData->fileId, data, count);
-#else
-    result = (uint32_t)fread(data, 1, count, sysData->file);
-#endif
-    sysData->position += result;
+    uint32_t result = (uint32_t)fread(data, 1, count, sysData->file);
+    sysData->streamPosition += result;
     return result;
 }
 
 static uint32_t disk_file_write(MXFFileSysData *sysData, const uint8_t *data, uint32_t count)
 {
-    uint32_t result;
-#if defined(USE_LOW_LEVEL_IO)
-    result = write(sysData->fileId, data, count);
-#else
-    result = (uint32_t)fwrite(data, 1, count, sysData->file);
-#endif
-    sysData->position += result;
+    uint32_t result = (uint32_t)fwrite(data, 1, count, sysData->file);
+    sysData->streamPosition += result;
     return result;
 }
 
 static int disk_file_getchar(MXFFileSysData *sysData)
 {
-    int result;
-#if defined(USE_LOW_LEVEL_IO)
-    uint8_t c;
-    if (read(sysData->fileId, &c, 1) != 1)
-    {
-        result = EOF;
-    }
-    else
-    {
-        result = c;
-    }
-#else
-    result = fgetc(sysData->file);
-#endif
+    int result = fgetc(sysData->file);
     if (result != EOF)
     {
-        sysData->position++;
+        sysData->streamPosition++;
     }
     return result;
 }
 
 static int disk_file_putchar(MXFFileSysData *sysData, int c)
 {
-    int result;
-#if defined(USE_LOW_LEVEL_IO)
-    uint8_t cbyte = (uint8_t)c;
-    if (write(sysData->fileId, &cbyte, 1) != 1)
-    {
-        result = EOF;
-    }
-    else
-    {
-        result = cbyte;
-    }
-#else
-    result = fputc(c, sysData->file);
-#endif
+    int result = fputc(c, sysData->file);
     if (result != EOF)
     {
-        sysData->position++;
+        sysData->streamPosition++;
     }
     return result;
 }
 
 static int disk_file_eof(MXFFileSysData *sysData)
 {
-#if defined(USE_LOW_LEVEL_IO)
-    return eof(sysData->fileId);
-#else
     return feof(sysData->file);
-#endif
 }
 
 static int disk_file_seek(MXFFileSysData *sysData, int64_t offset, int whence)
 {
-    if (sysData->isFIFO)
+    if (sysData->isStream)
     {
         return (whence == SEEK_CUR && offset == 0) ||
-               (whence == SEEK_SET && offset == sysData->position);
+               (whence == SEEK_SET && offset == sysData->streamPosition);
     }
 
-#if defined(USE_LOW_LEVEL_IO)
-    return _lseeki64(sysData->fileId, offset, whence) != -1;
-#else
     return fseeko(sysData->file, offset, whence) == 0;
-#endif
 }
 
 static int64_t disk_file_tell(MXFFileSysData *sysData)
 {
-    if (sysData->isFIFO)
+    if (sysData->isStream)
     {
-        return sysData->position;
+        return sysData->streamPosition;
     }
 
-#if defined(USE_LOW_LEVEL_IO)
-    return _telli64(sysData->fileId);
-#else
     return ftello(sysData->file);
-#endif
-}
-
-static void free_disk_file(MXFFileSysData *sysData)
-{
-    if (sysData == NULL)
-    {
-        return;
-    }
-
-    free(sysData);
 }
 
 static int disk_file_is_seekable(MXFFileSysData *sysData)
@@ -245,11 +289,7 @@ static int disk_file_is_seekable(MXFFileSysData *sysData)
 
     if (!sysData->haveTestedIsSeekable)
     {
-#if defined(USE_LOW_LEVEL_IO)
-        sysData->isSeekable = (_lseek(sysData->fileId, 0, SEEK_CUR) != -1);
-#else
         sysData->isSeekable = (fseek(sysData->file, 0, SEEK_CUR) == 0);
-#endif
         sysData->haveTestedIsSeekable = 1;
     }
 
@@ -258,9 +298,7 @@ static int disk_file_is_seekable(MXFFileSysData *sysData)
 
 static int64_t disk_file_size(MXFFileSysData *sysData)
 {
-#if defined(USE_LOW_LEVEL_IO)
-    struct _stati64 statBuf;
-#elif defined(_MSC_VER)
+#if defined(_MSC_VER)
     int fo;
     struct _stati64 statBuf;
 #else
@@ -273,14 +311,7 @@ static int64_t disk_file_size(MXFFileSysData *sysData)
         return -1;
     }
 
-#if defined(USE_LOW_LEVEL_IO)
-    if (_fstati64(sysData->fileId, &statBuf) != 0)
-    {
-        return -1;
-    }
-    return statBuf.st_size;
-
-#elif defined(_MSC_VER)
+#if defined(_MSC_VER)
     if ((fo = _fileno(sysData->file)) == -1)
     {
         return -1;
@@ -305,112 +336,7 @@ static int64_t disk_file_size(MXFFileSysData *sysData)
 }
 
 
-static void stdin_file_close(MXFFileSysData *sysData)
-{
-#if defined(USE_LOW_LEVEL_IO)
-    sysData->fileId = -1;
-#else
-    sysData->file = NULL;
-#endif
-    sysData->position = -1;
-}
-
-static uint32_t stdin_file_read(MXFFileSysData *sysData, uint8_t *data, uint32_t count)
-{
-    uint32_t numRead;
-
-    /* fail if reading the bytes will cause the byte count to exceed the maximum and wrap around */
-    if (sysData->position + count < 0)
-    {
-        return 0;
-    }
-
-#if defined(USE_LOW_LEVEL_IO)
-    numRead = read(sysData->fileId, data, count);
-#else
-    numRead = (uint32_t)fread(data, 1, count, sysData->file);
-#endif
-
-    sysData->position += numRead;
-
-    return numRead;
-}
-
-static uint32_t stdin_file_write(MXFFileSysData *sysData, const uint8_t *data, uint32_t count)
-{
-    (void)sysData;
-    (void)data;
-    (void)count;
-
-    /* stdin is not writeable */
-    return 0;
-}
-
-static int stdin_file_getchar(MXFFileSysData *sysData)
-{
-#if defined(USE_LOW_LEVEL_IO)
-    uint8_t c;
-#else
-    int c;
-#endif
-
-    /* fail if reading the bytes will cause the byte count to exceed the maximum and wrap around */
-    if (sysData->position + 1 < 0)
-    {
-        return 0;
-    }
-
-#if defined(USE_LOW_LEVEL_IO)
-    if (read(sysData->fileId, &c, 1) != 1)
-    {
-        return EOF;
-    }
-    sysData->position++;
-    return c;
-#else
-    if ((c = fgetc(sysData->file)) == EOF)
-    {
-        return EOF;
-    }
-    sysData->position++;
-    return c;
-#endif
-}
-
-static int stdin_file_putchar(MXFFileSysData *sysData, int c)
-{
-    (void)sysData;
-    (void)c;
-
-    /* stdin is not writeable */
-    return EOF;
-}
-
-static int stdin_file_eof(MXFFileSysData *sysData)
-{
-#if defined(USE_LOW_LEVEL_IO)
-    return eof(sysData->fileId);
-#else
-    return feof(sysData->file);
-#endif
-}
-
-static int stdin_file_seek(MXFFileSysData *sysData, int64_t offset, int whence)
-{
-    (void)sysData;
-    (void)offset;
-    (void)whence;
-
-    /* stdin is not seekable */
-    return 0;
-}
-
-static int64_t stdin_file_tell(MXFFileSysData *sysData)
-{
-    return sysData->position;
-}
-
-static void free_stdin_file(MXFFileSysData *sysData)
+static void free_disk_file(MXFFileSysData *sysData)
 {
     if (sysData == NULL)
     {
@@ -420,20 +346,43 @@ static void free_stdin_file(MXFFileSysData *sysData)
     free(sysData);
 }
 
-static int stdin_file_is_seekable(MXFFileSysData *sysData)
+
+static void assign_file_struct(MXFFile *mxfFile, MXFFileSysData *sysData, int lowLevel)
 {
-    (void)sysData;
+    if (lowLevel)
+    {
+#if defined(USE_MSC_LOW_LEVEL_IO)
+        mxfFile->close         = disk_file_close_ll;
+        mxfFile->read          = disk_file_read_ll;
+        mxfFile->write         = disk_file_write_ll;
+        mxfFile->get_char      = disk_file_getchar_ll;
+        mxfFile->put_char      = disk_file_putchar_ll;
+        mxfFile->eof           = disk_file_eof_ll;
+        mxfFile->seek          = disk_file_seek_ll;
+        mxfFile->tell          = disk_file_tell_ll;
+        mxfFile->is_seekable   = disk_file_is_seekable_ll;
+        mxfFile->size          = disk_file_size_ll;
+#else
+        assert(0);
+#endif
+    }
+    else
+    {
+        mxfFile->close         = disk_file_close;
+        mxfFile->read          = disk_file_read;
+        mxfFile->write         = disk_file_write;
+        mxfFile->get_char      = disk_file_getchar;
+        mxfFile->put_char      = disk_file_putchar;
+        mxfFile->eof           = disk_file_eof;
+        mxfFile->seek          = disk_file_seek;
+        mxfFile->tell          = disk_file_tell;
+        mxfFile->is_seekable   = disk_file_is_seekable;
+        mxfFile->size          = disk_file_size;
+    }
 
-    return 0;
+    mxfFile->free_sys_data     = free_disk_file;
+    mxfFile->sysData           = sysData;
 }
-
-static int64_t stdin_file_size(MXFFileSysData *sysData)
-{
-    (void)sysData;
-
-    return -1;
-}
-
 
 int mxf_disk_file_open_new(const char *filename, MXFFile **mxfFile)
 {
@@ -445,7 +394,7 @@ int mxf_disk_file_open_new(const char *filename, MXFFile **mxfFile)
     CHK_MALLOC_OFAIL(newDiskFile, MXFFileSysData);
     memset(newDiskFile, 0, sizeof(MXFFileSysData));
 
-#if defined(USE_LOW_LEVEL_IO)
+#if defined(USE_MSC_LOW_LEVEL_IO)
     if ((newDiskFile->fileId = open(filename, _O_BINARY | _O_RDWR | _O_CREAT | _O_TRUNC, _S_IREAD | _S_IWRITE)) == -1)
 #else
     if ((newDiskFile->file = fopen(filename, "w+b")) == NULL)
@@ -454,24 +403,13 @@ int mxf_disk_file_open_new(const char *filename, MXFFile **mxfFile)
         goto fail;
     }
 
-#if defined(USE_LOW_LEVEL_IO)
-    newDiskFile->isFIFO = check_file_is_fifo(newDiskFile->fileId);
+#if defined(USE_MSC_LOW_LEVEL_IO)
+    newDiskFile->isStream = check_file_is_stream(newDiskFile->fileId);
+    assign_file_struct(newMXFFile, newDiskFile, 1);
 #else
-    newDiskFile->isFIFO = check_file_is_fifo(fileno(newDiskFile->file));
+    newDiskFile->isStream = check_file_is_stream(fileno(newDiskFile->file));
+    assign_file_struct(newMXFFile, newDiskFile, 0);
 #endif
-
-    newMXFFile->close         = disk_file_close;
-    newMXFFile->read          = disk_file_read;
-    newMXFFile->write         = disk_file_write;
-    newMXFFile->get_char      = disk_file_getchar;
-    newMXFFile->put_char      = disk_file_putchar;
-    newMXFFile->eof           = disk_file_eof;
-    newMXFFile->seek          = disk_file_seek;
-    newMXFFile->tell          = disk_file_tell;
-    newMXFFile->is_seekable   = disk_file_is_seekable;
-    newMXFFile->size          = disk_file_size;
-    newMXFFile->sysData       = newDiskFile;
-    newMXFFile->free_sys_data = free_disk_file;
 
     *mxfFile = newMXFFile;
     return 1;
@@ -492,7 +430,7 @@ int mxf_disk_file_open_read(const char *filename, MXFFile **mxfFile)
     CHK_MALLOC_OFAIL(newDiskFile, MXFFileSysData);
     memset(newDiskFile, 0, sizeof(MXFFileSysData));
 
-#if defined(USE_LOW_LEVEL_IO)
+#if defined(USE_MSC_LOW_LEVEL_IO)
     if ((newDiskFile->fileId = open(filename, _O_BINARY | _O_RDONLY)) == -1)
 #else
     if ((newDiskFile->file = fopen(filename, "rb")) == NULL)
@@ -501,24 +439,13 @@ int mxf_disk_file_open_read(const char *filename, MXFFile **mxfFile)
         goto fail;
     }
 
-#if defined(USE_LOW_LEVEL_IO)
-    newDiskFile->isFIFO = check_file_is_fifo(newDiskFile->fileId);
+#if defined(USE_MSC_LOW_LEVEL_IO)
+    newDiskFile->isStream = check_file_is_stream(newDiskFile->fileId);
+    assign_file_struct(newMXFFile, newDiskFile, 1);
 #else
-    newDiskFile->isFIFO = check_file_is_fifo(fileno(newDiskFile->file));
+    newDiskFile->isStream = check_file_is_stream(fileno(newDiskFile->file));
+    assign_file_struct(newMXFFile, newDiskFile, 0);
 #endif
-
-    newMXFFile->close         = disk_file_close;
-    newMXFFile->read          = disk_file_read;
-    newMXFFile->write         = disk_file_write;
-    newMXFFile->get_char      = disk_file_getchar;
-    newMXFFile->put_char      = disk_file_putchar;
-    newMXFFile->eof           = disk_file_eof;
-    newMXFFile->seek          = disk_file_seek;
-    newMXFFile->tell          = disk_file_tell;
-    newMXFFile->is_seekable   = disk_file_is_seekable;
-    newMXFFile->size          = disk_file_size;
-    newMXFFile->sysData       = newDiskFile;
-    newMXFFile->free_sys_data = free_disk_file;
 
     *mxfFile = newMXFFile;
     return 1;
@@ -539,7 +466,7 @@ int mxf_disk_file_open_modify(const char *filename, MXFFile **mxfFile)
     CHK_MALLOC_OFAIL(newDiskFile, MXFFileSysData);
     memset(newDiskFile, 0, sizeof(MXFFileSysData));
 
-#if defined(USE_LOW_LEVEL_IO)
+#if defined(USE_MSC_LOW_LEVEL_IO)
     if ((newDiskFile->fileId = open(filename, _O_BINARY | _O_RDWR)) == -1)
 #else
     if ((newDiskFile->file = fopen(filename, "r+b")) == NULL)
@@ -548,24 +475,13 @@ int mxf_disk_file_open_modify(const char *filename, MXFFile **mxfFile)
         goto fail;
     }
 
-#if defined(USE_LOW_LEVEL_IO)
-    newDiskFile->isFIFO = check_file_is_fifo(newDiskFile->fileId);
+#if defined(USE_MSC_LOW_LEVEL_IO)
+    newDiskFile->isStream = check_file_is_stream(newDiskFile->fileId);
+    assign_file_struct(newMXFFile, newDiskFile, 1);
 #else
-    newDiskFile->isFIFO = check_file_is_fifo(fileno(newDiskFile->file));
+    newDiskFile->isStream = check_file_is_stream(fileno(newDiskFile->file));
+    assign_file_struct(newMXFFile, newDiskFile, 0);
 #endif
-
-    newMXFFile->close         = disk_file_close;
-    newMXFFile->read          = disk_file_read;
-    newMXFFile->write         = disk_file_write;
-    newMXFFile->get_char      = disk_file_getchar;
-    newMXFFile->put_char      = disk_file_putchar;
-    newMXFFile->eof           = disk_file_eof;
-    newMXFFile->seek          = disk_file_seek;
-    newMXFFile->tell          = disk_file_tell;
-    newMXFFile->is_seekable   = disk_file_is_seekable;
-    newMXFFile->size          = disk_file_size;
-    newMXFFile->sysData       = newDiskFile;
-    newMXFFile->free_sys_data = free_disk_file;
 
     *mxfFile = newMXFFile;
     return 1;
@@ -587,24 +503,9 @@ int mxf_stdin_wrap_read(MXFFile **mxfFile)
     CHK_MALLOC_OFAIL(newStdInFile, MXFFileSysData);
     memset(newStdInFile, 0, sizeof(MXFFileSysData));
 
-#if defined(USE_LOW_LEVEL_IO)
-    newStdInFile->fileId = 0;
-#else
-    newStdInFile->file = stdin;
-#endif
-
-    newMXFFile->close         = stdin_file_close;
-    newMXFFile->read          = stdin_file_read;
-    newMXFFile->write         = stdin_file_write;
-    newMXFFile->get_char      = stdin_file_getchar;
-    newMXFFile->put_char      = stdin_file_putchar;
-    newMXFFile->eof           = stdin_file_eof;
-    newMXFFile->seek          = stdin_file_seek;
-    newMXFFile->tell          = stdin_file_tell;
-    newMXFFile->is_seekable   = stdin_file_is_seekable;
-    newMXFFile->size          = stdin_file_size;
-    newMXFFile->sysData       = newStdInFile;
-    newMXFFile->free_sys_data = free_stdin_file;
+    newStdInFile->file     = stdin;
+    newStdInFile->isStream = 1;
+    assign_file_struct(newMXFFile, newStdInFile, 0);
 
     *mxfFile = newMXFFile;
     return 1;
