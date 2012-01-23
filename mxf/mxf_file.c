@@ -80,10 +80,28 @@ struct MXFFileSysData
 #endif
     int isSeekable;
     int haveTestedIsSeekable;
+    int isFIFO;
+    int64_t position;
 
     /* used for stdin only */
     int64_t byteCount;
 };
+
+
+static int check_file_is_fifo(int fileId)
+{
+    struct stat buf;
+    if (fstat(fileId, &buf) != 0)
+    {
+        return 0;
+    }
+
+#if defined(_MSC_VER)
+    return ((buf.st_mode & _S_IFMT) == _S_IFIFO);
+#else
+    return S_ISFIFO(buf.st_mode);
+#endif
+}
 
 
 static void disk_file_close(MXFFileSysData *sysData)
@@ -105,48 +123,72 @@ static void disk_file_close(MXFFileSysData *sysData)
 
 static uint32_t disk_file_read(MXFFileSysData *sysData, uint8_t *data, uint32_t count)
 {
+    uint32_t result;
 #if defined(USE_LOW_LEVEL_IO)
-    return read(sysData->fileId, data, count);
+    result = read(sysData->fileId, data, count);
 #else
-    return (uint32_t)fread(data, 1, count, sysData->file);
+    result = (uint32_t)fread(data, 1, count, sysData->file);
 #endif
+    sysData->position += result;
+    return result;
 }
 
 static uint32_t disk_file_write(MXFFileSysData *sysData, const uint8_t *data, uint32_t count)
 {
+    uint32_t result;
 #if defined(USE_LOW_LEVEL_IO)
-    return write(sysData->fileId, data, count);
+    result = write(sysData->fileId, data, count);
 #else
-    return (uint32_t)fwrite(data, 1, count, sysData->file);
+    result = (uint32_t)fwrite(data, 1, count, sysData->file);
 #endif
+    sysData->position += result;
+    return result;
 }
 
 static int disk_file_getchar(MXFFileSysData *sysData)
 {
+    int result;
 #if defined(USE_LOW_LEVEL_IO)
     uint8_t c;
     if (read(sysData->fileId, &c, 1) != 1)
     {
-        return EOF;
+        result = EOF;
     }
-    return c;
+    else
+    {
+        result = c;
+    }
 #else
-    return fgetc(sysData->file);
+    result = fgetc(sysData->file);
 #endif
+    if (result != EOF)
+    {
+        sysData->position++;
+    }
+    return result;
 }
 
 static int disk_file_putchar(MXFFileSysData *sysData, int c)
 {
+    int result;
 #if defined(USE_LOW_LEVEL_IO)
     uint8_t cbyte = (uint8_t)c;
     if (write(sysData->fileId, &cbyte, 1) != 1)
     {
-        return EOF;
+        result = EOF;
     }
-    return cbyte;
+    else
+    {
+        result = cbyte;
+    }
 #else
-    return fputc(c, sysData->file);
+    result = fputc(c, sysData->file);
 #endif
+    if (result != EOF)
+    {
+        sysData->position++;
+    }
+    return result;
 }
 
 static int disk_file_eof(MXFFileSysData *sysData)
@@ -160,6 +202,12 @@ static int disk_file_eof(MXFFileSysData *sysData)
 
 static int disk_file_seek(MXFFileSysData *sysData, int64_t offset, int whence)
 {
+    if (sysData->isFIFO)
+    {
+        return (whence == SEEK_CUR && offset == 0) ||
+               (whence == SEEK_SET && offset == sysData->position);
+    }
+
 #if defined(USE_LOW_LEVEL_IO)
     return _lseeki64(sysData->fileId, offset, whence) != -1;
 #else
@@ -169,6 +217,11 @@ static int disk_file_seek(MXFFileSysData *sysData, int64_t offset, int whence)
 
 static int64_t disk_file_tell(MXFFileSysData *sysData)
 {
+    if (sysData->isFIFO)
+    {
+        return sysData->position;
+    }
+
 #if defined(USE_LOW_LEVEL_IO)
     return _telli64(sysData->fileId);
 #else
@@ -404,6 +457,12 @@ int mxf_disk_file_open_new(const char *filename, MXFFile **mxfFile)
         goto fail;
     }
 
+#if defined(USE_LOW_LEVEL_IO)
+    newDiskFile->isFIFO = check_file_is_fifo(newDiskFile->fileId);
+#else
+    newDiskFile->isFIFO = check_file_is_fifo(fileno(newDiskFile->file));
+#endif
+
     newMXFFile->close         = disk_file_close;
     newMXFFile->read          = disk_file_read;
     newMXFFile->write         = disk_file_write;
@@ -445,6 +504,12 @@ int mxf_disk_file_open_read(const char *filename, MXFFile **mxfFile)
         goto fail;
     }
 
+#if defined(USE_LOW_LEVEL_IO)
+    newDiskFile->isFIFO = check_file_is_fifo(newDiskFile->fileId);
+#else
+    newDiskFile->isFIFO = check_file_is_fifo(fileno(newDiskFile->file));
+#endif
+
     newMXFFile->close         = disk_file_close;
     newMXFFile->read          = disk_file_read;
     newMXFFile->write         = disk_file_write;
@@ -485,6 +550,12 @@ int mxf_disk_file_open_modify(const char *filename, MXFFile **mxfFile)
     {
         goto fail;
     }
+
+#if defined(USE_LOW_LEVEL_IO)
+    newDiskFile->isFIFO = check_file_is_fifo(newDiskFile->fileId);
+#else
+    newDiskFile->isFIFO = check_file_is_fifo(fileno(newDiskFile->file));
+#endif
 
     newMXFFile->close         = disk_file_close;
     newMXFFile->read          = disk_file_read;
