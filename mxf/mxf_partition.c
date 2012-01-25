@@ -395,10 +395,6 @@ int mxf_update_partitions(MXFFile *mxfFile, MXFFilePartitions *partitions)
         {
             partition->footerPartition = lastPartition->thisPartition;
         }
-        else
-        {
-            partition->footerPartition = 0;
-        }
 
         previousPartition = partition;
     }
