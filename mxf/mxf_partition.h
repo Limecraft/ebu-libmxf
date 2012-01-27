@@ -129,6 +129,8 @@ int mxf_write_rip(MXFFile *mxfFile, MXFFilePartitions *partitions);
 int mxf_read_header_pp_kl_with_runin(MXFFile *mxfFile, mxfKey *key, uint8_t *llen, uint64_t *len);
 int mxf_read_header_pp_kl(MXFFile *mxfFile, mxfKey *key, uint8_t *llen, uint64_t *len);
 
+int mxf_find_footer_partition(MXFFile *mxfFile);
+
 
 #ifdef __cplusplus
 }

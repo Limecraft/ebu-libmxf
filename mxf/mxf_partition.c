@@ -759,3 +759,66 @@ int mxf_read_header_pp_kl_with_runin(MXFFile *mxfFile, mxfKey *key, uint8_t *lle
     return 1;
 }
 
+int mxf_find_footer_partition(MXFFile *mxfFile)
+{
+    const uint32_t maxIterations = 250; /* i.e. search maximum 8MB */
+    const uint32_t bufferSize = 32768 + 15;
+    unsigned char *buffer;
+    uint32_t numRead = 0;
+    int64_t offset;
+    int lastIteration = 0;
+    uint32_t i, j;
+
+    CHK_MALLOC_ARRAY_ORET(buffer, unsigned char, bufferSize);
+
+    if (!mxf_file_seek(mxfFile, 0, SEEK_END))
+        goto fail;
+
+    offset = mxf_file_tell(mxfFile);
+
+    for (i = 0; i < maxIterations; i++) {
+        if (offset < 17) /* file must start with a header partition pack */
+            break;
+        numRead = bufferSize - 15;
+        if (numRead > offset)
+            numRead = offset;
+
+        /* first 15 bytes from last read are used for comparison in this read */
+        if (i > 0)
+            memcpy(buffer + numRead, buffer, 15);
+
+        if (!mxf_file_seek(mxfFile, offset - numRead, SEEK_SET) ||
+            mxf_file_read(mxfFile, buffer, numRead) != numRead)
+        {
+            break;
+        }
+
+        for (j = 0; j < numRead; j++) {
+            if (buffer[j]     == g_PartitionPackPrefix_key.octet0 &&
+                buffer[j + 1] == g_PartitionPackPrefix_key.octet1 &&
+                memcmp(&buffer[j + 2], &g_PartitionPackPrefix_key.octet2, 11) == 0)
+            {
+                if (buffer[j + 13] == 0x04) {
+                    /* found footer partition pack key - seek to it */
+                    if (!mxf_file_seek(mxfFile, offset - numRead + j, SEEK_SET))
+                        goto fail;
+
+                    SAFE_FREE(&buffer);
+                    return 1;
+                } else if (buffer[j + 13] == 0x02 || buffer[j + 13] == 0x03) {
+                    /* found a header or body partition pack key - continue search in this buffer only */
+                    lastIteration = 1;
+                }
+            }
+        }
+        if (lastIteration)
+            break;
+
+        offset -= numRead;
+    }
+
+fail:
+    SAFE_FREE(&buffer);
+    return 0;
+}
+
