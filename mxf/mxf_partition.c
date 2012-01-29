@@ -781,7 +781,7 @@ int mxf_find_footer_partition(MXFFile *mxfFile)
             break;
         numRead = bufferSize - 15;
         if (numRead > offset)
-            numRead = offset;
+            numRead = (uint32_t)offset;
 
         /* first 15 bytes from last read are used for comparison in this read */
         if (i > 0)
