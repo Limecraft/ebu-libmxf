@@ -66,15 +66,15 @@ struct MXFFileSysData
     int readOnly;
     int64_t virtualStartPos;
     Chunk *chunks;
-    int64_t numChunks;
+    size_t numChunks;
     int64_t position;
 };
 
 
 
-static int get_chunk_pos(MXFFileSysData *sysData, int64_t *posChunkIndex, int64_t *posChunkPos)
+static int get_chunk_pos(MXFFileSysData *sysData, size_t *posChunkIndex, int64_t *posChunkPos)
 {
-    int64_t chunkIndex;
+    size_t chunkIndex;
     int64_t chunkPos;
 
     if (sysData->numChunks == 0)
@@ -85,11 +85,11 @@ static int get_chunk_pos(MXFFileSysData *sysData, int64_t *posChunkIndex, int64_
         chunkIndex = 0;
         chunkPos = sysData->position;
     } else {
-        chunkIndex = sysData->position / sysData->chunkSize;
+        chunkIndex = (size_t)(sysData->position / sysData->chunkSize);
         assert(chunkIndex <= sysData->numChunks);
         if (chunkIndex == sysData->numChunks)
             chunkIndex--;
-        chunkPos = sysData->position - sysData->chunkSize * chunkIndex;
+        chunkPos = sysData->position - (int64_t)sysData->chunkSize * chunkIndex;
     }
     assert(chunkPos <= sysData->chunks[chunkIndex].size);
 
@@ -160,7 +160,7 @@ static int64_t mem_file_size(MXFFileSysData *sysData)
 static uint32_t mem_file_read(MXFFileSysData *sysData, uint8_t *data, uint32_t count)
 {
     uint32_t totalRead = 0;
-    int64_t posChunkIndex;
+    size_t posChunkIndex;
     int64_t posChunkPos;
     int64_t numRead;
 
@@ -192,7 +192,7 @@ static uint32_t mem_file_read(MXFFileSysData *sysData, uint8_t *data, uint32_t c
 static uint32_t mem_file_write(MXFFileSysData *sysData, const uint8_t *data, uint32_t count)
 {
     uint32_t totalWrite = 0;
-    int64_t posChunkIndex;
+    size_t posChunkIndex;
     int64_t posChunkPos;
     int64_t numWrite;
 
@@ -387,25 +387,25 @@ MXFFile* mxf_mem_file_get_file(MXFMemoryFile *mxfMemFile)
     return mxfMemFile->mxfFile;
 }
 
-int64_t mxf_mem_file_get_num_chunks(MXFMemoryFile *mxfMemFile)
+size_t mxf_mem_file_get_num_chunks(MXFMemoryFile *mxfMemFile)
 {
     return mxfMemFile->mxfFile->sysData->numChunks;
 }
 
-unsigned char* mxf_mem_file_get_chunk_data(MXFMemoryFile *mxfMemFile, int64_t chunkIndex)
+unsigned char* mxf_mem_file_get_chunk_data(MXFMemoryFile *mxfMemFile, size_t chunkIndex)
 {
-    if (chunkIndex < 0 || chunkIndex >= mxfMemFile->mxfFile->sysData->numChunks) {
-        mxf_log_error("Invalid chunk index value %"PRId64""LOG_LOC_FORMAT, chunkIndex, LOG_LOC_PARAMS);
+    if (chunkIndex >= mxfMemFile->mxfFile->sysData->numChunks) {
+        mxf_log_error("Invalid chunk index value %"PRIszt""LOG_LOC_FORMAT, chunkIndex, LOG_LOC_PARAMS);
         return NULL;
     }
 
     return mxfMemFile->mxfFile->sysData->chunks[chunkIndex].data;
 }
 
-int64_t mxf_mem_file_get_chunk_size(MXFMemoryFile *mxfMemFile, int64_t chunkIndex)
+int64_t mxf_mem_file_get_chunk_size(MXFMemoryFile *mxfMemFile, size_t chunkIndex)
 {
-    if (chunkIndex < 0 || chunkIndex >= mxfMemFile->mxfFile->sysData->numChunks) {
-        mxf_log_error("Invalid chunk index value %"PRId64""LOG_LOC_FORMAT, chunkIndex, LOG_LOC_PARAMS);
+    if (chunkIndex >= mxfMemFile->mxfFile->sysData->numChunks) {
+        mxf_log_error("Invalid chunk index value %"PRIszt""LOG_LOC_FORMAT, chunkIndex, LOG_LOC_PARAMS);
         return 0;
     }
 
@@ -419,7 +419,7 @@ int64_t mxf_mem_file_get_size(MXFMemoryFile *mxfMemFile)
     if (sysData->numChunks == 0)
         return 0;
 
-    return sysData->chunkSize * (sysData->numChunks - 1) +
+    return (int64_t)sysData->chunkSize * (sysData->numChunks - 1) +
            sysData->chunks[sysData->numChunks - 1].size;
 }
 
@@ -427,7 +427,7 @@ int mxf_mem_file_flush_to_file(MXFMemoryFile *mxfMemFile, MXFFile *mxfFile)
 {
     MXFFileSysData *sysData = mxfMemFile->mxfFile->sysData;
 
-    int64_t i;
+    size_t i;
     for (i = 0; i < sysData->numChunks; i++) {
         const unsigned char *data = sysData->chunks[i].data;
         int64_t remainder = sysData->chunks[i].size;

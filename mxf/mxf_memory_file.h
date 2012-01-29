@@ -51,9 +51,9 @@ int mxf_mem_file_open_read(const unsigned char *data, int64_t size, int64_t virt
 
 MXFFile* mxf_mem_file_get_file(MXFMemoryFile *mxfMemFile);
 
-int64_t mxf_mem_file_get_num_chunks(MXFMemoryFile *mxfMemFile);
-unsigned char* mxf_mem_file_get_chunk_data(MXFMemoryFile *mxfMemFile, int64_t chunkIndex);
-int64_t mxf_mem_file_get_chunk_size(MXFMemoryFile *mxfMemFile, int64_t chunkIndex);
+size_t mxf_mem_file_get_num_chunks(MXFMemoryFile *mxfMemFile);
+unsigned char* mxf_mem_file_get_chunk_data(MXFMemoryFile *mxfMemFile, size_t chunkIndex);
+int64_t mxf_mem_file_get_chunk_size(MXFMemoryFile *mxfMemFile, size_t chunkIndex);
 
 int64_t mxf_mem_file_get_size(MXFMemoryFile *mxfMemFile);
 
