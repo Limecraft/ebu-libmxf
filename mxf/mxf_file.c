@@ -522,7 +522,7 @@ fail:
 
 void mxf_file_close(MXFFile **mxfFile)
 {
-    return mxf_file_close_2(mxfFile, free);
+    mxf_file_close_2(mxfFile, free);
 }
 
 void mxf_file_close_2(MXFFile **mxfFile, void (*free_func)(void*))
