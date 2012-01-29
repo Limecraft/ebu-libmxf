@@ -59,6 +59,8 @@
 #   define fseeko   fseek
 #   define ftello   ftell
 #else
+/* Posix name fileno was deprecated in Visual C++ 2005. Redefine to the ISO C++ name */
+#   define fileno   _fileno
 /* 64-bit ftell and fseek were introduced in Visual C++ 2005 */
 #   define fseeko   _fseeki64
 #   define ftello   _ftelli64
