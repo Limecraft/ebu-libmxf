@@ -322,7 +322,12 @@ static int init_audio_sequence(ArchiveMXFWriter *output, const mxfRational *fram
 
 static uint32_t get_audio_element_size(const mxfRational *frameRate, uint32_t audioQuantBits)
 {
-    size_t i;
+    uint32_t maxNumSamples = 0;
+    uint32_t dataSize;
+    uint32_t fillSize;
+    uint32_t elementInKAGSize;
+    size_t i, j = 0;
+
     for (i = 0; i < ARRAY_SIZE(AUDIO_SEQUENCES); i++)
     {
         if (memcmp(frameRate, &AUDIO_SEQUENCES[i].frameRate, sizeof(*frameRate)) == 0)
@@ -336,8 +341,6 @@ static uint32_t get_audio_element_size(const mxfRational *frameRate, uint32_t au
         return 0;
     }
 
-    uint32_t maxNumSamples = 0;
-    size_t j = 0;
     while (AUDIO_SEQUENCES[i].sequence[j])
     {
         if (AUDIO_SEQUENCES[i].sequence[j] > maxNumSamples)
@@ -345,9 +348,9 @@ static uint32_t get_audio_element_size(const mxfRational *frameRate, uint32_t au
         j++;
     }
 
-    uint32_t dataSize = mxfKey_extlen + ESS_ELEMENT_LLEN + get_audio_frame_size(maxNumSamples, audioQuantBits);
-    uint32_t fillSize = (j > 1 ? mxfKey_extlen + MIN_LLEN : 0);
-    uint32_t elementInKAGSize = (dataSize + fillSize) % KAG_SIZE;
+    dataSize = mxfKey_extlen + ESS_ELEMENT_LLEN + get_audio_frame_size(maxNumSamples, audioQuantBits);
+    fillSize = (j > 1 ? mxfKey_extlen + MIN_LLEN : 0);
+    elementInKAGSize = (dataSize + fillSize) % KAG_SIZE;
     if (elementInKAGSize > 0) {
         fillSize += KAG_SIZE - elementInKAGSize;
         while (fillSize < (uint32_t)MIN_LLEN + mxfKey_extlen)
@@ -359,12 +362,15 @@ static uint32_t get_audio_element_size(const mxfRational *frameRate, uint32_t au
 
 static int check_and_update_audio_sequence(ArchiveMXFWriter *output, uint32_t dataSize)
 {
-    uint32_t numSamples = dataSize / output->blockAlign;
+    uint32_t numSamples;
+    int64_t position;
+
+    numSamples = dataSize / output->blockAlign;
     CHK_ORET(dataSize == numSamples * output->blockAlign);
 
     /* Note: output->duration is updated after writing the video data, i.e. it starts at 1 for the first audio data */
     CHK_ORET(output->duration > 0);
-    int64_t position = output->duration - 1;
+    position = output->duration - 1;
 
     /* check tracks have the same number of samples as the first track */
     if (output->essWriteState.audioNum > 0)
@@ -2362,13 +2368,13 @@ uint32_t get_archive_mxf_content_package_size(const mxfRational *frameRate, uint
                                               uint32_t componentDepth, int numAudioTracks, uint32_t audioQuantBits,
                                               int includeCRC32)
 {
+    uint32_t videoFrameSize = get_video_frame_size(frameRate, signalStandard, componentDepth);
+    uint32_t audioElementSize = get_audio_element_size(frameRate, audioQuantBits);
     uint32_t systemItemSize = 28;
     if (includeCRC32)
     {
         systemItemSize += 12 + (1 + numAudioTracks) * 4;
     }
-    uint32_t videoFrameSize = get_video_frame_size(frameRate, signalStandard, componentDepth);
-    uint32_t audioElementSize = get_audio_element_size(frameRate, audioQuantBits);
 
     return mxfKey_extlen + ESS_ELEMENT_LLEN + systemItemSize +
            mxfKey_extlen + ESS_ELEMENT_LLEN + videoFrameSize +
