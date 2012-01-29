@@ -172,8 +172,8 @@ static uint32_t mem_file_read(MXFFileSysData *sysData, uint8_t *data, uint32_t c
         if (numRead > 0) {
             if (numRead > count - totalRead)
                 numRead = count - totalRead;
-            memcpy(&data[totalRead], &sysData->chunks[posChunkIndex].data[posChunkPos], numRead);
-            totalRead += numRead;
+            memcpy(&data[totalRead], &sysData->chunks[posChunkIndex].data[posChunkPos], (uint32_t)numRead);
+            totalRead += (uint32_t)numRead;
             sysData->position += numRead;
             posChunkPos += numRead;
         }
@@ -211,8 +211,8 @@ static uint32_t mem_file_write(MXFFileSysData *sysData, const uint8_t *data, uin
         if (numWrite > 0) {
             if (numWrite > count - totalWrite)
                 numWrite = count - totalWrite;
-            memcpy(&sysData->chunks[posChunkIndex].data[posChunkPos], &data[totalWrite], numWrite);
-            totalWrite += numWrite;
+            memcpy(&sysData->chunks[posChunkIndex].data[posChunkPos], &data[totalWrite], (uint32_t)numWrite);
+            totalWrite += (uint32_t)numWrite;
             sysData->position += numWrite;
             posChunkPos += numWrite;
             if (posChunkPos > sysData->chunks[posChunkIndex].size)
