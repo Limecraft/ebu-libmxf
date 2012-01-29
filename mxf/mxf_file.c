@@ -39,14 +39,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-
-#if defined(_MSC_VER)
-#include <io.h>
-#include <fcntl.h>
 #include <sys/stat.h>
-#else
-#include <sys/stat.h>
-#endif
 
 #include <mxf/mxf.h>
 #include <mxf/mxf_macros.h>
@@ -54,17 +47,14 @@
 
 #if defined(_MSC_VER)
 #if (_MSC_VER < 1400)
-/* use low-level file I/O */
-#   define USE_MSC_LOW_LEVEL_IO
-#   define fseeko   fseek
-#   define ftello   ftell
-#else
+#error Visual C++ 2005 or later is required. Earlier versions do not support 64-bit stream I/O
+#endif
+
 /* Posix name fileno was deprecated in Visual C++ 2005. Redefine to the ISO C++ name */
 #   define fileno   _fileno
 /* 64-bit ftell and fseek were introduced in Visual C++ 2005 */
 #   define fseeko   _fseeki64
 #   define ftello   _ftelli64
-#endif
 #endif
 
 
@@ -75,9 +65,6 @@
 
 struct MXFFileSysData
 {
-#if defined(USE_MSC_LOW_LEVEL_IO)
-    int fileId;
-#endif
     FILE *file;
 
     int isSeekable;
@@ -101,115 +88,6 @@ static int check_file_is_stream(int fileId)
     return S_ISFIFO(buf.st_mode);
 #endif
 }
-
-
-#if defined(USE_MSC_LOW_LEVEL_IO)
-
-static void disk_file_close_ll(MXFFileSysData *sysData)
-{
-    /* 0 = stdin, 1 = stdout, 2 = stderr */
-    if (sysData->fileId > 2)
-    {
-        close(sysData->fileId);
-    }
-    sysData->fileId = -1;
-}
-
-static uint32_t disk_file_read_ll(MXFFileSysData *sysData, uint8_t *data, uint32_t count)
-{
-    uint32_t result = read(sysData->fileId, data, count);
-    sysData->streamPosition += result;
-    return result;
-}
-
-static uint32_t disk_file_write_ll(MXFFileSysData *sysData, const uint8_t *data, uint32_t count)
-{
-    uint32_t result = write(sysData->fileId, data, count);
-    sysData->streamPosition += result;
-    return result;
-}
-
-static int disk_file_getchar_ll(MXFFileSysData *sysData)
-{
-    uint8_t c;
-    if (read(sysData->fileId, &c, 1) != 1)
-    {
-        return EOF;
-    }
-    sysData->streamPosition++;
-    return c;
-}
-
-static int disk_file_putchar_ll(MXFFileSysData *sysData, int c)
-{
-    uint8_t cbyte = (uint8_t)c;
-    if (write(sysData->fileId, &cbyte, 1) != 1)
-    {
-        return EOF;
-    }
-    sysData->streamPosition++;
-    return cbyte;
-}
-
-static int disk_file_eof_ll(MXFFileSysData *sysData)
-{
-    return eof(sysData->fileId);
-}
-
-static int disk_file_seek_ll(MXFFileSysData *sysData, int64_t offset, int whence)
-{
-    if (sysData->isStream)
-    {
-        return (whence == SEEK_CUR && offset == 0) ||
-               (whence == SEEK_SET && offset == sysData->streamPosition);
-    }
-
-    return _lseeki64(sysData->fileId, offset, whence) != -1;
-}
-
-static int64_t disk_file_tell_ll(MXFFileSysData *sysData)
-{
-    if (sysData->isStream)
-    {
-        return sysData->streamPosition;
-    }
-
-    return _telli64(sysData->fileId);
-}
-
-static int disk_file_is_seekable_ll(MXFFileSysData *sysData)
-{
-    if (sysData == NULL)
-    {
-        return 0;
-    }
-
-    if (!sysData->haveTestedIsSeekable)
-    {
-        sysData->isSeekable = (_lseek(sysData->fileId, 0, SEEK_CUR) != -1);
-        sysData->haveTestedIsSeekable = 1;
-    }
-
-    return sysData->isSeekable;
-}
-
-static int64_t disk_file_size_ll(MXFFileSysData *sysData)
-{
-    struct _stati64 statBuf;
-
-    if (sysData == NULL)
-    {
-        return -1;
-    }
-
-    if (_fstati64(sysData->fileId, &statBuf) != 0)
-    {
-        return -1;
-    }
-    return statBuf.st_size;
-}
-
-#endif /* USE_MSC_LOW_LEVEL_IO */
 
 
 static void disk_file_close(MXFFileSysData *sysData)
@@ -349,41 +227,21 @@ static void free_disk_file(MXFFileSysData *sysData)
 }
 
 
-static void assign_file_struct(MXFFile *mxfFile, MXFFileSysData *sysData, int lowLevel)
+static void assign_file_struct(MXFFile *mxfFile, MXFFileSysData *sysData)
 {
-    if (lowLevel)
-    {
-#if defined(USE_MSC_LOW_LEVEL_IO)
-        mxfFile->close         = disk_file_close_ll;
-        mxfFile->read          = disk_file_read_ll;
-        mxfFile->write         = disk_file_write_ll;
-        mxfFile->get_char      = disk_file_getchar_ll;
-        mxfFile->put_char      = disk_file_putchar_ll;
-        mxfFile->eof           = disk_file_eof_ll;
-        mxfFile->seek          = disk_file_seek_ll;
-        mxfFile->tell          = disk_file_tell_ll;
-        mxfFile->is_seekable   = disk_file_is_seekable_ll;
-        mxfFile->size          = disk_file_size_ll;
-#else
-        assert(0);
-#endif
-    }
-    else
-    {
-        mxfFile->close         = disk_file_close;
-        mxfFile->read          = disk_file_read;
-        mxfFile->write         = disk_file_write;
-        mxfFile->get_char      = disk_file_getchar;
-        mxfFile->put_char      = disk_file_putchar;
-        mxfFile->eof           = disk_file_eof;
-        mxfFile->seek          = disk_file_seek;
-        mxfFile->tell          = disk_file_tell;
-        mxfFile->is_seekable   = disk_file_is_seekable;
-        mxfFile->size          = disk_file_size;
-    }
+    mxfFile->close         = disk_file_close;
+    mxfFile->read          = disk_file_read;
+    mxfFile->write         = disk_file_write;
+    mxfFile->get_char      = disk_file_getchar;
+    mxfFile->put_char      = disk_file_putchar;
+    mxfFile->eof           = disk_file_eof;
+    mxfFile->seek          = disk_file_seek;
+    mxfFile->tell          = disk_file_tell;
+    mxfFile->is_seekable   = disk_file_is_seekable;
+    mxfFile->size          = disk_file_size;
 
-    mxfFile->free_sys_data     = free_disk_file;
-    mxfFile->sysData           = sysData;
+    mxfFile->free_sys_data = free_disk_file;
+    mxfFile->sysData       = sysData;
 }
 
 int mxf_disk_file_open_new(const char *filename, MXFFile **mxfFile)
@@ -396,22 +254,13 @@ int mxf_disk_file_open_new(const char *filename, MXFFile **mxfFile)
     CHK_MALLOC_OFAIL(newDiskFile, MXFFileSysData);
     memset(newDiskFile, 0, sizeof(MXFFileSysData));
 
-#if defined(USE_MSC_LOW_LEVEL_IO)
-    if ((newDiskFile->fileId = open(filename, _O_BINARY | _O_RDWR | _O_CREAT | _O_TRUNC, _S_IREAD | _S_IWRITE)) == -1)
-#else
     if ((newDiskFile->file = fopen(filename, "w+b")) == NULL)
-#endif
     {
         goto fail;
     }
 
-#if defined(USE_MSC_LOW_LEVEL_IO)
-    newDiskFile->isStream = check_file_is_stream(newDiskFile->fileId);
-    assign_file_struct(newMXFFile, newDiskFile, 1);
-#else
     newDiskFile->isStream = check_file_is_stream(fileno(newDiskFile->file));
-    assign_file_struct(newMXFFile, newDiskFile, 0);
-#endif
+    assign_file_struct(newMXFFile, newDiskFile);
 
     *mxfFile = newMXFFile;
     return 1;
@@ -432,22 +281,13 @@ int mxf_disk_file_open_read(const char *filename, MXFFile **mxfFile)
     CHK_MALLOC_OFAIL(newDiskFile, MXFFileSysData);
     memset(newDiskFile, 0, sizeof(MXFFileSysData));
 
-#if defined(USE_MSC_LOW_LEVEL_IO)
-    if ((newDiskFile->fileId = open(filename, _O_BINARY | _O_RDONLY)) == -1)
-#else
     if ((newDiskFile->file = fopen(filename, "rb")) == NULL)
-#endif
     {
         goto fail;
     }
 
-#if defined(USE_MSC_LOW_LEVEL_IO)
-    newDiskFile->isStream = check_file_is_stream(newDiskFile->fileId);
-    assign_file_struct(newMXFFile, newDiskFile, 1);
-#else
     newDiskFile->isStream = check_file_is_stream(fileno(newDiskFile->file));
-    assign_file_struct(newMXFFile, newDiskFile, 0);
-#endif
+    assign_file_struct(newMXFFile, newDiskFile);
 
     *mxfFile = newMXFFile;
     return 1;
@@ -468,22 +308,13 @@ int mxf_disk_file_open_modify(const char *filename, MXFFile **mxfFile)
     CHK_MALLOC_OFAIL(newDiskFile, MXFFileSysData);
     memset(newDiskFile, 0, sizeof(MXFFileSysData));
 
-#if defined(USE_MSC_LOW_LEVEL_IO)
-    if ((newDiskFile->fileId = open(filename, _O_BINARY | _O_RDWR)) == -1)
-#else
     if ((newDiskFile->file = fopen(filename, "r+b")) == NULL)
-#endif
     {
         goto fail;
     }
 
-#if defined(USE_MSC_LOW_LEVEL_IO)
-    newDiskFile->isStream = check_file_is_stream(newDiskFile->fileId);
-    assign_file_struct(newMXFFile, newDiskFile, 1);
-#else
     newDiskFile->isStream = check_file_is_stream(fileno(newDiskFile->file));
-    assign_file_struct(newMXFFile, newDiskFile, 0);
-#endif
+    assign_file_struct(newMXFFile, newDiskFile);
 
     *mxfFile = newMXFFile;
     return 1;
@@ -507,7 +338,7 @@ int mxf_stdin_wrap_read(MXFFile **mxfFile)
 
     newStdInFile->file     = stdin;
     newStdInFile->isStream = 1;
-    assign_file_struct(newMXFFile, newStdInFile, 0);
+    assign_file_struct(newMXFFile, newStdInFile);
 
     *mxfFile = newMXFFile;
     return 1;
