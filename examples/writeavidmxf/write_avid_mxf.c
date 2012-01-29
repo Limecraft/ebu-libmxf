@@ -2072,8 +2072,8 @@ static int create_track_writer(AvidClipWriter *clipWriter, PackageDefinitions *p
             }
             if (newTrackWriter->vbiSize > 0)
             {
-                CHK_MALLOC_ARRAY_OFAIL(newTrackWriter->vbiData, uint8_t, newTrackWriter->vbiSize);
-                for (i = 0; i < newTrackWriter->vbiSize / 4; i++)
+                CHK_MALLOC_ARRAY_OFAIL(newTrackWriter->vbiData, uint8_t, (uint32_t)newTrackWriter->vbiSize);
+                for (i = 0; i < (uint32_t)newTrackWriter->vbiSize / 4; i++)
                 {
                     newTrackWriter->vbiData[i * 4    ] = 0x80; // U
                     newTrackWriter->vbiData[i * 4 + 1] = 0x10; // Y
@@ -2400,7 +2400,7 @@ int write_samples(AvidClipWriter *clipWriter, uint32_t materialTrackID, uint32_t
                 {
                     /* black VBI lines */
                     CHK_ORET(mxf_write_essence_element_data(writer->mxfFile, writer->essenceElement, writer->vbiData,
-                                                            writer->vbiSize));
+                                                            (uint32_t)writer->vbiSize));
                 }
                 CHK_ORET(mxf_write_essence_element_data(writer->mxfFile, writer->essenceElement, data, size));
             }
@@ -2408,7 +2408,7 @@ int write_samples(AvidClipWriter *clipWriter, uint32_t materialTrackID, uint32_t
             {
                 /* write input data, but skip extra (-writer->vbiSize) input VBI data */
                 CHK_ORET(mxf_write_essence_element_data(writer->mxfFile, writer->essenceElement,
-                                                        data - writer->vbiSize, size + writer->vbiSize));
+                                                        data - writer->vbiSize, (uint32_t)(size + writer->vbiSize)));
             }
             writer->duration++;
             break;
@@ -2444,7 +2444,7 @@ int write_sample_data(AvidClipWriter *clipWriter, uint32_t materialTrackID, cons
         if (writer->vbiSize > 0)
         {
             CHK_ORET(mxf_write_essence_element_data(writer->mxfFile, writer->essenceElement, writer->vbiData,
-                                                    writer->vbiSize));
+                                                    (uint32_t)writer->vbiSize));
         }
     }
 
