@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="test_avidp2transfer"
-	ProjectGUID="{1B5869D8-43DE-47DF-87F0-431420B7F31D}"
+	Name="avidp2transfer"
+	ProjectGUID="{BAD317B2-6BD9-42C0-932A-F5BC13307CEC}"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
@@ -14,13 +14,13 @@
 			Name="Debug|Win32"
 			OutputDirectory="Debug"
 			IntermediateDirectory="Debug"
-			ConfigurationType="1"
+			ConfigurationType="4"
 			CharacterSet="1">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(AAFSDKINSTALL)\include;..\..\..\..;..\..\..;..\..\..\..\examples\transfertop2"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE,_WIN32"
+				AdditionalIncludeDirectories="$(AAFSDKINSTALL)\include;..\..\..\..\..;..\..\..;..\..\..\..\..\examples\transfertop2"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB,_WIN32"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -31,15 +31,8 @@
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="libMXF.lib avidp2transfer.lib AAFD.lib AAFIIDD.lib"
-				OutputFile="$(OutDir)/test_avidp2transfer.exe"
-				LinkIncremental="2"
-				AdditionalLibraryDirectories="$(AAFSDKINSTALL)\lib;..\avidp2transfer\Debug;..\..\..\mxf\Debug"
-				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/test_avidp2transfer.pdb"
-				SubSystem="1"
-				TargetMachine="1"/>
+				Name="VCLibrarianTool"
+				OutputFile="$(OutDir)/avidp2transfer.lib"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -54,8 +47,6 @@
 				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"/>
-			<Tool
-				Name="VCWebDeploymentTool"/>
 			<Tool
 				Name="VCManagedWrapperGeneratorTool"/>
 			<Tool
@@ -65,12 +56,12 @@
 			Name="Release|Win32"
 			OutputDirectory="Release"
 			IntermediateDirectory="Release"
-			ConfigurationType="1"
+			ConfigurationType="4"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="$(AAFSDKINSTALL)\include;..\..\..\..;..\..\..;..\..\..\..\examples\transfertop2"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
+				AdditionalIncludeDirectories="$(AAFSDKINSTALL)\include;..\..\..\..\..;..\..\..;..\..\..\..\..\examples\transfertop2"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="4"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
@@ -79,16 +70,8 @@
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="libMXF.lib avidp2transfer.lib AAFD.lib AAFIIDD.lib"
-				OutputFile="$(OutDir)/test_avidp2transfer.exe"
-				LinkIncremental="1"
-				AdditionalLibraryDirectories="$(AAFSDKINSTALL)\lib;..\avidp2transfer\Release;..\..\..\mxf\Release"
-				GenerateDebugInformation="TRUE"
-				SubSystem="1"
-				OptimizeReferences="2"
-				EnableCOMDATFolding="2"
-				TargetMachine="1"/>
+				Name="VCLibrarianTool"
+				OutputFile="$(OutDir)/avidp2transfer.lib"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -103,8 +86,6 @@
 				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"/>
-			<Tool
-				Name="VCWebDeploymentTool"/>
 			<Tool
 				Name="VCManagedWrapperGeneratorTool"/>
 			<Tool
@@ -119,13 +100,31 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath="..\..\..\..\examples\transfertop2\test_avidp2transfer.cpp">
+				RelativePath="..\..\..\..\..\examples\transfertop2\avid_mxf_to_p2.c">
+			</File>
+			<File
+				RelativePath="..\..\..\..\..\examples\transfertop2\avidp2transfer.cpp">
+			</File>
+			<File
+				RelativePath="..\..\..\..\..\examples\transfertop2\xml_writer.c">
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
+			<File
+				RelativePath="..\..\..\..\..\examples\transfertop2\avid_mxf_to_p2.h">
+			</File>
+			<File
+				RelativePath="..\..\..\..\..\examples\transfertop2\avidp2transfer.h">
+			</File>
+			<File
+				RelativePath="..\..\..\..\..\examples\transfertop2\icon_avid_to_p2.h">
+			</File>
+			<File
+				RelativePath="..\..\..\..\..\examples\transfertop2\xml_writer.h">
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"

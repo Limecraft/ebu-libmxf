@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="MXFDump"
-	ProjectGUID="{F1789184-5550-4C77-BD7A-D02493E8CE5F}"
+	Name="test_avid_mxf_to_p2"
+	ProjectGUID="{EDC74565-63A6-4730-9443-110A22F1B16F}"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
@@ -19,24 +19,26 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\tools\MXFDump"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
+				AdditionalIncludeDirectories="..\..\..\..\..;..\..\..;..\..\..\..\..\examples\transfertop2"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE,_WIN32"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				WarnAsError="FALSE"
 				Detect64BitPortabilityProblems="TRUE"
-				DebugInformationFormat="4"/>
+				DebugInformationFormat="4"
+				CompileAs="1"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/MXFDump.exe"
+				AdditionalDependencies="libMXF.lib avidp2transfer.lib"
+				OutputFile="$(OutDir)/test_avid_mxf_to_p2.exe"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="..\avidp2transfer\Debug;..\..\..\mxf\Debug"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/MXFDump.pdb"
+				ProgramDatabaseFile="$(OutDir)/test_avid_mxf_to_p2.pdb"
 				SubSystem="1"
 				TargetMachine="1"/>
 			<Tool
@@ -68,7 +70,7 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\..\tools\MXFDump"
+				AdditionalIncludeDirectories="..\..\..\..\..;..\..\..;..\..\..\..\..\examples\transfertop2"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="4"
 				UsePrecompiledHeader="0"
@@ -79,8 +81,10 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/MXFDump.exe"
+				AdditionalDependencies="libMXF.lib avidp2transfer.lib"
+				OutputFile="$(OutDir)/test_avid_mxf_to_p2.exe"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="..\avidp2transfer\Release;..\..\..\mxf\Release"
 				GenerateDebugInformation="TRUE"
 				SubSystem="1"
 				OptimizeReferences="2"
@@ -116,26 +120,19 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath="..\..\..\tools\MXFDump\MXFDump.cpp">
+				RelativePath="..\..\..\..\..\examples\transfertop2\test_avid_mxf_to_p2.c">
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
-			<File
-				RelativePath="..\..\..\tools\MXFDump\AAFMetaDictionary.h">
-			</File>
-			<File
-				RelativePath="..\..\..\tools\MXFDump\MXFLabels.h">
-			</File>
-			<File
-				RelativePath="..\..\..\tools\MXFDump\MXFMetaDictionary.h">
-			</File>
 		</Filter>
-		<File
-			RelativePath="..\..\readme_MXFDump.txt">
-		</File>
+		<Filter
+			Name="Resource Files"
+			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
+			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}">
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>

@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="7.10"
-	Name="avidmxfinfo"
-	ProjectGUID="{B366FAC9-B5EB-4660-B198-FB896BDF56C7}"
+	Name="test_avidp2transfer"
+	ProjectGUID="{1B5869D8-43DE-47DF-87F0-431420B7F31D}"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
@@ -19,28 +19,25 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..;..\..;..\..\..\examples\avidmxfinfo"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
+				AdditionalIncludeDirectories="$(AAFSDKINSTALL)\include;..\..\..\..\..;..\..\..;..\..\..\..\..\examples\transfertop2"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE,_WIN32"
 				MinimalRebuild="TRUE"
-				ExceptionHandling="FALSE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				WarnAsError="TRUE"
 				Detect64BitPortabilityProblems="TRUE"
-				DebugInformationFormat="4"
-				CompileAs="1"/>
+				DebugInformationFormat="4"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libMXF.lib"
-				OutputFile="$(OutDir)/avidmxfinfo.exe"
+				AdditionalDependencies="libMXF.lib avidp2transfer.lib AAFD.lib AAFIIDD.lib"
+				OutputFile="$(OutDir)/test_avidp2transfer.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\mxf\Debug"
+				AdditionalLibraryDirectories="$(AAFSDKINSTALL)\lib;..\avidp2transfer\Debug;..\..\..\mxf\Debug"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/avidmxfinfo.pdb"
+				ProgramDatabaseFile="$(OutDir)/test_avidp2transfer.pdb"
 				SubSystem="1"
 				TargetMachine="1"/>
 			<Tool
@@ -69,26 +66,24 @@
 			OutputDirectory="Release"
 			IntermediateDirectory="Release"
 			ConfigurationType="1"
-			CharacterSet="1">
+			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\..;..\..;..\..\..\examples\avidmxfinfo"
+				AdditionalIncludeDirectories="$(AAFSDKINSTALL)\include;..\..\..\..\..;..\..\..;..\..\..\..\..\examples\transfertop2"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
-				RuntimeLibrary="2"
+				RuntimeLibrary="4"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
-				WarnAsError="TRUE"
 				Detect64BitPortabilityProblems="TRUE"
-				DebugInformationFormat="3"
-				CompileAs="1"/>
+				DebugInformationFormat="3"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libMXF.lib"
-				OutputFile="$(OutDir)/avidmxfinfo.exe"
+				AdditionalDependencies="libMXF.lib avidp2transfer.lib AAFD.lib AAFIIDD.lib"
+				OutputFile="$(OutDir)/test_avidp2transfer.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\mxf\Release"
+				AdditionalLibraryDirectories="$(AAFSDKINSTALL)\lib;..\avidp2transfer\Release;..\..\..\mxf\Release"
 				GenerateDebugInformation="TRUE"
 				SubSystem="1"
 				OptimizeReferences="2"
@@ -124,19 +119,13 @@
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath="..\..\..\examples\avidmxfinfo\avid_mxf_info.c">
-			</File>
-			<File
-				RelativePath="..\..\..\examples\avidmxfinfo\main.c">
+				RelativePath="..\..\..\..\..\examples\transfertop2\test_avidp2transfer.cpp">
 			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
-			<File
-				RelativePath="..\..\..\examples\avidmxfinfo\avid_mxf_info.h">
-			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"
