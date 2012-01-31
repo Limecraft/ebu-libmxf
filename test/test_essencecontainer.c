@@ -82,7 +82,7 @@ int test_read(const char *filename)
     CHK_OFAIL(mxf_read_next_nonfiller_kl(mxfFile, &key, &llen, &len));
     CHK_OFAIL(mxf_is_gc_essence_element(&key));
     CHK_OFAIL(llen == 4 && len == 256);
-    CHK_OFAIL(mxf_file_read(mxfFile, essenceData, len));
+    CHK_OFAIL(mxf_file_read(mxfFile, essenceData, (uint32_t)len));
 
     /* read body pp 1 */
     CHK_OFAIL(mxf_read_next_nonfiller_kl(mxfFile, &key, &llen, &len));
@@ -94,7 +94,7 @@ int test_read(const char *filename)
     CHK_OFAIL(mxf_read_next_nonfiller_kl(mxfFile, &key, &llen, &len));
     CHK_OFAIL(mxf_open_essence_element_read(mxfFile, &key, llen, len, &essenceElement));
     CHK_OFAIL(llen == 8 && len == 1024);
-    CHK_OFAIL(mxf_read_essence_element_data(mxfFile, essenceElement, len, essenceData, &numRead));
+    CHK_OFAIL(mxf_read_essence_element_data(mxfFile, essenceElement, (uint32_t)len, essenceData, &numRead));
     CHK_OFAIL(numRead == len);
     mxf_close_essence_element(&essenceElement);
 
