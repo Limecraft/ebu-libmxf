@@ -60,7 +60,7 @@ static void add_delta_entry(MXFIndexTableSegment *segment, MXFDeltaEntry *entry)
             deltaEntryArrayLen++;
             lastEntry = lastEntry->next;
         }
-        assert(8 + deltaEntryArrayLen * 6 <= 0xffff);
+        assert(8 + deltaEntryArrayLen * 6 <= UINT16_MAX);
         lastEntry->next = entry;
     }
 }
@@ -80,7 +80,7 @@ static void add_index_entry(MXFIndexTableSegment *segment, MXFIndexEntry *entry)
             indexEntryArrayLen++;
             lastEntry = lastEntry->next;
         }
-        assert(8 + indexEntryArrayLen * (11 + segment->sliceCount * 4 + segment->posTableCount * 8) <= 0xffff);
+        assert(8 + indexEntryArrayLen * (11 + segment->sliceCount * 4 + segment->posTableCount * 8) <= UINT16_MAX);
         lastEntry->next = entry;
     }
 }

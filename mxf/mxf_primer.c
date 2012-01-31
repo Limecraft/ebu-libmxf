@@ -128,7 +128,7 @@ int mxf_create_primer_pack(MXFPrimerPack **primerPack)
     CHK_MALLOC_ORET(newPrimerPack, MXFPrimerPack);
     memset(newPrimerPack, 0, sizeof(MXFPrimerPack));
     mxf_initialise_list(&newPrimerPack->entries, free_primer_pack_entry_in_list);
-    newPrimerPack->nextTag = 0xffff; /* we count down when assigning dynamic tags */
+    newPrimerPack->nextTag = UINT16_MAX; /* we count down when assigning dynamic tags */
 
     *primerPack = newPrimerPack;
     return 1;

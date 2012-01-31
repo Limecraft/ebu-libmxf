@@ -874,11 +874,11 @@ int mxf_avid_write_index_entry_array_header(MXFFile *mxfFile, uint8_t sliceCount
                                             uint32_t numIndexEntries)
 {
     CHK_ORET(mxf_write_local_tag(mxfFile, 0x3f0a));
-    if (8 + numIndexEntries * (11 + sliceCount * 4 + posTableCount * 8) > 0xffff)
+    if (8 + numIndexEntries * (11 + sliceCount * 4 + posTableCount * 8) > UINT16_MAX)
     {
         /* Avid ignores the local set 16-bit size restriction and relies on the array header to
            provide the size */
-        CHK_ORET(mxf_write_uint16(mxfFile, 0xffff));
+        CHK_ORET(mxf_write_uint16(mxfFile, UINT16_MAX));
     }
     else
     {

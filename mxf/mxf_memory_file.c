@@ -433,8 +433,8 @@ int mxf_mem_file_flush_to_file(MXFMemoryFile *mxfMemFile, MXFFile *mxfFile)
         int64_t remainder = sysData->chunks[i].size;
         uint32_t writeSize;
         while (remainder > 0) {
-            if (remainder > 0xffffffff)
-                writeSize = 0xffffffff;
+            if (remainder > UINT32_MAX)
+                writeSize = UINT32_MAX;
             else
                 writeSize = (uint32_t)remainder;
 
