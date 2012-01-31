@@ -139,7 +139,7 @@ static void mem_file_close(MXFFileSysData *sysData)
         return;
 
     if (!sysData->readOnly) {
-        int64_t i;
+        size_t i;
         for (i = 0; i < sysData->numChunks; i++)
             free(sysData->chunks[i].data);
     }
