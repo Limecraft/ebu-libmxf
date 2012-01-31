@@ -163,6 +163,7 @@ int test_create_and_write(const char *filename)
     MXFIndexTableSegment *indexSegment = NULL;
     uint32_t sliceOffset[2];
     mxfRational posTable[2];
+    const mxfRational editRate = {25, 1};
     int i;
     int k;
 
@@ -188,7 +189,6 @@ int test_create_and_write(const char *filename)
 
     CHK_OFAIL(mxf_create_index_table_segment(&indexSegment));
     mxf_generate_uuid(&indexSegment->instanceUID);
-    const mxfRational editRate = {25, 1};
     indexSegment->indexEditRate = editRate;
     indexSegment->indexDuration = 0x64;
     indexSegment->editUnitByteCount = 0x100;

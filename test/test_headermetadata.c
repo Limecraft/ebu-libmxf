@@ -136,11 +136,11 @@ typedef struct
 static int before_set_read(void *privateData, MXFHeaderMetadata *headerMetadata,
                            const mxfKey *key, uint8_t llen, uint64_t len, int *skip)
 {
+    FilterData *filterData = (FilterData*)privateData;
+
     (void)headerMetadata;
     (void)llen;
     (void)len;
-
-    FilterData *filterData = (FilterData*)privateData;
 
     /* TestSet1 is skipped */
 
@@ -165,9 +165,9 @@ static int before_set_read(void *privateData, MXFHeaderMetadata *headerMetadata,
 
 static int after_set_read(void *privateData, MXFHeaderMetadata *headerMetadata, MXFMetadataSet *set, int *skip)
 {
-    (void)headerMetadata;
-
     FilterData *filterData = (FilterData*)privateData;
+
+    (void)headerMetadata;
 
     /* All except Preface are skipped */
 
@@ -246,6 +246,8 @@ int test_read(const char *filename)
     mxfUL ul;
     int64_t headerMetadataFilePos;
     MXFListIterator setsIter;
+    FilterData filterData;
+    MXFReadFilter readFilter;
 
 
     if (!mxf_disk_file_open_read(filename, &mxfFile))
@@ -410,9 +412,7 @@ int test_read(const char *filename)
 
     /* test reading using filter */
 
-    FilterData filterData;
     memset(&filterData, 0, sizeof(FilterData));
-    MXFReadFilter readFilter;
     readFilter.privateData = &filterData;
     readFilter.before_set_read = before_set_read;
     readFilter.after_set_read = after_set_read;
