@@ -60,7 +60,7 @@ static void add_delta_entry(MXFIndexTableSegment *segment, MXFDeltaEntry *entry)
             deltaEntryArrayLen++;
             lastEntry = lastEntry->next;
         }
-        assert(8 + deltaEntryArrayLen * 14 <= 0xffff);
+        assert(8 + deltaEntryArrayLen * 6 <= 0xffff);
         lastEntry->next = entry;
     }
 }
