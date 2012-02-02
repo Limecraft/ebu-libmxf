@@ -43,7 +43,7 @@ extern "C"
 
 #define LIBMXF_VERSION_MAJOR    1
 #define LIBMXF_VERSION_MINOR    0
-#define LIBMXF_VERSION_MICRO    1
+#define LIBMXF_VERSION_MICRO    2
 #define LIBMXF_VERSION_RELEASE  2   /* 0 = Unknown version
                                        1 = Released version
                                        2 = Development version
