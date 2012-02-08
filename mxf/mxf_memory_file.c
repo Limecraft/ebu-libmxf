@@ -135,9 +135,6 @@ static void free_mem_file(MXFFileSysData *sysData)
 
 static void mem_file_close(MXFFileSysData *sysData)
 {
-    if (!sysData)
-        return;
-
     if (!sysData->readOnly) {
         size_t i;
         for (i = 0; i < sysData->numChunks; i++)
@@ -151,9 +148,6 @@ static void mem_file_close(MXFFileSysData *sysData)
 
 static int64_t mem_file_size(MXFFileSysData *sysData)
 {
-    if (!sysData)
-        return -1;
-
     return sysData->virtualStartPos + mxf_mem_file_get_size(&sysData->mxfMemFile);
 }
 

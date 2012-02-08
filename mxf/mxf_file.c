@@ -169,11 +169,6 @@ static int64_t disk_file_tell(MXFFileSysData *sysData)
 
 static int disk_file_is_seekable(MXFFileSysData *sysData)
 {
-    if (sysData == NULL)
-    {
-        return 0;
-    }
-
     if (!sysData->haveTestedIsSeekable)
     {
         sysData->isSeekable = (fseek(sysData->file, 0, SEEK_CUR) == 0);
@@ -192,11 +187,6 @@ static int64_t disk_file_size(MXFFileSysData *sysData)
     int fo;
     struct stat statBuf;
 #endif
-
-    if (sysData == NULL)
-    {
-        return -1;
-    }
 
 #if defined(_WIN32)
     if ((fo = _fileno(sysData->file)) == -1)
@@ -222,14 +212,8 @@ static int64_t disk_file_size(MXFFileSysData *sysData)
 #endif
 }
 
-
 static void free_disk_file(MXFFileSysData *sysData)
 {
-    if (sysData == NULL)
-    {
-        return;
-    }
-
     free(sysData);
 }
 

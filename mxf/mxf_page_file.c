@@ -467,11 +467,6 @@ static uint32_t write_to_page(MXFFileSysData *sysData, const uint8_t *data, uint
 
 static void free_page_file(MXFFileSysData *sysData)
 {
-    if (sysData == NULL)
-    {
-        return;
-    }
-
     free(sysData);
 }
 
@@ -479,11 +474,6 @@ static void page_file_close(MXFFileSysData *sysData)
 {
     FileDescriptor *fd;
     FileDescriptor *nextFd;
-
-    if (sysData == NULL)
-    {
-        return;
-    }
 
     SAFE_FREE(&sysData->filenameTemplate);
 
@@ -508,11 +498,6 @@ static void page_file_close(MXFFileSysData *sysData)
 
 static int64_t page_file_size(MXFFileSysData *sysData)
 {
-    if (sysData == NULL)
-    {
-        return -1;
-    }
-
     if (sysData->numPages == 0)
     {
         return 0;
