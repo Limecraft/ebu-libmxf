@@ -149,23 +149,16 @@ static int64_t disk_file_size(const char *filename)
 {
 #if defined(_WIN32)
     struct _stati64 statBuf;
+    if (_stati64(filename, &statBuf) != 0)
 #else
     struct stat statBuf;
-#endif
-
-#if defined(_WIN32)
-    if (_stati64(filename, &statBuf) != 0)
-    {
-        return -1;
-    }
-    return statBuf.st_size;
-#else
     if (stat(filename, &statBuf) != 0)
+#endif
     {
         return -1;
     }
+
     return statBuf.st_size;
-#endif
 }
 
 
