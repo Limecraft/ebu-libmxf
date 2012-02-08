@@ -22,6 +22,11 @@ libMXF_@LIBMXF_MAJORMINOR@_la_SOURCES = \
 	mxf_avid_dictionary_data.h \
 	mxf_avid_metadictionary_data.h
 
+if IS_WIN32
+libMXF_@LIBMXF_MAJORMINOR@_la_SOURCES += mxf_win32_file.c
+endif
+
+
 libMXF_@LIBMXF_MAJORMINOR@_la_CFLAGS = $(LIBMXF_CFLAGS)
 libMXF_@LIBMXF_MAJORMINOR@_la_LDFLAGS = -version-info $(LIBMXF_LIBVERSION)
 libMXF_@LIBMXF_MAJORMINOR@_la_LIBADD = $(LIBMXF_LIBADDLIBS)
@@ -52,7 +57,7 @@ library_include_HEADERS = \
 	mxf_types.h \
 	mxf_utils.h \
 	mxf_uu_metadata.h \
-	mxf_version.h
-
+	mxf_version.h \
+	mxf_win32_file.h
 
 

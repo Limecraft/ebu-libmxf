@@ -228,6 +228,10 @@
 				RelativePath="..\..\..\mxf\mxf_version.c"
 				>
 			</File>
+			<File
+				RelativePath="..\..\..\mxf\mxf_win32_file.c"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -344,6 +348,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\mxf\mxf_version.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\mxf\mxf_win32_file.h"
 				>
 			</File>
 		</Filter>

@@ -207,8 +207,8 @@ AC_FUNC_FSEEKO
 dnl mingw doesn't support _FILE_OFFSET_BITS and so fseeko and ftello are
 dnl redefined instead
 case "$host" in
-	*-*-*mingw*) AC_DEFINE([fseeko], [fseeko64], [Define 64-bit file seek])
-				 AC_DEFINE([ftello], [ftello64], [Define 64-bit file tell]) ;;
+   *-*-*mingw*) AC_DEFINE([fseeko], [fseeko64], [Define 64-bit file seek])
+                AC_DEFINE([ftello], [ftello64], [Define 64-bit file tell]) ;;
 esac
 
 
@@ -254,9 +254,11 @@ AC_SUBST(AAFSDK_LIBS)
 
 
 case "$host" in
-	*-*-darwin*) os=mac ;;
+	*-*-*mingw*) os=win ;;
+	*-*-darwin*) os=mac
 esac
 AM_CONDITIONAL([IS_MACOS], [test x"$os" = xmac])
+AM_CONDITIONAL([IS_WIN32], [test x"$os" = xwin])
 
 
 dnl-----------------------------------------------------------------------------
