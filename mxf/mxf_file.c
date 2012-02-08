@@ -45,14 +45,14 @@
 #include <mxf/mxf_macros.h>
 
 
-#if defined(_MSC_VER)
-#if (_MSC_VER < 1400)
+#if defined(_WIN32)
+#if defined(_MSC_VER) && (_MSC_VER < 1400)
 #error Visual C++ 2005 or later is required. Earlier versions do not support 64-bit stream I/O
 #endif
 
-/* Posix name fileno was deprecated in Visual C++ 2005. Redefine to the ISO C++ name */
+/* In Visual C++ 2005 the posix names were deprecated and the ISO C++ names should be used instead */
+/* Also, 64-bit ftell and fseek support was added */
 #   define fileno   _fileno
-/* 64-bit ftell and fseek were introduced in Visual C++ 2005 */
 #   define fseeko   _fseeki64
 #   define ftello   _ftelli64
 #endif
@@ -178,7 +178,7 @@ static int disk_file_is_seekable(MXFFileSysData *sysData)
 
 static int64_t disk_file_size(MXFFileSysData *sysData)
 {
-#if defined(_MSC_VER)
+#if defined(_WIN32)
     int fo;
     struct _stati64 statBuf;
 #else
@@ -191,7 +191,7 @@ static int64_t disk_file_size(MXFFileSysData *sysData)
         return -1;
     }
 
-#if defined(_MSC_VER)
+#if defined(_WIN32)
     if ((fo = _fileno(sysData->file)) == -1)
     {
         return -1;
