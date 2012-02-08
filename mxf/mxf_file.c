@@ -63,6 +63,13 @@
 #define SKIP_BUFFER_SIZE        2048
 
 
+typedef enum
+{
+    NEW_MODE,
+    READ_MODE,
+    MODIFY_MODE,
+} OpenMode;
+
 struct MXFFileSysData
 {
     FILE *file;
@@ -244,7 +251,7 @@ static void assign_file_struct(MXFFile *mxfFile, MXFFileSysData *sysData)
     mxfFile->sysData       = sysData;
 }
 
-int mxf_disk_file_open_new(const char *filename, MXFFile **mxfFile)
+static int disk_file_open(const char *filename, OpenMode mode, MXFFile **mxfFile)
 {
     MXFFile *newMXFFile = NULL;
     MXFFileSysData *newDiskFile = NULL;
@@ -254,10 +261,21 @@ int mxf_disk_file_open_new(const char *filename, MXFFile **mxfFile)
     CHK_MALLOC_OFAIL(newDiskFile, MXFFileSysData);
     memset(newDiskFile, 0, sizeof(MXFFileSysData));
 
-    if ((newDiskFile->file = fopen(filename, "w+b")) == NULL)
+    switch (mode)
     {
-        goto fail;
+        case NEW_MODE:
+            newDiskFile->file = fopen(filename, "w+b");
+            break;
+        case READ_MODE:
+            newDiskFile->file = fopen(filename, "rb");
+            break;
+        case MODIFY_MODE:
+            newDiskFile->file = fopen(filename, "r+b");
+            break;
+
     }
+    if (!newDiskFile->file)
+        goto fail;
 
     newDiskFile->isStream = check_file_is_stream(fileno(newDiskFile->file));
     assign_file_struct(newMXFFile, newDiskFile);
@@ -269,60 +287,22 @@ fail:
     SAFE_FREE(&newMXFFile);
     SAFE_FREE(&newDiskFile);
     return 0;
+}
+
+
+int mxf_disk_file_open_new(const char *filename, MXFFile **mxfFile)
+{
+    return disk_file_open(filename, NEW_MODE, mxfFile);
 }
 
 int mxf_disk_file_open_read(const char *filename, MXFFile **mxfFile)
 {
-    MXFFile *newMXFFile = NULL;
-    MXFFileSysData *newDiskFile = NULL;
-
-    CHK_MALLOC_ORET(newMXFFile, MXFFile);
-    memset(newMXFFile, 0, sizeof(MXFFile));
-    CHK_MALLOC_OFAIL(newDiskFile, MXFFileSysData);
-    memset(newDiskFile, 0, sizeof(MXFFileSysData));
-
-    if ((newDiskFile->file = fopen(filename, "rb")) == NULL)
-    {
-        goto fail;
-    }
-
-    newDiskFile->isStream = check_file_is_stream(fileno(newDiskFile->file));
-    assign_file_struct(newMXFFile, newDiskFile);
-
-    *mxfFile = newMXFFile;
-    return 1;
-
-fail:
-    SAFE_FREE(&newMXFFile);
-    SAFE_FREE(&newDiskFile);
-    return 0;
+    return disk_file_open(filename, READ_MODE, mxfFile);
 }
 
 int mxf_disk_file_open_modify(const char *filename, MXFFile **mxfFile)
 {
-    MXFFile *newMXFFile = NULL;
-    MXFFileSysData *newDiskFile = NULL;
-
-    CHK_MALLOC_ORET(newMXFFile, MXFFile);
-    memset(newMXFFile, 0, sizeof(MXFFile));
-    CHK_MALLOC_OFAIL(newDiskFile, MXFFileSysData);
-    memset(newDiskFile, 0, sizeof(MXFFileSysData));
-
-    if ((newDiskFile->file = fopen(filename, "r+b")) == NULL)
-    {
-        goto fail;
-    }
-
-    newDiskFile->isStream = check_file_is_stream(fileno(newDiskFile->file));
-    assign_file_struct(newMXFFile, newDiskFile);
-
-    *mxfFile = newMXFFile;
-    return 1;
-
-fail:
-    SAFE_FREE(&newMXFFile);
-    SAFE_FREE(&newDiskFile);
-    return 0;
+    return disk_file_open(filename, MODIFY_MODE, mxfFile);
 }
 
 
