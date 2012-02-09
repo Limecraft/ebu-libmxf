@@ -59,9 +59,9 @@ struct MXFFileSysData
 
 static void win32_file_close(MXFFileSysData *sysData)
 {
-    if (sysData->file) {
+    if (sysData->file != INVALID_HANDLE_VALUE) {
         CloseHandle(sysData->file);
-        sysData->file = NULL;
+        sysData->file = INVALID_HANDLE_VALUE;
     }
 }
 
@@ -176,6 +176,7 @@ static int mxf_win32_file_open(const char *in_filename, int flags, OpenMode mode
     memset(newMXFFile, 0, sizeof(MXFFile));
     CHK_MALLOC_OFAIL(newDiskFile, MXFFileSysData);
     memset(newDiskFile, 0, sizeof(MXFFileSysData));
+    newDiskFile->file = INVALID_HANDLE_VALUE;
 
     if (flags & MXF_WIN32_FLAG_RANDOM_ACCESS)
         attrs_and_flags |= FILE_FLAG_RANDOM_ACCESS;
@@ -197,7 +198,7 @@ static int mxf_win32_file_open(const char *in_filename, int flags, OpenMode mode
                                            NULL, OPEN_EXISTING, attrs_and_flags, NULL);
             break;
     }
-    if (!newDiskFile->file)
+    if (newDiskFile->file == INVALID_HANDLE_VALUE)
         goto fail;
 
 #if defined (_UNICODE)
