@@ -68,6 +68,7 @@ struct MXFFileSysData
     Chunk *chunks;
     size_t numChunks;
     int64_t position;
+    int eof;
 };
 
 
@@ -86,12 +87,14 @@ static int get_chunk_pos(MXFFileSysData *sysData, size_t *posChunkIndex, int64_t
         chunkPos = sysData->position;
     } else {
         chunkIndex = (size_t)(sysData->position / sysData->chunkSize);
-        assert(chunkIndex <= sysData->numChunks);
-        if (chunkIndex == sysData->numChunks)
+        if (chunkIndex > sysData->numChunks)
+            return 0;
+        if (chunkIndex == sysData->numChunks) /* when position == size then return 1 */
             chunkIndex--;
         chunkPos = sysData->position - (int64_t)sysData->chunkSize * chunkIndex;
     }
-    assert(chunkPos <= sysData->chunks[chunkIndex].size);
+    if (chunkPos > sysData->chunks[chunkIndex].size)
+        return 0;
 
     *posChunkIndex = chunkIndex;
     *posChunkPos = chunkPos;
@@ -103,13 +106,20 @@ static int extend_mem_file(MXFFileSysData *sysData, uint32_t minSize)
     uint32_t i;
     Chunk *newChunks;
     uint32_t numExtendChunks;
+    int64_t chunkRemainder;
 
     assert(!sysData->readOnly);
 
-    numExtendChunks = (minSize + sysData->chunkSize - 1) / sysData->chunkSize;
-    if (numExtendChunks == 0)
-        numExtendChunks = 1;
+    if (sysData->numChunks == 0) {
+        chunkRemainder = 0;
+    } else {
+        chunkRemainder = sysData->chunks[sysData->numChunks - 1].allocSize -
+                            sysData->chunks[sysData->numChunks - 1].size;
+    }
+    if (minSize <= chunkRemainder)
+        return 1;
 
+    numExtendChunks = (uint32_t)((minSize - chunkRemainder + sysData->chunkSize - 1) / sysData->chunkSize);
     newChunks = (Chunk*)realloc(sysData->chunks, (sysData->numChunks + numExtendChunks) * sizeof(Chunk));
     if (!newChunks) {
         mxf_log_error("Failed to reallocate memory file chunks" LOG_LOC_FORMAT, LOG_LOC_PARAMS);
@@ -158,8 +168,16 @@ static uint32_t mem_file_read(MXFFileSysData *sysData, uint8_t *data, uint32_t c
     int64_t posChunkPos;
     int64_t numRead;
 
-    if (count == 0 || !get_chunk_pos(sysData, &posChunkIndex, &posChunkPos))
+    if (count == 0)
         return 0;
+
+    if (!get_chunk_pos(sysData, &posChunkIndex, &posChunkPos)) {
+        sysData->eof = 1;
+        return 0;
+    }
+
+
+    sysData->eof = 0;
 
     while (totalRead < count) {
         numRead = sysData->chunks[posChunkIndex].size - posChunkPos;
@@ -173,12 +191,15 @@ static uint32_t mem_file_read(MXFFileSysData *sysData, uint8_t *data, uint32_t c
         }
 
         if (posChunkPos >= sysData->chunks[posChunkIndex].size) {
-            if (posChunkIndex + 1 >= sysData->numChunks)
-                break;
             posChunkIndex++;
             posChunkPos = 0;
+            if (posChunkIndex >= sysData->numChunks)
+                break;
         }
     }
+
+    if (totalRead < count)
+        sysData->eof = 1;
 
     return totalRead;
 }
@@ -189,16 +210,49 @@ static uint32_t mem_file_write(MXFFileSysData *sysData, const uint8_t *data, uin
     size_t posChunkIndex;
     int64_t posChunkPos;
     int64_t numWrite;
+    int64_t fileSize;
 
     if (count == 0 || sysData->readOnly)
         return 0;
 
-    if (sysData->numChunks == 0 && !extend_mem_file(sysData, count))
-        return 0;
+    fileSize = mxf_mem_file_get_size(&sysData->mxfMemFile);
+    if (sysData->position + count > fileSize) {
+        if (sysData->position + count - fileSize > UINT32_MAX ||
+            !extend_mem_file(sysData, sysData->position + count - fileSize))
+        {
+            return 0;
+        }
 
-    /* note that check here is not strictly neccessary */
-    if (!get_chunk_pos(sysData, &posChunkIndex, &posChunkPos))
-        return 0;
+        /* add data from fileSize to sysData->position */
+        if (sysData->position > fileSize) {
+            size_t endPosChunkIndex;
+            int64_t endPosChunkPos;
+            int64_t chunkRemainder;
+            int64_t originalPos = sysData->position;
+
+            sysData->position = fileSize;
+            get_chunk_pos(sysData, &endPosChunkIndex, &endPosChunkPos);
+            sysData->position = originalPos;
+            assert(endPosChunkPos == sysData->chunks[endPosChunkIndex].size);
+
+            while (1) {
+                chunkRemainder = sysData->chunks[endPosChunkIndex].allocSize - sysData->chunks[endPosChunkIndex].size;
+                if (fileSize + chunkRemainder >= sysData->position) {
+                    sysData->chunks[endPosChunkIndex].size = sysData->position - fileSize;
+                    fileSize = sysData->position;
+                    break;
+                }
+                sysData->chunks[endPosChunkIndex].size = sysData->chunks[endPosChunkIndex].allocSize;
+                fileSize += chunkRemainder;
+                endPosChunkIndex++;
+            }
+        }
+    }
+
+
+    sysData->eof = 0;
+
+    get_chunk_pos(sysData, &posChunkIndex, &posChunkPos);
 
     while (totalWrite < count) {
         numWrite = sysData->chunks[posChunkIndex].allocSize - posChunkPos;
@@ -214,12 +268,6 @@ static uint32_t mem_file_write(MXFFileSysData *sysData, const uint8_t *data, uin
         }
 
         if (posChunkPos >= sysData->chunks[posChunkIndex].allocSize) {
-            if (totalWrite < count &&
-                posChunkIndex + 1 >= sysData->numChunks &&
-                !extend_mem_file(sysData, count - totalWrite))
-            {
-                break;
-            }
             posChunkIndex++;
             posChunkPos = 0;
         }
@@ -248,7 +296,7 @@ static int mem_file_putchar(MXFFileSysData *sysData, int c)
 
 static int mem_file_eof(MXFFileSysData *sysData)
 {
-    return sysData->position >= mxf_mem_file_get_size(&sysData->mxfMemFile);
+    return sysData->eof;
 }
 
 static int mem_file_seek(MXFFileSysData *sysData, int64_t offset, int whence)
@@ -273,10 +321,12 @@ static int mem_file_seek(MXFFileSysData *sysData, int64_t offset, int whence)
             position = sysData->position;
             break;
     }
-    if (position < 0 || position > size)
+    if (position < 0)
         return 0;
 
+    sysData->eof = 0;
     sysData->position = position;
+
     return 1;
 }
 

@@ -81,15 +81,35 @@ int main()
     CHECK(mxf_file_seek(mxfFile, 0, SEEK_SET));
     CHECK(mxf_file_size(mxfFile) == DATA_SIZE);
     CHECK(mxf_file_read(mxfFile, data, DATA_SIZE) == DATA_SIZE);
+    CHECK(!mxf_file_eof(mxfFile));
+    CHECK(mxf_file_read(mxfFile, data, DATA_SIZE) == 0);
     CHECK(mxf_file_eof(mxfFile));
+    CHECK(mxf_file_seek(mxfFile, -DATA_SIZE / 2, SEEK_CUR));
+    CHECK(mxf_file_read(mxfFile, data, DATA_SIZE) == DATA_SIZE / 2);
+    CHECK(mxf_file_eof(mxfFile));
+    CHECK(mxf_file_getc(mxfFile) == EOF);
     CHECK(mxf_file_tell(mxfFile) == DATA_SIZE);
+    CHECK(mxf_file_seek(mxfFile, DATA_SIZE * 2, SEEK_SET));
+    CHECK(mxf_file_tell(mxfFile) == DATA_SIZE * 2);
+    CHECK(mxf_file_getc(mxfFile) == EOF);
+    CHECK(mxf_file_seek(mxfFile, DATA_SIZE, SEEK_SET));
     CHECK(mxf_file_write(mxfFile, data, DATA_SIZE) == DATA_SIZE);
-    CHECK(mxf_file_eof(mxfFile));
     CHECK(mxf_file_tell(mxfFile) == DATA_SIZE * 2);
     CHECK(mxf_file_read(mxfFile, data, DATA_SIZE) == 0);
+    CHECK(mxf_file_eof(mxfFile));
     CHECK(mxf_file_seek(mxfFile, 0, SEEK_SET));
     CHECK(mxf_file_tell(mxfFile) == 0);
     CHECK(mxf_file_write(mxfFile, data, DATA_SIZE) == DATA_SIZE);
+    CHECK(mxf_file_seek(mxfFile, DATA_SIZE * 4, SEEK_SET));
+    CHECK(mxf_file_tell(mxfFile) == DATA_SIZE * 4);
+    CHECK(mxf_file_getc(mxfFile) == EOF);
+    CHECK(mxf_file_size(mxfFile) == 2 * DATA_SIZE);
+    CHECK(mxf_file_write(mxfFile, data, DATA_SIZE) == DATA_SIZE);
+    CHECK(mxf_file_size(mxfFile) == DATA_SIZE * 5);
+    CHECK(mxf_file_write(mxfFile, data, DATA_SIZE / 3) == DATA_SIZE / 3);
+    CHECK(mxf_file_size(mxfFile) == DATA_SIZE * 5 + DATA_SIZE / 3);
+    CHECK(mxf_file_write(mxfFile, data, DATA_SIZE) == DATA_SIZE);
+    CHECK(mxf_file_size(mxfFile) == DATA_SIZE * 6 + DATA_SIZE / 3);
 
     mxf_file_close(&mxfFile);
 
@@ -107,6 +127,8 @@ int main()
     CHECK(mxf_file_seek(mxfFile, 0, SEEK_SET));
     CHECK(mxf_file_size(mxfFile) == DATA_SIZE);
     CHECK(mxf_file_read(mxfFile, data, DATA_SIZE) == DATA_SIZE);
+    CHECK(!mxf_file_eof(mxfFile));
+    CHECK(mxf_file_read(mxfFile, data, DATA_SIZE) == 0);
     CHECK(mxf_file_eof(mxfFile));
     CHECK(mxf_file_tell(mxfFile) == DATA_SIZE);
 
