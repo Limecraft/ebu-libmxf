@@ -218,7 +218,7 @@ static uint32_t mem_file_write(MXFFileSysData *sysData, const uint8_t *data, uin
     fileSize = mxf_mem_file_get_size(&sysData->mxfMemFile);
     if (sysData->position + count > fileSize) {
         if (sysData->position + count - fileSize > UINT32_MAX ||
-            !extend_mem_file(sysData, sysData->position + count - fileSize))
+            !extend_mem_file(sysData, (uint32_t)(sysData->position + count - fileSize)))
         {
             return 0;
         }
