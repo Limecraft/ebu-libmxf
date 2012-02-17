@@ -6,6 +6,7 @@ check_PROGRAMS = \
 	test_datamodel \
 	test_essencecontainer \
 	test_headermetadata \
+	test_mxf_cache_file \
 	test_mxf_page_file \
 	test_mxf_memory_file
 
@@ -21,6 +22,7 @@ TESTS = \
 	test_indextable.test \
 	test_partition.test \
 	test_primer.test \
+	test_mxf_cache_file.test \
 	test_mxf_page_file.test \
 	test_mxf_memory_file.test
 
@@ -34,6 +36,7 @@ EXTRA_DIST = \
 	test_indextable.test \
 	test_partition.test \
 	test_primer.test \
+	test_mxf_cache_file.test \
 	test_mxf_page_file.test \
 	test_mxf_memory_file.test \
 	test_essencecontainer.md5 \

@@ -6,6 +6,7 @@ libMXF_@LIBMXF_MAJORMINOR@_la_SOURCES = \
 	mxf_avid_dictionary_data.h \
 	mxf_avid_metadictionary.c \
 	mxf_avid_metadictionary_data.h \
+	mxf_cache_file.c \
 	mxf_data_model.c \
 	mxf_essence_container.c \
 	mxf_file.c \
@@ -40,6 +41,7 @@ library_include_HEADERS = \
 	mxf_avid_labels_and_keys.h \
 	mxf_avid_metadictionary.h \
 	mxf_baseline_data_model.h \
+	mxf_cache_file.h \
 	mxf_data_model.h \
 	mxf_essence_container.h \
 	mxf_extensions_data_model.h \

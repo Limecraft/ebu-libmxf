@@ -169,6 +169,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\mxf\mxf_cache_file.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\mxf\mxf_data_model.c"
 				>
 			</File>
@@ -276,6 +280,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\mxf\mxf_baseline_data_model.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\mxf\mxf_cache_file.h"
 				>
 			</File>
 			<File

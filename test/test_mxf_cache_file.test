@@ -1,0 +1,8 @@
+#!/bin/sh
+
+RESULT=`./test_mxf_cache_file /tmp/libmxf_test.mxf`
+
+rm /tmp/libmxf_test.mxf
+
+exit $RESULT
+
