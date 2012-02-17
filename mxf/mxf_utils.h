@@ -97,6 +97,9 @@ size_t mxf_utf16_to_utf8(char *u8_str, const mxfUTF16Char *u16_str, size_t u8_si
 size_t mxf_utf8_to_utf16(mxfUTF16Char *u16_str, const char *u8_str, size_t u16_size);
 
 
+uint32_t mxf_get_system_page_size();
+
+
 #ifdef __cplusplus
 }
 #endif

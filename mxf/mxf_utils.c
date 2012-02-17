@@ -39,6 +39,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <errno.h>
 
 
 #if defined(_WIN32)
@@ -52,6 +53,7 @@
 #include <uuid/uuid.h>
 #include <time.h>
 #include <sys/time.h>
+#include <unistd.h>
 
 #endif
 
@@ -552,5 +554,31 @@ size_t mxf_utf8_to_utf16(mxfUTF16Char *u16_str, const char *u8_str, size_t u16_s
         *u16_str_ptr = 0;
 
     return convert_size;
+}
+
+uint32_t mxf_get_system_page_size()
+{
+    uint32_t pageSize;
+#if defined (_WIN32)
+    SYSTEM_INFO systemInfo;
+#else
+    long psResult;
+#endif
+
+#if defined (_WIN32)
+    GetSystemInfo(&systemInfo);
+    pageSize = systemInfo.dwPageSize;
+#else
+    psResult = sysconf(_SC_PAGESIZE);
+    if (psResult < 0) {
+        pageSize = 8192;
+        mxf_log_warn("Failed to get system page size using sysconf(__SC_PAGESIZE): %s. Defaulting to %u\n",
+                     strerror(errno), pageSize);
+    } else {
+        pageSize = (uint32_t)psResult;
+    }
+#endif
+
+    return pageSize;
 }
 
