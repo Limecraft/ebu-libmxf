@@ -8,7 +8,8 @@ check_PROGRAMS = \
 	test_headermetadata \
 	test_mxf_cache_file \
 	test_mxf_page_file \
-	test_mxf_memory_file
+	test_mxf_memory_file \
+	test_mxf_rw_intl_file
 
 AM_CFLAGS = $(LIBMXF_CFLAGS)
 LDADD = $(LIBMXF_LDADDLIBS)
@@ -24,7 +25,8 @@ TESTS = \
 	test_primer.test \
 	test_mxf_cache_file.test \
 	test_mxf_page_file.test \
-	test_mxf_memory_file.test
+	test_mxf_memory_file.test \
+	test_mxf_rw_intl_file.test
 
 
 
@@ -39,6 +41,7 @@ EXTRA_DIST = \
 	test_mxf_cache_file.test \
 	test_mxf_page_file.test \
 	test_mxf_memory_file.test \
+	test_mxf_rw_intl_file.test \
 	test_essencecontainer.md5 \
 	test_headermetadata.md5 \
 	test_indextable.md5 \

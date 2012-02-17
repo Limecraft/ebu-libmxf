@@ -19,6 +19,7 @@ libMXF_@LIBMXF_MAJORMINOR@_la_SOURCES = \
 	mxf_page_file.c \
 	mxf_partition.c \
 	mxf_primer.c \
+	mxf_rw_intl_file.c \
 	mxf_utils.c \
 	mxf_uu_metadata.c \
 	mxf_version.c
@@ -56,6 +57,7 @@ library_include_HEADERS = \
 	mxf_page_file.h \
 	mxf_partition.h \
 	mxf_primer.h \
+	mxf_rw_intl_file.h \
 	mxf_types.h \
 	mxf_utils.h \
 	mxf_uu_metadata.h \

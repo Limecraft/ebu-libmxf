@@ -1,0 +1,4 @@
+#!/bin/sh
+
+./test_mxf_rw_intl_file
+
