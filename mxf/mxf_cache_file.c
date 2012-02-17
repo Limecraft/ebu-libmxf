@@ -85,7 +85,7 @@ static void get_current_page_info(MXFFileSysData *sysData, int64_t *pagePosition
 
     *pagePosition = pageNumber * sysData->pageSize;
     *pageIndex    = (uint32_t)(pageNumber % sysData->numPages);
-    *pageOffset   = sysData->position - (*pagePosition);
+    *pageOffset   = (uint32_t)(sysData->position - (*pagePosition));
 }
 
 static int flush_dirty_pages(MXFFileSysData *sysData, uint32_t pageIndex, uint32_t pagesRequired)
