@@ -352,8 +352,8 @@ void mxf_default_get_timestamp_now(mxfTimestamp *now)
     now->sec   = gmt.tm_sec;
     now->qmsec = (uint8_t)(tb.millitm / 4 + 0.5); /* 1/250th second */
 
-#elif defined(_MSC_VER) || (defined(_WIN32) && defined(__GNUC__))
-    /* MSVC 8 (MinGW doesn't seem to have gmtime_s() yet ) */
+#elif defined(_MSC_VER)
+    /* MSVC */
 
     struct _timeb tb;
     struct tm gmt;
