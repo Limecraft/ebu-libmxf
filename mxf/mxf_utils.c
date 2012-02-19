@@ -331,8 +331,8 @@ void mxf_default_generate_uuid(mxfUUID *uuid)
 
 void mxf_default_get_timestamp_now(mxfTimestamp *now)
 {
-#if (defined(_MSC_VER) && _MSC_VER < 1400) || (defined(_WIN32) && defined(__GNUC__))
-    /* MSVC 7 or MinGW */
+#if defined(_WIN32) && defined(__GNUC__)
+    /* MinGW */
 
     /* NOTE: gmtime is not thread safe (not reentrant) */
 
