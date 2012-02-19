@@ -285,9 +285,10 @@ int mxf_rw_intl_open(MXFRWInterleaver *interleaver, MXFFile *target, int isWrite
     newMXFFile->tell          = intl_file_tell;
     newMXFFile->is_seekable   = intl_file_is_seekable;
     newMXFFile->size          = intl_file_size;
-
     newMXFFile->free_sys_data = free_intl_file;
     newMXFFile->sysData       = newIntlFile;
+    newMXFFile->minLLen       = target->minLLen;
+    newMXFFile->runinLen      = target->runinLen;
 
     *mxfFile = newMXFFile;
     return 1;

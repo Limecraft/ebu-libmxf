@@ -432,9 +432,10 @@ int mxf_cache_file_open(MXFFile *target, uint32_t in_cachePageSize, uint32_t cac
     newMXFFile->tell          = cache_file_tell;
     newMXFFile->is_seekable   = cache_file_is_seekable;
     newMXFFile->size          = cache_file_size;
-
     newMXFFile->free_sys_data = free_cache_file;
     newMXFFile->sysData       = newDiskFile;
+    newMXFFile->minLLen       = target->minLLen;
+    newMXFFile->runinLen      = target->runinLen;
 
 
     *cacheFile = &newDiskFile->cacheFile;
