@@ -45,16 +45,8 @@
 #include <mxf/mxf_macros.h>
 
 
-#if defined(_WIN32)
 #if defined(_MSC_VER) && (_MSC_VER < 1400)
 #error Visual C++ 2005 or later is required. Earlier versions do not support 64-bit stream I/O
-#endif
-
-/* In Visual C++ 2005 the posix names were deprecated and the ISO C++ names should be used instead */
-/* Also, 64-bit ftell and fseek support was added */
-#   define fileno   _fileno
-#   define fseeko   _fseeki64
-#   define ftello   _ftelli64
 #endif
 
 
@@ -154,7 +146,11 @@ static int disk_file_seek(MXFFileSysData *sysData, int64_t offset, int whence)
                (whence == SEEK_SET && offset == sysData->streamPosition);
     }
 
+#if defined(_WIN32)
+    return _fseeki64(sysData->file, offset, whence) == 0;
+#else
     return fseeko(sysData->file, offset, whence) == 0;
+#endif
 }
 
 static int64_t disk_file_tell(MXFFileSysData *sysData)
@@ -164,7 +160,11 @@ static int64_t disk_file_tell(MXFFileSysData *sysData)
         return sysData->streamPosition;
     }
 
+#if defined(_WIN32)
+    return _ftelli64(sysData->file);
+#else
     return ftello(sysData->file);
+#endif
 }
 
 static int disk_file_is_seekable(MXFFileSysData *sysData)
@@ -243,7 +243,11 @@ static int disk_file_open(const char *filename, OpenMode mode, MXFFile **mxfFile
     if (!newDiskFile->file)
         goto fail;
 
+#if defined(_WIN32)
+    newDiskFile->isStream = check_file_is_stream(_fileno(newDiskFile->file));
+#else
     newDiskFile->isStream = check_file_is_stream(fileno(newDiskFile->file));
+#endif
     assign_file_struct(newMXFFile, newDiskFile);
 
     *mxfFile = newMXFFile;
