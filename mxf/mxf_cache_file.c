@@ -69,7 +69,7 @@ struct MXFFileSysData
     uint32_t pageSize;
     uint32_t firstDirtyPage;
     uint32_t dirtyCount;
-    int enableTargetEOF;
+    int eof;
 };
 
 
@@ -166,9 +166,6 @@ static uint32_t cache_file_read(MXFFileSysData *sysData, uint8_t *data, uint32_t
     uint32_t remCount = count;
     uint32_t i;
 
-    if (count > 0)
-        sysData->enableTargetEOF = 1;
-
     while (remCount > 0) {
         get_current_page_info(sysData, &pagePosition, &pageIndex, &pageOffset);
 
@@ -210,6 +207,8 @@ static uint32_t cache_file_read(MXFFileSysData *sysData, uint8_t *data, uint32_t
         }
     }
 
+    sysData->eof = (count > 0 && remCount > 0);
+
     return count - remCount;
 }
 
@@ -221,9 +220,6 @@ static uint32_t cache_file_write(MXFFileSysData *sysData, const uint8_t *data, u
     uint32_t numWrite;
     uint32_t numPagesWrite;
     uint32_t remCount = count;
-
-    if (count > 0)
-        sysData->enableTargetEOF = 0;
 
     while (remCount > 0) {
         get_current_page_info(sysData, &pagePosition, &pageIndex, &pageOffset);
@@ -288,20 +284,7 @@ static int cache_file_putchar(MXFFileSysData *sysData, int c)
 
 static int cache_file_eof(MXFFileSysData *sysData)
 {
-    int64_t pagePosition;
-    uint32_t pageIndex;
-    uint32_t pageOffset;
-
-    get_current_page_info(sysData, &pagePosition, &pageIndex, &pageOffset);
-
-    /* (sysData->pages[pageIndex].position != pagePosition) is true if position at the start of a page */
-    /* (sysData->position == sysData->pages[pageIndex].position + sysData->pages[pageIndex].size) is true if read
-       past the end of the page */
-
-    return sysData->enableTargetEOF &&
-           (sysData->pages[pageIndex].position != pagePosition ||
-                sysData->position == sysData->pages[pageIndex].position + sysData->pages[pageIndex].size) &&
-           mxf_file_eof(sysData->target);
+    return sysData->eof;
 }
 
 static int cache_file_seek(MXFFileSysData *sysData, int64_t offset, int whence)
@@ -331,7 +314,7 @@ static int cache_file_seek(MXFFileSysData *sysData, int64_t offset, int whence)
     if (newPosition < 0)
         return 0;
 
-    sysData->enableTargetEOF = 0;
+    sysData->eof      = 0;
     sysData->position = newPosition;
 
     get_current_page_info(sysData, &pagePosition, &pageIndex, &pageOffset);
