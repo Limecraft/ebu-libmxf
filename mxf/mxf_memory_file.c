@@ -171,13 +171,9 @@ static uint32_t mem_file_read(MXFFileSysData *sysData, uint8_t *data, uint32_t c
     if (count == 0)
         return 0;
 
-    if (!get_chunk_pos(sysData, &posChunkIndex, &posChunkPos)) {
-        sysData->eof = 1;
+    if (!get_chunk_pos(sysData, &posChunkIndex, &posChunkPos))
         return 0;
-    }
 
-
-    sysData->eof = 0;
 
     while (totalRead < count) {
         numRead = sysData->chunks[posChunkIndex].size - posChunkPos;
@@ -198,8 +194,7 @@ static uint32_t mem_file_read(MXFFileSysData *sysData, uint8_t *data, uint32_t c
         }
     }
 
-    if (totalRead < count)
-        sysData->eof = 1;
+    sysData->eof = (count > 0 && totalRead < count);
 
     return totalRead;
 }
@@ -249,8 +244,6 @@ static uint32_t mem_file_write(MXFFileSysData *sysData, const uint8_t *data, uin
         }
     }
 
-
-    sysData->eof = 0;
 
     get_chunk_pos(sysData, &posChunkIndex, &posChunkPos);
 
@@ -324,7 +317,7 @@ static int mem_file_seek(MXFFileSysData *sysData, int64_t offset, int whence)
     if (position < 0)
         return 0;
 
-    sysData->eof = 0;
+    sysData->eof      = 0;
     sysData->position = position;
 
     return 1;
