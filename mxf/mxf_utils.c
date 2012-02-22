@@ -336,13 +336,13 @@ void mxf_default_get_timestamp_now(mxfTimestamp *now)
 
     /* NOTE: gmtime is not thread safe (not reentrant) */
 
-    struct _timeb tb;
+    struct __timeb64 tb;
     struct tm gmt;
 
     memset(&gmt, 0, sizeof(struct tm));
 
-    _ftime(&tb);
-    memcpy(&gmt, gmtime(&tb.time), sizeof(struct tm)); /* memcpy does nothing if gmtime returns NULL */
+    _ftime64(&tb);
+    memcpy(&gmt, _gmtime64(&tb.time), sizeof(struct tm)); /* memcpy does nothing if gmtime returns NULL */
 
     now->year  = gmt.tm_year + 1900;
     now->month = gmt.tm_mon + 1;
