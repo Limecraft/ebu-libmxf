@@ -90,54 +90,65 @@ static void get_current_page_info(MXFFileSysData *sysData, int64_t *pagePosition
 
 static int flush_dirty_pages(MXFFileSysData *sysData, uint32_t pageIndex, uint32_t pagesRequired)
 {
-    uint32_t cleanCount = 0;
     int64_t originalTargetPos;
-    uint32_t numPagesWrite;
+    uint32_t remPages = pagesRequired;
+    uint32_t cleanIndex = pageIndex;
+    uint32_t numCleanPages;
     uint32_t numWrite;
+    int doWrite;
     uint32_t i;
 
-    CHK_ORET(pagesRequired > 0 && pagesRequired <= sysData->numPages);
-
-    if (sysData->dirtyCount == 0)
+    if (sysData->dirtyCount == 0 || pagesRequired == 0)
         return 1;
-
-    /* note: relying on numPages < UINT32_MAX / 2 */
-    if (pageIndex + pagesRequired > sysData->firstDirtyPage &&
-        pageIndex                 < sysData->firstDirtyPage + sysData->dirtyCount)
-    {
-        cleanCount = pageIndex + pagesRequired - sysData->firstDirtyPage;
-        if (cleanCount > sysData->dirtyCount)
-            cleanCount = sysData->dirtyCount;
-    }
-    if (cleanCount == 0)
-        return 1;
-
 
     originalTargetPos = mxf_file_tell(sysData->target);
-    if (originalTargetPos != sysData->pages[sysData->firstDirtyPage].position)
-        CHK_ORET(mxf_file_seek(sysData->target, sysData->pages[sysData->firstDirtyPage].position, SEEK_SET));
 
+    while (sysData->dirtyCount > 0 && remPages > 0) {
+        if (sysData->pages[cleanIndex].isDirty) {
+            doWrite = 1;
+            if (cleanIndex >= sysData->firstDirtyPage) {
+                assert(cleanIndex - sysData->firstDirtyPage < sysData->dirtyCount);
+                numCleanPages = sysData->dirtyCount - (cleanIndex - sysData->firstDirtyPage);
+            } else {
+                assert((sysData->firstDirtyPage + sysData->dirtyCount) % sysData->numPages > cleanIndex);
+                numCleanPages = ((sysData->firstDirtyPage + sysData->dirtyCount) % sysData->numPages) - cleanIndex;
+                assert(numCleanPages <= sysData->dirtyCount);
+            }
+            /* need to flush to the end to ensure dirty pages are contiguous */
+            if (cleanIndex != sysData->firstDirtyPage && remPages < numCleanPages)
+                remPages = numCleanPages;
 
-    while (cleanCount > 0) {
-        numPagesWrite = sysData->numPages - sysData->firstDirtyPage;
-        if (numPagesWrite > cleanCount)
-            numPagesWrite = cleanCount;
-        numWrite = (numPagesWrite - 1) * sysData->pageSize +
-                    sysData->pages[sysData->firstDirtyPage + numPagesWrite - 1].size;
-
-        CHK_ORET(mxf_file_write(
-                      sysData->target,
-                      &sysData->cacheData[sysData->firstDirtyPage * sysData->pageSize],
-                      numWrite) == numWrite);
-
-        for (i = 0 ; i < numPagesWrite; i++) {
-            sysData->pages[sysData->firstDirtyPage].isDirty = 0;
-            sysData->firstDirtyPage = (sysData->firstDirtyPage + 1) % sysData->numPages;
-            sysData->dirtyCount--;
-            cleanCount--;
+            if (numCleanPages > sysData->numPages - cleanIndex)
+                numCleanPages = sysData->numPages - cleanIndex;
+        } else {
+            doWrite = 0;
+            if (cleanIndex >= sysData->firstDirtyPage)
+                numCleanPages = sysData->numPages - cleanIndex;
+            else
+                numCleanPages = sysData->firstDirtyPage - cleanIndex;
         }
-    }
+        if (numCleanPages > remPages)
+            numCleanPages = remPages;
 
+        if (doWrite) {
+            numWrite = (numCleanPages - 1) * sysData->pageSize +
+                        sysData->pages[cleanIndex + numCleanPages - 1].size;
+
+            CHK_ORET(mxf_file_seek(sysData->target, sysData->pages[cleanIndex].position, SEEK_SET));
+            CHK_ORET(mxf_file_write(sysData->target, &sysData->cacheData[cleanIndex * sysData->pageSize], numWrite) ==
+                        numWrite);
+
+            for (i = 0 ; i < numCleanPages; i++)
+                sysData->pages[cleanIndex + i].isDirty = 0;
+            sysData->dirtyCount -= numCleanPages;
+
+            if (cleanIndex == sysData->firstDirtyPage)
+                sysData->firstDirtyPage = (sysData->firstDirtyPage + numCleanPages) % sysData->numPages;
+        }
+
+        cleanIndex = (cleanIndex + numCleanPages) % sysData->numPages;
+        remPages -= numCleanPages;
+    }
 
     if (mxf_file_tell(sysData->target) != originalTargetPos)
         CHK_ORET(mxf_file_seek(sysData->target, originalTargetPos, SEEK_SET));
