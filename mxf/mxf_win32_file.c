@@ -186,7 +186,7 @@ static int mxf_win32_file_open(const char *in_filename, int flags, OpenMode mode
     switch (mode)
     {
         case NEW_MODE:
-            newDiskFile->file = CreateFile(filename, GENERIC_WRITE, FILE_SHARE_WRITE,
+            newDiskFile->file = CreateFile(filename, GENERIC_WRITE | GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
                                            NULL, CREATE_ALWAYS, attrs_and_flags, NULL);
             break;
         case READ_MODE:
@@ -194,7 +194,7 @@ static int mxf_win32_file_open(const char *in_filename, int flags, OpenMode mode
                                            NULL, OPEN_EXISTING, attrs_and_flags, NULL);
             break;
         case MODIFY_MODE:
-            newDiskFile->file = CreateFile(filename, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ,
+            newDiskFile->file = CreateFile(filename, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE,
                                            NULL, OPEN_EXISTING, attrs_and_flags, NULL);
             break;
     }
