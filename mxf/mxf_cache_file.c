@@ -91,6 +91,7 @@ static void get_current_page_info(MXFFileSysData *sysData, int64_t *pagePosition
 static int flush_dirty_pages(MXFFileSysData *sysData, uint32_t pageIndex, uint32_t pagesRequired)
 {
     int64_t originalTargetPos;
+    int64_t currentTargetPos;
     uint32_t remPages = pagesRequired;
     uint32_t cleanIndex = pageIndex;
     uint32_t numCleanPages;
@@ -102,6 +103,7 @@ static int flush_dirty_pages(MXFFileSysData *sysData, uint32_t pageIndex, uint32
         return 1;
 
     originalTargetPos = mxf_file_tell(sysData->target);
+    currentTargetPos = originalTargetPos;
 
     while (sysData->dirtyCount > 0 && remPages > 0) {
         if (sysData->pages[cleanIndex].isDirty) {
@@ -134,9 +136,14 @@ static int flush_dirty_pages(MXFFileSysData *sysData, uint32_t pageIndex, uint32
             numWrite = (numCleanPages - 1) * sysData->pageSize +
                         sysData->pages[cleanIndex + numCleanPages - 1].size;
 
-            CHK_ORET(mxf_file_seek(sysData->target, sysData->pages[cleanIndex].position, SEEK_SET));
+            if (currentTargetPos != sysData->pages[cleanIndex].position) {
+                CHK_ORET(mxf_file_seek(sysData->target, sysData->pages[cleanIndex].position, SEEK_SET));
+                currentTargetPos = sysData->pages[cleanIndex].position;
+            }
+
             CHK_ORET(mxf_file_write(sysData->target, &sysData->cacheData[cleanIndex * sysData->pageSize], numWrite) ==
                         numWrite);
+            currentTargetPos += numWrite;
 
             for (i = 0 ; i < numCleanPages; i++)
                 sysData->pages[cleanIndex + i].isDirty = 0;
@@ -150,7 +157,7 @@ static int flush_dirty_pages(MXFFileSysData *sysData, uint32_t pageIndex, uint32
         remPages -= numCleanPages;
     }
 
-    if (mxf_file_tell(sysData->target) != originalTargetPos)
+    if (currentTargetPos != originalTargetPos)
         CHK_ORET(mxf_file_seek(sysData->target, originalTargetPos, SEEK_SET));
 
     return 1;
