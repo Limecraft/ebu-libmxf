@@ -228,9 +228,9 @@ static uint32_t cache_file_write(MXFFileSysData *sysData, const uint8_t *data, u
             if (!sysData->pages[pageIndex].isDirty) {
                 if (sysData->dirtyCount > 0) {
                     /* sequence of dirty pages must be contiguous - flush all dirty pages if there is a gap */
-                    if (pageIndex == 0 ||
-                        sysData->pages[(pageIndex - 1) % sysData->numPages].position != pagePosition - sysData->pageSize ||
-                        !sysData->pages[(pageIndex - 1) % sysData->numPages].isDirty)
+                    uint32_t prevPageIndex = (pageIndex == 0 ? sysData->numPages - 1 : pageIndex - 1);
+                    if (sysData->pages[prevPageIndex].position != pagePosition - sysData->pageSize ||
+                        !sysData->pages[prevPageIndex].isDirty)
                     {
                         CHK_ORET(flush_dirty_pages(sysData, 0, sysData->numPages));
                     }
