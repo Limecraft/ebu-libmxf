@@ -42,6 +42,7 @@
 
 
 #define DATA_SIZE   65536
+#define PAGE_SIZE   8192
 
 
 
@@ -64,7 +65,8 @@ int main(int argc, const char *argv[])
     MXFFile *target;
     MXFCacheFile *cacheFile;
     MXFFile *mxfFile;
-    unsigned char *data;
+    unsigned char *writeData;
+    unsigned char *readData;
 
     if (argc != 2)
     {
@@ -72,24 +74,27 @@ int main(int argc, const char *argv[])
         return 1;
     }
 
-    data = malloc(DATA_SIZE);
-    memset(data, 122, DATA_SIZE);
+    writeData = malloc(DATA_SIZE);
+    memset(writeData, 122, DATA_SIZE);
+    writeData[0] = 0x01;
+    writeData[DATA_SIZE / 2] = 0x02;
+    readData = malloc(DATA_SIZE);
 
 
     CHECK(mxf_disk_file_open_new(argv[1], &target));
-    CHECK(mxf_cache_file_open(target, 0, 2 * 1024 * 1024, &cacheFile));
+    CHECK(mxf_cache_file_open(target, PAGE_SIZE, 4 * DATA_SIZE, &cacheFile));
     mxfFile = mxf_cache_file_get_file(cacheFile);
 
-    CHECK(mxf_file_write(mxfFile, data, DATA_SIZE) == DATA_SIZE);
+    CHECK(mxf_file_write(mxfFile, writeData, DATA_SIZE) == DATA_SIZE);
 
     CHECK(mxf_file_seek(mxfFile, 0, SEEK_SET));
     CHECK(mxf_file_size(mxfFile) == DATA_SIZE);
-    CHECK(mxf_file_read(mxfFile, data, DATA_SIZE) == DATA_SIZE);
+    CHECK(mxf_file_read(mxfFile, readData, DATA_SIZE) == DATA_SIZE);
     CHECK(!mxf_file_eof(mxfFile));
-    CHECK(mxf_file_read(mxfFile, data, DATA_SIZE) == 0);
+    CHECK(mxf_file_read(mxfFile, readData, DATA_SIZE) == 0);
     CHECK(mxf_file_eof(mxfFile));
     CHECK(mxf_file_seek(mxfFile, -DATA_SIZE / 2, SEEK_CUR));
-    CHECK(mxf_file_read(mxfFile, data, DATA_SIZE) == DATA_SIZE / 2);
+    CHECK(mxf_file_read(mxfFile, readData, DATA_SIZE) == DATA_SIZE / 2);
     CHECK(mxf_file_eof(mxfFile));
     CHECK(mxf_file_getc(mxfFile) == EOF);
     CHECK(mxf_file_tell(mxfFile) == DATA_SIZE);
@@ -97,27 +102,38 @@ int main(int argc, const char *argv[])
     CHECK(mxf_file_tell(mxfFile) == DATA_SIZE * 2);
     CHECK(mxf_file_getc(mxfFile) == EOF);
     CHECK(mxf_file_seek(mxfFile, DATA_SIZE, SEEK_SET));
-    CHECK(mxf_file_write(mxfFile, data, DATA_SIZE) == DATA_SIZE);
+    CHECK(mxf_file_write(mxfFile, writeData, DATA_SIZE) == DATA_SIZE);
     CHECK(mxf_file_tell(mxfFile) == DATA_SIZE * 2);
-    CHECK(mxf_file_read(mxfFile, data, DATA_SIZE) == 0);
+    CHECK(mxf_file_read(mxfFile, readData, DATA_SIZE) == 0);
     CHECK(mxf_file_seek(mxfFile, 0, SEEK_SET));
     CHECK(mxf_file_tell(mxfFile) == 0);
-    CHECK(mxf_file_write(mxfFile, data, DATA_SIZE) == DATA_SIZE);
+    CHECK(mxf_file_write(mxfFile, writeData, DATA_SIZE) == DATA_SIZE);
     CHECK(mxf_file_seek(mxfFile, DATA_SIZE * 4, SEEK_SET));
     CHECK(mxf_file_tell(mxfFile) == DATA_SIZE * 4);
     CHECK(mxf_file_getc(mxfFile) == EOF);
     CHECK(mxf_file_size(mxfFile) == 2 * DATA_SIZE);
-    CHECK(mxf_file_write(mxfFile, data, DATA_SIZE) == DATA_SIZE);
+    CHECK(mxf_file_write(mxfFile, writeData, DATA_SIZE) == DATA_SIZE);
     CHECK(mxf_file_size(mxfFile) == 5 * DATA_SIZE);
-    CHECK(mxf_file_write(mxfFile, data, DATA_SIZE / 3) == DATA_SIZE / 3);
+    CHECK(mxf_file_write(mxfFile, writeData, DATA_SIZE / 3) == DATA_SIZE / 3);
     CHECK(mxf_file_size(mxfFile) == DATA_SIZE * 5 + DATA_SIZE / 3);
-    CHECK(mxf_file_write(mxfFile, data, DATA_SIZE) == DATA_SIZE);
+    CHECK(mxf_file_write(mxfFile, writeData, DATA_SIZE) == DATA_SIZE);
     CHECK(mxf_file_size(mxfFile) == DATA_SIZE * 6 + DATA_SIZE / 3);
+    CHECK(mxf_file_seek(mxfFile, 0, SEEK_SET));
+    CHECK(mxf_file_write(mxfFile, writeData, DATA_SIZE) == DATA_SIZE);
+    CHECK(mxf_file_seek(mxfFile, 0, SEEK_SET));
+    CHECK(mxf_file_getc(mxfFile) == 0x01);
+    CHECK(mxf_file_seek(mxfFile, 4 * DATA_SIZE, SEEK_SET));
+    CHECK(mxf_file_write(mxfFile, &writeData[DATA_SIZE / 2], DATA_SIZE / 2) == DATA_SIZE / 2);
+    CHECK(mxf_file_seek(mxfFile, PAGE_SIZE / 2, SEEK_SET));
+    CHECK(mxf_file_write(mxfFile, &writeData[DATA_SIZE / 2], DATA_SIZE / 2) == DATA_SIZE / 2);
+    CHECK(mxf_file_seek(mxfFile, 0, SEEK_SET));
+    CHECK(mxf_file_getc(mxfFile) == 0x01);
 
     mxf_file_close(&mxfFile);
 
 
-    free(data);
+    free(writeData);
+    free(readData);
 
     return 0;
 }

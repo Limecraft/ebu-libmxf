@@ -70,6 +70,7 @@ struct MXFFileSysData
     uint32_t firstDirtyPage;
     uint32_t dirtyCount;
     int eof;
+    int writingAtEOF;
 };
 
 
@@ -90,8 +91,6 @@ static void get_current_page_info(MXFFileSysData *sysData, int64_t *pagePosition
 
 static int flush_dirty_pages(MXFFileSysData *sysData, uint32_t pageIndex, uint32_t pagesRequired)
 {
-    int64_t originalTargetPos;
-    int64_t currentTargetPos;
     uint32_t remPages = pagesRequired;
     uint32_t cleanIndex = pageIndex;
     uint32_t numCleanPages;
@@ -101,9 +100,6 @@ static int flush_dirty_pages(MXFFileSysData *sysData, uint32_t pageIndex, uint32
 
     if (sysData->dirtyCount == 0 || pagesRequired == 0)
         return 1;
-
-    originalTargetPos = mxf_file_tell(sysData->target);
-    currentTargetPos = originalTargetPos;
 
     while (sysData->dirtyCount > 0 && remPages > 0) {
         if (sysData->pages[cleanIndex].isDirty) {
@@ -136,14 +132,9 @@ static int flush_dirty_pages(MXFFileSysData *sysData, uint32_t pageIndex, uint32
             numWrite = (numCleanPages - 1) * sysData->pageSize +
                         sysData->pages[cleanIndex + numCleanPages - 1].size;
 
-            if (currentTargetPos != sysData->pages[cleanIndex].position) {
-                CHK_ORET(mxf_file_seek(sysData->target, sysData->pages[cleanIndex].position, SEEK_SET));
-                currentTargetPos = sysData->pages[cleanIndex].position;
-            }
-
+            CHK_ORET(mxf_file_seek(sysData->target, sysData->pages[cleanIndex].position, SEEK_SET));
             CHK_ORET(mxf_file_write(sysData->target, &sysData->cacheData[cleanIndex * sysData->pageSize], numWrite) ==
                         numWrite);
-            currentTargetPos += numWrite;
 
             for (i = 0 ; i < numCleanPages; i++)
                 sysData->pages[cleanIndex + i].isDirty = 0;
@@ -156,9 +147,6 @@ static int flush_dirty_pages(MXFFileSysData *sysData, uint32_t pageIndex, uint32
         cleanIndex = (cleanIndex + numCleanPages) % sysData->numPages;
         remPages -= numCleanPages;
     }
-
-    if (currentTargetPos != originalTargetPos)
-        CHK_ORET(mxf_file_seek(sysData->target, originalTargetPos, SEEK_SET));
 
     return 1;
 }
@@ -194,7 +182,8 @@ static uint32_t cache_file_read(MXFFileSysData *sysData, uint8_t *data, uint32_t
             numRead = sysData->pages[pageIndex].size - pageOffset;
             if (numRead > remCount)
                 numRead = remCount;
-            memcpy(&data[count - remCount], &sysData->cacheData[pageIndex * sysData->pageSize + pageOffset], numRead);
+            if (data)
+                memcpy(&data[count - remCount], &sysData->cacheData[pageIndex * sysData->pageSize + pageOffset], numRead);
             remCount -= numRead;
             sysData->position += numRead;
         } else {
@@ -204,11 +193,14 @@ static uint32_t cache_file_read(MXFFileSysData *sysData, uint8_t *data, uint32_t
             if (numPagesRead > sysData->numPages - pageIndex)
                 numPagesRead = sysData->numPages - pageIndex;
 
-            if (sysData->dirtyCount > 0)
-                CHK_ORET(flush_dirty_pages(sysData, pageIndex, numPagesRead));
+            CHK_ORET(flush_dirty_pages(sysData, pageIndex, numPagesRead));
 
+            CHK_ORET(mxf_file_seek(sysData->target, pagePosition, SEEK_SET));
             numRead = mxf_file_read(sysData->target, &sysData->cacheData[pageIndex * sysData->pageSize],
                                     numPagesRead * sysData->pageSize);
+
+            if (numRead == 0)
+                break;
 
             numPagesRead = numRead / sysData->pageSize;
             for (i = 0; i < numPagesRead; i++) {
@@ -219,9 +211,6 @@ static uint32_t cache_file_read(MXFFileSysData *sysData, uint8_t *data, uint32_t
                 sysData->pages[pageIndex + i].size     = numRead - numPagesRead * sysData->pageSize;
                 sysData->pages[pageIndex + i].position = pagePosition + i * sysData->pageSize;
             }
-
-            if (numRead == 0)
-                break;
         }
     }
 
@@ -238,9 +227,18 @@ static uint32_t cache_file_write(MXFFileSysData *sysData, const uint8_t *data, u
     uint32_t numWrite;
     uint32_t numPagesWrite;
     uint32_t remCount = count;
+    uint32_t numRead;
+    int64_t originalPosition;
+    int originalEOF;
+    uint32_t i;
 
     while (remCount > 0) {
         get_current_page_info(sysData, &pagePosition, &pageIndex, &pageOffset);
+
+        if (sysData->pages[pageIndex].position == -1) {
+            sysData->pages[pageIndex].size     = 0;
+            sysData->pages[pageIndex].position = pagePosition;
+        }
 
         if (sysData->pages[pageIndex].position == pagePosition) {
             if (!sysData->pages[pageIndex].isDirty) {
@@ -272,10 +270,25 @@ static uint32_t cache_file_write(MXFFileSysData *sysData, const uint8_t *data, u
             if (numPagesWrite > sysData->numPages)
                 numPagesWrite = sysData->numPages;
 
-            CHK_ORET(flush_dirty_pages(sysData, pageIndex, numPagesWrite));
+            if (sysData->writingAtEOF) {
+                CHK_ORET(flush_dirty_pages(sysData, pageIndex, numPagesWrite));
+                for (i = 0; i < numPagesWrite; i++) {
+                    sysData->pages[(pageIndex + i) % sysData->numPages].size     = 0;
+                    sysData->pages[(pageIndex + i) % sysData->numPages].position = -1;
+                }
+            } else {
+                originalPosition = sysData->position;
+                originalEOF      = sysData->eof;
 
-            sysData->pages[pageIndex].size = 0;
-            sysData->pages[pageIndex].position = pagePosition;
+                numRead = cache_file_read(sysData, NULL, numPagesWrite * sysData->pageSize);
+                if (numRead < numPagesWrite * sysData->pageSize) {
+                    CHK_ORET(sysData->eof);
+                    sysData->writingAtEOF = 1;
+                }
+
+                sysData->position = originalPosition;
+                sysData->eof      = originalEOF;
+            }
         }
     }
 
@@ -332,8 +345,9 @@ static int cache_file_seek(MXFFileSysData *sysData, int64_t offset, int whence)
     if (newPosition < 0)
         return 0;
 
-    sysData->eof      = 0;
-    sysData->position = newPosition;
+    sysData->eof          = 0;
+    sysData->position     = newPosition;
+    sysData->writingAtEOF = 0;
 
     get_current_page_info(sysData, &pagePosition, &pageIndex, &pageOffset);
     if (sysData->pages[pageIndex].position == pagePosition)
