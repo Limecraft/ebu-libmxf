@@ -65,6 +65,7 @@ typedef enum
 struct MXFFileSysData
 {
     FILE *file;
+    OpenMode mode;
 
     int isSeekable;
     int haveTestedIsSeekable;
@@ -182,9 +183,17 @@ static int64_t disk_file_size(MXFFileSysData *sysData)
 {
 #if defined(_WIN32)
     struct _stati64 statBuf;
-    if (_fstati64(_fileno(sysData->file), &statBuf) != 0)
 #else
     struct stat statBuf;
+#endif
+
+    // flush user-space data because fstat uses the stream's integer descriptor
+    if (sysData->mode == NEW_MODE || sysData->mode == MODIFY_MODE)
+        fflush(sysData->file);
+
+#if defined(_WIN32)
+    if (_fstati64(_fileno(sysData->file), &statBuf) != 0)
+#else
     if (fstat(fileno(sysData->file), &statBuf) != 0)
 #endif
     {
@@ -248,6 +257,7 @@ static int disk_file_open(const char *filename, OpenMode mode, MXFFile **mxfFile
 #else
     newDiskFile->isStream = check_file_is_stream(fileno(newDiskFile->file));
 #endif
+    newDiskFile->mode = mode;
     assign_file_struct(newMXFFile, newDiskFile);
 
     *mxfFile = newMXFFile;
