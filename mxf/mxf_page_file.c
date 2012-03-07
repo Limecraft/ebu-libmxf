@@ -128,12 +128,18 @@ static void disk_file_close(FileDescriptor *fileDesc)
 
 static uint32_t disk_file_read(FileDescriptor *fileDesc, uint8_t *data, uint32_t count)
 {
-    return (uint32_t)fread(data, 1, count, fileDesc->file);
+    uint32_t result = (uint32_t)fread(data, 1, count, fileDesc->file);
+    if (result != count && ferror(fileDesc->file))
+        mxf_log_error("fread failed: %s\n", strerror(errno));
+    return result;
 }
 
 static uint32_t disk_file_write(FileDescriptor *fileDesc, const uint8_t *data, uint32_t count)
 {
-    return (uint32_t)fwrite(data, 1, count, fileDesc->file);
+    uint32_t result = (uint32_t)fwrite(data, 1, count, fileDesc->file);
+    if (result != count)
+        mxf_log_error("fwrite failed: %s\n", strerror(errno));
+    return result;
 }
 
 static int disk_file_seek(FileDescriptor *fileDesc, int64_t offset, int whence)

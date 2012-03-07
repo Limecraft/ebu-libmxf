@@ -40,6 +40,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <sys/stat.h>
+#include <errno.h>
 
 #include <mxf/mxf.h>
 #include <mxf/mxf_macros.h>
@@ -103,6 +104,8 @@ static void disk_file_close(MXFFileSysData *sysData)
 static uint32_t disk_file_read(MXFFileSysData *sysData, uint8_t *data, uint32_t count)
 {
     uint32_t result = (uint32_t)fread(data, 1, count, sysData->file);
+    if (result != count && ferror(sysData->file))
+        mxf_log_error("fread failed: %s\n", strerror(errno));
     sysData->streamPosition += result;
     return result;
 }
@@ -110,6 +113,8 @@ static uint32_t disk_file_read(MXFFileSysData *sysData, uint8_t *data, uint32_t 
 static uint32_t disk_file_write(MXFFileSysData *sysData, const uint8_t *data, uint32_t count)
 {
     uint32_t result = (uint32_t)fwrite(data, 1, count, sysData->file);
+    if (result != count)
+        mxf_log_error("fwrite failed: %s\n", strerror(errno));
     sysData->streamPosition += result;
     return result;
 }
