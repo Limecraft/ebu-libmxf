@@ -153,6 +153,7 @@ typedef struct
     mxfUL essenceContainerLabel;
 
     /* picture info */
+    mxfUL pictureCodingLabel;
     uint8_t frameLayout;
     mxfRational aspectRatio;
     uint32_t storedWidth;

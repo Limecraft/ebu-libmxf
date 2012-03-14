@@ -195,6 +195,7 @@ static const DNxHDTypeString DNXHD_TYPE_STRINGS[] =
 typedef struct
 {
     AvidEssenceType essenceType;
+    int checkPictureCodingLabel;
     const mxfUL *essenceContainerLabel;
     const mxfUL *pictureCodingLabel;
     int32_t avidResolutionID;
@@ -202,102 +203,102 @@ typedef struct
 
 static const EssenceTypeMap ESSENCE_TYPE_MAP[] =
 {
-    {MPEG_30_ESSENCE_TYPE,  &MXF_EC_L(D10_30_625_50_picture_only),   0, 0},
-    {MPEG_30_ESSENCE_TYPE,  &MXF_EC_L(D10_30_525_60_picture_only),   0, 0},
-    {MPEG_40_ESSENCE_TYPE,  &MXF_EC_L(D10_40_625_50_picture_only),   0, 0},
-    {MPEG_40_ESSENCE_TYPE,  &MXF_EC_L(D10_40_525_60_picture_only),   0, 0},
-    {MPEG_50_ESSENCE_TYPE,  &MXF_EC_L(D10_50_625_50_picture_only),   0, 0},
-    {MPEG_50_ESSENCE_TYPE,  &MXF_EC_L(D10_50_525_60_picture_only),   0, 0},
+    {MPEG_30_ESSENCE_TYPE,  0,  &MXF_EC_L(D10_30_625_50_picture_only),   &MXF_CMDEF_L(D10_30_625_50), 0},
+    {MPEG_30_ESSENCE_TYPE,  0,  &MXF_EC_L(D10_30_525_60_picture_only),   &MXF_CMDEF_L(D10_30_525_60), 0},
+    {MPEG_40_ESSENCE_TYPE,  0,  &MXF_EC_L(D10_40_625_50_picture_only),   &MXF_CMDEF_L(D10_40_625_50), 0},
+    {MPEG_40_ESSENCE_TYPE,  0,  &MXF_EC_L(D10_40_525_60_picture_only),   &MXF_CMDEF_L(D10_40_525_60), 0},
+    {MPEG_50_ESSENCE_TYPE,  0,  &MXF_EC_L(D10_50_625_50_picture_only),   &MXF_CMDEF_L(D10_50_625_50), 0},
+    {MPEG_50_ESSENCE_TYPE,  0,  &MXF_EC_L(D10_50_525_60_picture_only),   &MXF_CMDEF_L(D10_50_525_60), 0},
 
-    {DV_25_411_ESSENCE_TYPE,  &MXF_EC_L(IECDV_25_525_60_ClipWrapped),        0, 0},
-    {DV_25_420_ESSENCE_TYPE,  &MXF_EC_L(IECDV_25_625_50_ClipWrapped),        0, 0},
-    {DV_25_411_ESSENCE_TYPE,  &MXF_EC_L(DVBased_25_525_60_ClipWrapped),      0, 0},
-    {DV_25_411_ESSENCE_TYPE,  &MXF_EC_L(DVBased_25_625_50_ClipWrapped),      0, 0},
-    {DV_50_ESSENCE_TYPE,      &MXF_EC_L(DVBased_50_525_60_ClipWrapped),      0, 0},
-    {DV_50_ESSENCE_TYPE,      &MXF_EC_L(DVBased_50_625_50_ClipWrapped),      0, 0},
-    {DV_100_ESSENCE_TYPE,     &MXF_EC_L(DVBased_100_720_50_P_ClipWrapped),   0, 0},
-    {DV_100_ESSENCE_TYPE,     &MXF_EC_L(DVBased_100_720_60_P_ClipWrapped),   0, 0},
-    {DV_100_ESSENCE_TYPE,     &MXF_EC_L(DVBased_100_1080_50_I_ClipWrapped),  0, 0},
-    {DV_100_ESSENCE_TYPE,     &MXF_EC_L(DVBased_100_1080_60_I_ClipWrapped),  0, 0},
+    {DV_25_411_ESSENCE_TYPE,  0,  &MXF_EC_L(IECDV_25_525_60_ClipWrapped),           &MXF_CMDEF_L(IECDV_25_525_60),         0},
+    {DV_25_420_ESSENCE_TYPE,  0,  &MXF_EC_L(IECDV_25_625_50_ClipWrapped),           &MXF_CMDEF_L(IECDV_25_625_50),         0},
+    {DV_25_411_ESSENCE_TYPE,  0,  &MXF_EC_L(DVBased_25_525_60_ClipWrapped),         &MXF_CMDEF_L(DVBased_25_525_60),       0},
+    {DV_25_411_ESSENCE_TYPE,  0,  &MXF_EC_L(DVBased_25_625_50_ClipWrapped),         &MXF_CMDEF_L(DVBased_25_625_50),       0},
+    {DV_50_ESSENCE_TYPE,      0,  &MXF_EC_L(DVBased_50_525_60_ClipWrapped),         &MXF_CMDEF_L(DVBased_50_525_60),       0},
+    {DV_50_ESSENCE_TYPE,      0,  &MXF_EC_L(DVBased_50_625_50_ClipWrapped),         &MXF_CMDEF_L(DVBased_50_625_50),       0},
+    {DV_100_ESSENCE_TYPE,     0,  &MXF_EC_L(DVBased_100_720_50_P_ClipWrapped),      &MXF_CMDEF_L(DVBased_100_720_50_P),    0},
+    {DV_100_ESSENCE_TYPE,     0,  &MXF_EC_L(DVBased_100_720_60_P_ClipWrapped),      &MXF_CMDEF_L(DVBased_100_720_60_P),    0},
+    {DV_100_ESSENCE_TYPE,     0,  &MXF_EC_L(DVBased_100_1080_50_I_ClipWrapped),     &MXF_CMDEF_L(DVBased_100_1080_50_I),   0},
+    {DV_100_ESSENCE_TYPE,     0,  &MXF_EC_L(DVBased_100_1080_60_I_ClipWrapped),     &MXF_CMDEF_L(DVBased_100_1080_60_I),   0},
 
-    {MJPEG_10_1_ESSENCE_TYPE,     &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG101_PAL),    0x4b},
-    {MJPEG_10_1_ESSENCE_TYPE,     &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG101_NTSC),   0x4b},
-    {MJPEG_2_1_ESSENCE_TYPE,      &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG21_PAL),     0x4c},
-    {MJPEG_2_1_ESSENCE_TYPE,      &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG21_NTSC),    0x4c},
-    {MJPEG_3_1_ESSENCE_TYPE,      &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG31_PAL),     0x4d},
-    {MJPEG_3_1_ESSENCE_TYPE,      &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG31_NTSC),    0x4d},
-    {MJPEG_15_1_S_ESSENCE_TYPE,   &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG151s_PAL),   0x4e},
-    {MJPEG_15_1_S_ESSENCE_TYPE,   &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG151s_NTSC),  0x4e},
-    {MJPEG_4_1_S_ESSENCE_TYPE,    &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG41s_PAL),    0x4f},
-    {MJPEG_4_1_S_ESSENCE_TYPE,    &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG41s_NTSC),   0x4f},
-    {MJPEG_2_1_S_ESSENCE_TYPE,    &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG21s_PAL),    0x50},
-    {MJPEG_2_1_S_ESSENCE_TYPE,    &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG21s_NTSC),   0x50},
-    {MJPEG_20_1_ESSENCE_TYPE,     &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG201_PAL),    0x52},
-    {MJPEG_20_1_ESSENCE_TYPE,     &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG201_NTSC),   0x52},
-    {MJPEG_3_1_P_ESSENCE_TYPE,    &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG31p_PAL),    0x61},
-    {MJPEG_3_1_P_ESSENCE_TYPE,    &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG31p_NTSC),   0x61},
-    {MJPEG_2_1_P_ESSENCE_TYPE,    &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG21p_PAL),    0x62},
-    {MJPEG_2_1_P_ESSENCE_TYPE,    &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG21p_NTSC),   0x62},
-    {MJPEG_35_1_P_ESSENCE_TYPE,   &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG351p_PAL),   0x66},
-    {MJPEG_35_1_P_ESSENCE_TYPE,   &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG351p_NTSC),  0x66},
-    {MJPEG_14_1_P_ESSENCE_TYPE,   &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG141p_PAL),   0x67},
-    {MJPEG_14_1_P_ESSENCE_TYPE,   &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG141p_NTSC),  0x67},
-    {MJPEG_28_1_P_ESSENCE_TYPE,   &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG281p_PAL),   0x68},
-    {MJPEG_28_1_P_ESSENCE_TYPE,   &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG281p_NTSC),  0x68},
-    {MJPEG_10_1_M_ESSENCE_TYPE,   &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG101m_PAL),   0x6e},
-    {MJPEG_10_1_M_ESSENCE_TYPE,   &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG101m_NTSC),  0x6e},
-    {MJPEG_4_1_M_ESSENCE_TYPE,    &MXF_EC_L(AvidMJPEGClipWrapped),  0,                                 0x6f},
-    {MJPEG_8_1_M_ESSENCE_TYPE,    &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG81m_PAL),    0x70},
-    {MJPEG_8_1_M_ESSENCE_TYPE,    &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG81m_NTSC),   0x70},
-    {MJPEG_3_1_M_ESSENCE_TYPE,    &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG31m_PAL),    0x71},
-    {MJPEG_3_1_M_ESSENCE_TYPE,    &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG31m_NTSC),   0x71},
+    {MJPEG_10_1_ESSENCE_TYPE,     1,  &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG101_PAL),    0x4b},
+    {MJPEG_10_1_ESSENCE_TYPE,     1,  &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG101_NTSC),   0x4b},
+    {MJPEG_2_1_ESSENCE_TYPE,      1,  &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG21_PAL),     0x4c},
+    {MJPEG_2_1_ESSENCE_TYPE,      1,  &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG21_NTSC),    0x4c},
+    {MJPEG_3_1_ESSENCE_TYPE,      1,  &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG31_PAL),     0x4d},
+    {MJPEG_3_1_ESSENCE_TYPE,      1,  &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG31_NTSC),    0x4d},
+    {MJPEG_15_1_S_ESSENCE_TYPE,   1,  &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG151s_PAL),   0x4e},
+    {MJPEG_15_1_S_ESSENCE_TYPE,   1,  &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG151s_NTSC),  0x4e},
+    {MJPEG_4_1_S_ESSENCE_TYPE,    1,  &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG41s_PAL),    0x4f},
+    {MJPEG_4_1_S_ESSENCE_TYPE,    1,  &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG41s_NTSC),   0x4f},
+    {MJPEG_2_1_S_ESSENCE_TYPE,    1,  &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG21s_PAL),    0x50},
+    {MJPEG_2_1_S_ESSENCE_TYPE,    1,  &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG21s_NTSC),   0x50},
+    {MJPEG_20_1_ESSENCE_TYPE,     1,  &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG201_PAL),    0x52},
+    {MJPEG_20_1_ESSENCE_TYPE,     1,  &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG201_NTSC),   0x52},
+    {MJPEG_3_1_P_ESSENCE_TYPE,    1,  &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG31p_PAL),    0x61},
+    {MJPEG_3_1_P_ESSENCE_TYPE,    1,  &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG31p_NTSC),   0x61},
+    {MJPEG_2_1_P_ESSENCE_TYPE,    1,  &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG21p_PAL),    0x62},
+    {MJPEG_2_1_P_ESSENCE_TYPE,    1,  &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG21p_NTSC),   0x62},
+    {MJPEG_35_1_P_ESSENCE_TYPE,   1,  &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG351p_PAL),   0x66},
+    {MJPEG_35_1_P_ESSENCE_TYPE,   1,  &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG351p_NTSC),  0x66},
+    {MJPEG_14_1_P_ESSENCE_TYPE,   1,  &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG141p_PAL),   0x67},
+    {MJPEG_14_1_P_ESSENCE_TYPE,   1,  &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG141p_NTSC),  0x67},
+    {MJPEG_28_1_P_ESSENCE_TYPE,   1,  &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG281p_PAL),   0x68},
+    {MJPEG_28_1_P_ESSENCE_TYPE,   1,  &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG281p_NTSC),  0x68},
+    {MJPEG_10_1_M_ESSENCE_TYPE,   1,  &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG101m_PAL),   0x6e},
+    {MJPEG_10_1_M_ESSENCE_TYPE,   1,  &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG101m_NTSC),  0x6e},
+    {MJPEG_4_1_M_ESSENCE_TYPE,    1,  &MXF_EC_L(AvidMJPEGClipWrapped),  0,                                 0x6f},
+    {MJPEG_8_1_M_ESSENCE_TYPE,    1,  &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG81m_PAL),    0x70},
+    {MJPEG_8_1_M_ESSENCE_TYPE,    1,  &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG81m_NTSC),   0x70},
+    {MJPEG_3_1_M_ESSENCE_TYPE,    1,  &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG31m_PAL),    0x71},
+    {MJPEG_3_1_M_ESSENCE_TYPE,    1,  &MXF_EC_L(AvidMJPEGClipWrapped),  &MXF_CMDEF_L(AvidMJPEG31m_NTSC),   0x71},
 
-    {UNC_1_1_ESSENCE_TYPE,  &MXF_EC_L(SD_Unc_625_50i_422_135_ClipWrapped),      0, 0xaa},
-    {UNC_1_1_ESSENCE_TYPE,  &MXF_EC_L(SD_Unc_525_5994i_422_135_ClipWrapped),    0, 0xaa},
-    {UNC_1_1_ESSENCE_TYPE,  &MXF_EC_L(HD_Unc_1080_50i_422_ClipWrapped),         0, 0},
-    {UNC_1_1_ESSENCE_TYPE,  &MXF_EC_L(HD_Unc_1080_5994i_422_ClipWrapped),       0, 0},
-    {UNC_1_1_ESSENCE_TYPE,  &MXF_EC_L(HD_Unc_720_50p_422_ClipWrapped),          0, 0},
-    {UNC_1_1_ESSENCE_TYPE,  &MXF_EC_L(HD_Unc_720_5994p_422_ClipWrapped),        0, 0},
+    {UNC_1_1_ESSENCE_TYPE,  0,  &MXF_EC_L(SD_Unc_625_50i_422_135_ClipWrapped),      0, 0xaa},
+    {UNC_1_1_ESSENCE_TYPE,  0,  &MXF_EC_L(SD_Unc_525_5994i_422_135_ClipWrapped),    0, 0xaa},
+    {UNC_1_1_ESSENCE_TYPE,  0,  &MXF_EC_L(HD_Unc_1080_50i_422_ClipWrapped),         0, 0},
+    {UNC_1_1_ESSENCE_TYPE,  0,  &MXF_EC_L(HD_Unc_1080_5994i_422_ClipWrapped),       0, 0},
+    {UNC_1_1_ESSENCE_TYPE,  0,  &MXF_EC_L(HD_Unc_720_50p_422_ClipWrapped),          0, 0},
+    {UNC_1_1_ESSENCE_TYPE,  0,  &MXF_EC_L(HD_Unc_720_5994p_422_ClipWrapped),        0, 0},
     /* Avid Media Composer 5.03 wrongly used this label for 720_50p */
-    {UNC_1_1_ESSENCE_TYPE,  &MXF_EC_L(HD_Unc_720_60p_422_ClipWrapped),          0, 0},
+    {UNC_1_1_ESSENCE_TYPE,  0,  &MXF_EC_L(HD_Unc_720_60p_422_ClipWrapped),          0, 0},
 
-    {UNC_1_1_10B_ESSENCE_TYPE,  &MXF_EC_L(AvidUnc10Bit625ClipWrapped),    &MXF_CMDEF_L(AvidUncSD10Bit),  0x07e6},
-    {UNC_1_1_10B_ESSENCE_TYPE,  &MXF_EC_L(AvidUnc10Bit525ClipWrapped),    &MXF_CMDEF_L(AvidUncSD10Bit),  0x07e5},
-    {UNC_1_1_10B_ESSENCE_TYPE,  &MXF_EC_L(AvidUnc10Bit1080iClipWrapped),  &MXF_CMDEF_L(AvidUncHD10Bit),  0x07d0},
-    {UNC_1_1_10B_ESSENCE_TYPE,  &MXF_EC_L(AvidUnc10Bit720pClipWrapped),   &MXF_CMDEF_L(AvidUncHD10Bit),  0x07d4},
+    {UNC_1_1_10B_ESSENCE_TYPE,  0,  &MXF_EC_L(AvidUnc10Bit625ClipWrapped),    &MXF_CMDEF_L(AvidUncSD10Bit),  0x07e6},
+    {UNC_1_1_10B_ESSENCE_TYPE,  0,  &MXF_EC_L(AvidUnc10Bit525ClipWrapped),    &MXF_CMDEF_L(AvidUncSD10Bit),  0x07e5},
+    {UNC_1_1_10B_ESSENCE_TYPE,  0,  &MXF_EC_L(AvidUnc10Bit1080iClipWrapped),  &MXF_CMDEF_L(AvidUncHD10Bit),  0x07d0},
+    {UNC_1_1_10B_ESSENCE_TYPE,  0,  &MXF_EC_L(AvidUnc10Bit720pClipWrapped),   &MXF_CMDEF_L(AvidUncHD10Bit),  0x07d4},
 
-    {DNXHD_1235_ESSENCE_TYPE,  &MXF_EC_L(DNxHD1080p1235ClipWrapped),  0, 1235},
-    {DNXHD_1237_ESSENCE_TYPE,  &MXF_EC_L(DNxHD1080p1237ClipWrapped),  0, 1237},
-    {DNXHD_1238_ESSENCE_TYPE,  &MXF_EC_L(DNxHD1080p1238ClipWrapped),  0, 1238},
-    {DNXHD_1241_ESSENCE_TYPE,  &MXF_EC_L(DNxHD1080i1241ClipWrapped),  0, 1241},
-    {DNXHD_1242_ESSENCE_TYPE,  &MXF_EC_L(DNxHD1080i1242ClipWrapped),  0, 1242},
-    {DNXHD_1243_ESSENCE_TYPE,  &MXF_EC_L(DNxHD1080i1243ClipWrapped),  0, 1243},
-    {DNXHD_1250_ESSENCE_TYPE,  &MXF_EC_L(DNxHD720p1250ClipWrapped),   0, 1250},
-    {DNXHD_1251_ESSENCE_TYPE,  &MXF_EC_L(DNxHD720p1251ClipWrapped),   0, 1251},
-    {DNXHD_1252_ESSENCE_TYPE,  &MXF_EC_L(DNxHD720p1252ClipWrapped),   0, 1252},
-    {DNXHD_1253_ESSENCE_TYPE,  &MXF_EC_L(DNxHD1080p1253ClipWrapped),  0, 1253},
+    {DNXHD_1235_ESSENCE_TYPE,  0,  &MXF_EC_L(DNxHD1080p1235ClipWrapped),  &MXF_CMDEF_L(VC3_1080P_1235), 1235},
+    {DNXHD_1237_ESSENCE_TYPE,  0,  &MXF_EC_L(DNxHD1080p1237ClipWrapped),  &MXF_CMDEF_L(VC3_1080P_1237), 1237},
+    {DNXHD_1238_ESSENCE_TYPE,  0,  &MXF_EC_L(DNxHD1080p1238ClipWrapped),  &MXF_CMDEF_L(VC3_1080P_1238), 1238},
+    {DNXHD_1241_ESSENCE_TYPE,  0,  &MXF_EC_L(DNxHD1080i1241ClipWrapped),  &MXF_CMDEF_L(VC3_1080I_1241), 1241},
+    {DNXHD_1242_ESSENCE_TYPE,  0,  &MXF_EC_L(DNxHD1080i1242ClipWrapped),  &MXF_CMDEF_L(VC3_1080I_1242), 1242},
+    {DNXHD_1243_ESSENCE_TYPE,  0,  &MXF_EC_L(DNxHD1080i1243ClipWrapped),  &MXF_CMDEF_L(VC3_1080I_1243), 1243},
+    {DNXHD_1250_ESSENCE_TYPE,  0,  &MXF_EC_L(DNxHD720p1250ClipWrapped),   &MXF_CMDEF_L(VC3_720P_1250),  1250},
+    {DNXHD_1251_ESSENCE_TYPE,  0,  &MXF_EC_L(DNxHD720p1251ClipWrapped),   &MXF_CMDEF_L(VC3_720P_1251),  1251},
+    {DNXHD_1252_ESSENCE_TYPE,  0,  &MXF_EC_L(DNxHD720p1252ClipWrapped),   &MXF_CMDEF_L(VC3_720P_1252),  1252},
+    {DNXHD_1253_ESSENCE_TYPE,  0,  &MXF_EC_L(DNxHD1080p1253ClipWrapped),  &MXF_CMDEF_L(VC3_1080P_1253), 1253},
 
-    {MPEG4_ESSENCE_TYPE,  &MXF_EC_L(AvidMPEGClipWrapped),  &MXF_CMDEF_L(MP4AdvancedRealTimeSimpleL4), 0},
+    {MPEG4_ESSENCE_TYPE,  1,  &MXF_EC_L(AvidMPEGClipWrapped),  &MXF_CMDEF_L(MP4AdvancedRealTimeSimpleL4), 0},
 
-    {XDCAM_HD_ESSENCE_TYPE,  &MXF_EC_L(AvidMPEGClipWrapped),  &MXF_CMDEF_L(MPEG2_422P_HL_LONGGOP),  0},
-    {XDCAM_HD_ESSENCE_TYPE,  &MXF_EC_L(AvidMPEGClipWrapped),  &MXF_CMDEF_L(MPEG2_MP_HL_LONGGOP),    0},
-    {XDCAM_HD_ESSENCE_TYPE,  &MXF_EC_L(AvidMPEGClipWrapped),  &MXF_CMDEF_L(MPEG2_MP_H14_LONGGOP),   0},
+    {XDCAM_HD_ESSENCE_TYPE,  1,  &MXF_EC_L(AvidMPEGClipWrapped),  &MXF_CMDEF_L(MPEG2_422P_HL_LONGGOP),  0},
+    {XDCAM_HD_ESSENCE_TYPE,  1,  &MXF_EC_L(AvidMPEGClipWrapped),  &MXF_CMDEF_L(MPEG2_MP_HL_LONGGOP),    0},
+    {XDCAM_HD_ESSENCE_TYPE,  1,  &MXF_EC_L(AvidMPEGClipWrapped),  &MXF_CMDEF_L(MPEG2_MP_H14_LONGGOP),   0},
 
-    {AVCINTRA_100_ESSENCE_TYPE,  &MXF_EC_L(AVCIClipWrapped),  &MXF_CMDEF_L(AVCI_100_1080_60_I),  0},
-    {AVCINTRA_100_ESSENCE_TYPE,  &MXF_EC_L(AVCIClipWrapped),  &MXF_CMDEF_L(AVCI_100_1080_50_I),  0},
-    {AVCINTRA_100_ESSENCE_TYPE,  &MXF_EC_L(AVCIClipWrapped),  &MXF_CMDEF_L(AVCI_100_1080_30_P),  0},
-    {AVCINTRA_100_ESSENCE_TYPE,  &MXF_EC_L(AVCIClipWrapped),  &MXF_CMDEF_L(AVCI_100_1080_25_P),  0},
-    {AVCINTRA_100_ESSENCE_TYPE,  &MXF_EC_L(AVCIClipWrapped),  &MXF_CMDEF_L(AVCI_100_720_60_P),   0},
-    {AVCINTRA_100_ESSENCE_TYPE,  &MXF_EC_L(AVCIClipWrapped),  &MXF_CMDEF_L(AVCI_100_720_50_P),   0},
+    {AVCINTRA_100_ESSENCE_TYPE,  1,  &MXF_EC_L(AVCIClipWrapped),  &MXF_CMDEF_L(AVCI_100_1080_60_I),  0},
+    {AVCINTRA_100_ESSENCE_TYPE,  1,  &MXF_EC_L(AVCIClipWrapped),  &MXF_CMDEF_L(AVCI_100_1080_50_I),  0},
+    {AVCINTRA_100_ESSENCE_TYPE,  1,  &MXF_EC_L(AVCIClipWrapped),  &MXF_CMDEF_L(AVCI_100_1080_30_P),  0},
+    {AVCINTRA_100_ESSENCE_TYPE,  1,  &MXF_EC_L(AVCIClipWrapped),  &MXF_CMDEF_L(AVCI_100_1080_25_P),  0},
+    {AVCINTRA_100_ESSENCE_TYPE,  1,  &MXF_EC_L(AVCIClipWrapped),  &MXF_CMDEF_L(AVCI_100_720_60_P),   0},
+    {AVCINTRA_100_ESSENCE_TYPE,  1,  &MXF_EC_L(AVCIClipWrapped),  &MXF_CMDEF_L(AVCI_100_720_50_P),   0},
 
-    {AVCINTRA_50_ESSENCE_TYPE,  &MXF_EC_L(AVCIClipWrapped),  &MXF_CMDEF_L(AVCI_50_1080_60_I),  0},
-    {AVCINTRA_50_ESSENCE_TYPE,  &MXF_EC_L(AVCIClipWrapped),  &MXF_CMDEF_L(AVCI_50_1080_50_I),  0},
-    {AVCINTRA_50_ESSENCE_TYPE,  &MXF_EC_L(AVCIClipWrapped),  &MXF_CMDEF_L(AVCI_50_1080_30_P),  0},
-    {AVCINTRA_50_ESSENCE_TYPE,  &MXF_EC_L(AVCIClipWrapped),  &MXF_CMDEF_L(AVCI_50_1080_25_P),  0},
-    {AVCINTRA_50_ESSENCE_TYPE,  &MXF_EC_L(AVCIClipWrapped),  &MXF_CMDEF_L(AVCI_50_720_60_P),   0},
-    {AVCINTRA_50_ESSENCE_TYPE,  &MXF_EC_L(AVCIClipWrapped),  &MXF_CMDEF_L(AVCI_50_720_50_P),   0},
+    {AVCINTRA_50_ESSENCE_TYPE,  1,  &MXF_EC_L(AVCIClipWrapped),  &MXF_CMDEF_L(AVCI_50_1080_60_I),  0},
+    {AVCINTRA_50_ESSENCE_TYPE,  1,  &MXF_EC_L(AVCIClipWrapped),  &MXF_CMDEF_L(AVCI_50_1080_50_I),  0},
+    {AVCINTRA_50_ESSENCE_TYPE,  1,  &MXF_EC_L(AVCIClipWrapped),  &MXF_CMDEF_L(AVCI_50_1080_30_P),  0},
+    {AVCINTRA_50_ESSENCE_TYPE,  1,  &MXF_EC_L(AVCIClipWrapped),  &MXF_CMDEF_L(AVCI_50_1080_25_P),  0},
+    {AVCINTRA_50_ESSENCE_TYPE,  1,  &MXF_EC_L(AVCIClipWrapped),  &MXF_CMDEF_L(AVCI_50_720_60_P),   0},
+    {AVCINTRA_50_ESSENCE_TYPE,  1,  &MXF_EC_L(AVCIClipWrapped),  &MXF_CMDEF_L(AVCI_50_720_50_P),   0},
 
-    {PCM_ESSENCE_TYPE,  &MXF_EC_L(BWFClipWrapped),  0, 0},
+    {PCM_ESSENCE_TYPE,  0,  &MXF_EC_L(BWFClipWrapped),  0, 0},
 };
 
 
@@ -319,14 +320,41 @@ static AvidEssenceType get_essence_type(mxfUL *essenceContainerLabel, mxfUL *pic
     /* Note: using mxf_equals_ul_mod_regver function below because some Avid labels (e.g. D10)
        use a different registry version byte */
 
+    int match_ec, match_pc, match_resid;
+    int null_in_ec, null_in_pc;
+    int null_resid, null_ec, null_pc;
     size_t i;
+
+    null_in_ec = mxf_equals_ul(essenceContainerLabel, &g_Null_UL);
+    null_in_pc = mxf_equals_ul(pictureCodingLabel, &g_Null_UL);
+
     for (i = 0; i < ARRAY_SIZE(ESSENCE_TYPE_MAP); i++)
     {
-        if (mxf_equals_ul_mod_regver(essenceContainerLabel, ESSENCE_TYPE_MAP[i].essenceContainerLabel) &&
-            (!pictureCodingLabel || !ESSENCE_TYPE_MAP[i].pictureCodingLabel ||
-                mxf_equals_ul_mod_regver(pictureCodingLabel, ESSENCE_TYPE_MAP[i].pictureCodingLabel)) &&
-            (avidResolutionID == 0 || ESSENCE_TYPE_MAP[i].avidResolutionID == 0 ||
-                avidResolutionID == ESSENCE_TYPE_MAP[i].avidResolutionID))
+        null_ec = null_in_ec || !ESSENCE_TYPE_MAP[i].essenceContainerLabel;
+        null_pc = null_in_pc || !ESSENCE_TYPE_MAP[i].pictureCodingLabel;
+        null_resid = avidResolutionID == 0 || ESSENCE_TYPE_MAP[i].avidResolutionID == 0;
+
+        match_ec = !null_ec &&
+                    mxf_equals_ul_mod_regver(essenceContainerLabel, ESSENCE_TYPE_MAP[i].essenceContainerLabel);
+        match_pc = !null_pc &&
+                   mxf_equals_ul_mod_regver(pictureCodingLabel, ESSENCE_TYPE_MAP[i].pictureCodingLabel);
+        match_resid = !null_resid &&
+                      avidResolutionID == ESSENCE_TYPE_MAP[i].avidResolutionID;
+
+        if (match_ec &&
+            (!ESSENCE_TYPE_MAP[i].checkPictureCodingLabel || match_pc) &&
+            (null_resid || match_resid))
+        {
+            return ESSENCE_TYPE_MAP[i].essenceType;
+        }
+        else if (match_ec &&
+                 ESSENCE_TYPE_MAP[i].checkPictureCodingLabel &&
+                 !ESSENCE_TYPE_MAP[i].pictureCodingLabel &&
+                 match_resid)
+        {
+            return ESSENCE_TYPE_MAP[i].essenceType;
+        }
+        else if (null_ec && match_pc && (null_resid || match_resid))
         {
             return ESSENCE_TYPE_MAP[i].essenceType;
         }
@@ -764,7 +792,6 @@ int ami_read_info(const char *filename, AvidMXFInfo *info, int printDebugError)
     mxfRational maxEditRate = {25, 1};
     int64_t maxDuration = 0;
     int32_t avidResolutionID = 0x00;
-    mxfUL pictureEssenceCoding = g_Null_UL;
     TrackNumberRange videoTrackNumberRanges[64];
     int numVideoTrackNumberRanges = 0;
     TrackNumberRange audioTrackNumberRanges[64];
@@ -917,7 +944,7 @@ int ami_read_info(const char *filename, AvidMXFInfo *info, int printDebugError)
         /* picture essence coding label */
         if (mxf_have_item(descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, PictureEssenceCoding)))
         {
-            DCHECK(mxf_get_ul_item(descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, PictureEssenceCoding), &pictureEssenceCoding));
+            DCHECK(mxf_get_ul_item(descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, PictureEssenceCoding), &info->pictureCodingLabel));
         }
     }
     else if (mxf_is_subclass_of(dataModel, &descriptorSet->key, &MXF_SET_K(GenericSoundEssenceDescriptor)))
@@ -1313,9 +1340,10 @@ int ami_read_info(const char *filename, AvidMXFInfo *info, int printDebugError)
     /* using the header partition's essence container label because the label in the FileDescriptor
      is sometimes a weak reference to a ContainerDefinition in Avid files and the ContainerDefinition
      is not of much use */
-    info->essenceContainerLabel = *(mxfUL*)mxf_get_list_element(&headerPartition->essenceContainers, 0);
+    if (mxf_get_list_length(&headerPartition->essenceContainers) > 0)
+        info->essenceContainerLabel = *(mxfUL*)mxf_get_list_element(&headerPartition->essenceContainers, 0);
 
-    info->essenceType = get_essence_type(&info->essenceContainerLabel, &pictureEssenceCoding, avidResolutionID);
+    info->essenceType = get_essence_type(&info->essenceContainerLabel, &info->pictureCodingLabel, avidResolutionID);
 
 
 
