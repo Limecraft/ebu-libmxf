@@ -1413,8 +1413,11 @@ void ami_print_info(AvidMXFInfo *info)
     printf("Clip track string = %s\n", (info->tracksString == NULL) ? "" : info->tracksString);
     printf("%s essence\n", info->isVideo ? "Video": "Audio");
     printf("Essence type = %s\n", get_essence_type_string(info->essenceType, info->projectEditRate));
-    printf("Essence label = ");
+    printf("Essence container label = ");
     print_label(&info->essenceContainerLabel);
+    printf("\n");
+    printf("Picture coding label = ");
+    print_label(&info->pictureCodingLabel);
     printf("\n");
     printf("Track number = %d\n", info->trackNumber);
     printf("Edit rate = %d/%d\n", info->editRate.numerator, info->editRate.denominator);
