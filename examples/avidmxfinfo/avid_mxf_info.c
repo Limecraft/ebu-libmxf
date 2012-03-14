@@ -1417,9 +1417,6 @@ void ami_print_info(AvidMXFInfo *info)
     printf("Essence container label = ");
     print_label(&info->essenceContainerLabel);
     printf("\n");
-    printf("Picture coding label = ");
-    print_label(&info->pictureCodingLabel);
-    printf("\n");
     printf("Track number = %d\n", info->trackNumber);
     printf("Edit rate = %d/%d\n", info->editRate.numerator, info->editRate.denominator);
     printf("Track duration = %"PRId64" samples (", info->trackDuration);
@@ -1436,6 +1433,9 @@ void ami_print_info(AvidMXFInfo *info)
     printf(")\n");
     if (info->isVideo)
     {
+        printf("Picture coding label = ");
+        print_label(&info->pictureCodingLabel);
+        printf("\n");
         printf("Image aspect ratio = %d/%d\n", info->aspectRatio.numerator, info->aspectRatio.denominator);
         printf("Stored WxH = %dx%d (%s)\n", info->storedWidth, info->storedHeight, frame_layout_string(info->frameLayout));
         printf("Display WxH = %dx%d (%s)\n", info->storedWidth, info->storedHeight, frame_layout_string(info->frameLayout));
