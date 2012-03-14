@@ -299,6 +299,7 @@ static const EssenceTypeMap ESSENCE_TYPE_MAP[] =
     {AVCINTRA_50_ESSENCE_TYPE,  1,  &MXF_EC_L(AVCIClipWrapped),  &MXF_CMDEF_L(AVCI_50_720_50_P),   0},
 
     {PCM_ESSENCE_TYPE,  0,  &MXF_EC_L(BWFClipWrapped),  0, 0},
+    {PCM_ESSENCE_TYPE,  0,  &MXF_EC_L(AES3ClipWrapped), 0, 0},
 };
 
 
