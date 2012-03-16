@@ -2016,6 +2016,17 @@ int mxf_get_strongref_item(MXFMetadataSet *set, const mxfKey *itemKey, MXFMetada
     return 1;
 }
 
+int mxf_get_strongref_item_light(MXFMetadataSet *set, const mxfKey *itemKey, MXFMetadataSet **value)
+{
+    mxfUUID uuidValue;
+
+    CHK_ORET(set->headerMetadata != NULL);
+
+    CHK_ORET(mxf_get_uuid_item(set, itemKey, &uuidValue));
+
+    return mxf_dereference(set->headerMetadata, &uuidValue, value);
+}
+
 int mxf_get_weakref_item(MXFMetadataSet *set, const mxfKey *itemKey, MXFMetadataSet **value)
 {
     mxfUUID uuidValue;
@@ -2026,6 +2037,17 @@ int mxf_get_weakref_item(MXFMetadataSet *set, const mxfKey *itemKey, MXFMetadata
     CHK_ORET(mxf_dereference(set->headerMetadata, &uuidValue, value));
 
     return 1;
+}
+
+int mxf_get_weakref_item_light(MXFMetadataSet *set, const mxfKey *itemKey, MXFMetadataSet **value)
+{
+    mxfUUID uuidValue;
+
+    CHK_ORET(set->headerMetadata != NULL);
+
+    CHK_ORET(mxf_get_uuid_item(set, itemKey, &uuidValue));
+
+    return mxf_dereference(set->headerMetadata, &uuidValue, value);
 }
 
 int mxf_get_strongref_item_s(MXFListIterator *setsIter, MXFMetadataSet *set, const mxfKey *itemKey,

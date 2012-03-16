@@ -263,7 +263,9 @@ int mxf_get_timestamp_item(MXFMetadataSet *set, const mxfKey *itemKey, mxfTimest
 int mxf_get_utf16string_item_size(MXFMetadataSet *set, const mxfKey *itemKey, uint16_t *size);
 int mxf_get_utf16string_item(MXFMetadataSet *set, const mxfKey *itemKey, mxfUTF16Char *value);
 int mxf_get_strongref_item(MXFMetadataSet *set, const mxfKey *itemKey, MXFMetadataSet **value);
+int mxf_get_strongref_item_light(MXFMetadataSet *set, const mxfKey *itemKey, MXFMetadataSet **value);
 int mxf_get_weakref_item(MXFMetadataSet *set, const mxfKey *itemKey, MXFMetadataSet **value);
+int mxf_get_weakref_item_light(MXFMetadataSet *set, const mxfKey *itemKey, MXFMetadataSet **value);
 int mxf_get_strongref_item_s(MXFListIterator *setsIter, MXFMetadataSet *set, const mxfKey *itemKey,
                              MXFMetadataSet **value);
 int mxf_get_weakref_item_s(MXFListIterator *setsIter, MXFMetadataSet *set, const mxfKey *itemKey,
