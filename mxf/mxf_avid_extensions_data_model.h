@@ -837,6 +837,14 @@ MXF_ITEM_DEFINITION(TaggedValue, TaggedValueAttributeList,
 );
 
 
+MXF_ITEM_DEFINITION(EssenceGroup, EssenceGroupType,
+    MXF_LABEL(0xa0, 0x83, 0x00, 0x60, 0x94, 0xeb, 0x75, 0xcb, 0xd9, 0xc9, 0xbf, 0x24, 0xf6, 0xb8, 0x11, 0xd3),
+    0x0000,
+    MXF_INT32_TYPE,
+    0
+);
+
+
 
 
 #if !defined(KEEP_DATA_MODEL_DEFS)
