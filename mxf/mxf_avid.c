@@ -1300,10 +1300,8 @@ int mxf_avid_is_unc10bit_essence_element(const mxfKey *key)
 
 int mxf_avid_is_essence_element(const mxfKey *key)
 {
-    return mxf_avid_is_mjpeg_essence_element(key) ||
-           mxf_avid_is_dnxhd_essence_element(key) ||
-           mxf_avid_is_mpeg_essence_element(key) ||
-           mxf_avid_is_unc10bit_essence_element(key);
+    static const mxfKey avidEEKPrefix = MXF_AVID_EE_K(0, 0, 0, 0);
+    return mxf_equals_key_prefix(key, &avidEEKPrefix, 12);
 }
 
 
