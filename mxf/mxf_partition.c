@@ -601,23 +601,19 @@ int mxf_read_rip(MXFFile *mxfFile, MXFRIP *rip)
 
     mxf_initialise_list(&rip->entries, free);
 
-    /* read RIP size at end of file */
-    if (!mxf_file_seek(mxfFile, -4, SEEK_END))
-    {
-        return 0;
-    }
-    CHK_ORET(mxf_read_uint32(mxfFile, &size));
-
-    /* check size > min and can seek */
-    if (size < 33 || /* min RIP size = 16 + 1 + (4 + 8) * 1 + 4 */
-        !mxf_file_seek(mxfFile, (int64_t)0 - size, SEEK_CUR))
+    /* read RIP size (min is 16 + 1 + (4 + 8) * 1 + 4) at end of file */
+    if (!mxf_file_seek(mxfFile, -4, SEEK_END) ||
+        !mxf_read_uint32(mxfFile, &size) ||
+        size < 33)
     {
         return 0;
     }
 
-    /* check found RIP key */
-    CHK_ORET(mxf_read_kl(mxfFile, &key, &llen, &len));
-    if (!mxf_equals_key(&key, &g_RandomIndexPack_key))
+    /* seek, read and check RIP key */
+    if (!mxf_file_seek(mxfFile, (int64_t)0 - size, SEEK_CUR) ||
+        !mxf_read_k(mxfFile, &key) ||
+        !mxf_equals_key(&key, &g_RandomIndexPack_key) ||
+        !mxf_read_l(mxfFile, &llen, &len))
     {
         return 0;
     }
