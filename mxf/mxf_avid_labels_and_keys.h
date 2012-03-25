@@ -58,7 +58,7 @@ extern "C"
 
 
 
-/* 10-bit uncompressed */
+/* 10-bit uncompressed CDCI */
 
 static const mxfUL MXF_CMDEF_L(AvidUncSD10Bit)  = MXF_AVID_LABEL(0x03, 0x01, 0x01, 0x03, 0x01, 0x00);
 static const mxfUL MXF_CMDEF_L(AvidUncHD10Bit)  = MXF_AVID_LABEL(0x03, 0x01, 0x01, 0x03, 0x02, 0x00);
@@ -175,13 +175,18 @@ static const mxfUL MXF_EC_L(DNxHD720p1251ClipWrapped)   = MXF_AVID_DNXHD_EC_L(0x
 static const mxfUL MXF_EC_L(DNxHD720p1252ClipWrapped)   = MXF_AVID_DNXHD_EC_L(0x03, 0x03);
 
 
-/* 10-bit uncompressed */
+/* 10-bit uncompressed CDCI */
 
 static const mxfUL MXF_EC_L(AvidUnc10Bit625ClipWrapped)     = MXF_AVID_EC_L(0x07, 0x01, 0x0a);
 static const mxfUL MXF_EC_L(AvidUnc10Bit525ClipWrapped)     = MXF_AVID_EC_L(0x07, 0x01, 0x09);
 static const mxfUL MXF_EC_L(AvidUnc10Bit1080iClipWrapped)   = MXF_AVID_EC_L(0x07, 0x02, 0x01);
 static const mxfUL MXF_EC_L(AvidUnc10Bit1080pClipWrapped)   = MXF_AVID_EC_L(0x07, 0x02, 0x02);
 static const mxfUL MXF_EC_L(AvidUnc10Bit720pClipWrapped)    = MXF_AVID_EC_L(0x07, 0x02, 0x03);
+
+
+/* Uncompressed RGBA */
+
+static const mxfUL MXF_EC_L(AvidUncRGBA)    = MXF_AVID_EC_L(0x08, 0x01, 0x00);
 
 
 
@@ -230,12 +235,19 @@ static const mxfKey MXF_EE_K(BWFClipWrapped)  = MXF_AES3BWF_EE_K(0x01, MXF_BWF_C
 static const mxfKey MXF_EE_K(AES3ClipWrapped) = MXF_AES3BWF_EE_K(0x01, MXF_AES3_CLIP_WRAPPED_EE_TYPE, 0x01);
 
 
-/* Uncompressed */
+/* Uncompressed CDCI */
 
 static const mxfKey MXF_EE_K(UncClipWrapped)            = MXF_UNC_EE_K(0x01, MXF_UNC_CLIP_WRAPPED_EE_TYPE, 0x01);
 static const mxfKey MXF_EE_K(AvidUnc10BitClipWrapped)   = MXF_AVID_EE_K(0x15, 0x01, 0x07, 0x01);
 
 #define MXF_AVID_UNC_10BIT_PICT_TRACK_NUM   MXF_TRACK_NUM(0x15, 0x01, 0x07, 0x01)
+
+
+/* Uncompressed RGBA */
+
+static const mxfKey MXF_EE_K(AvidUncRGBA)   = MXF_AVID_EE_K(0x15, 0x01, 0x08, 0x01);
+
+#define MXF_AVID_UNC_RGBA_PICT_TRACK_NUM    MXF_TRACK_NUM(0x15, 0x01, 0x08, 0x01)
 
 
 
