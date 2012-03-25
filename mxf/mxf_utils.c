@@ -534,6 +534,23 @@ int mxf_equals_umid(const mxfUMID *umidA, const mxfUMID *umidB)
     return memcmp((const void*)umidA, (const void*)umidB, sizeof(mxfUMID)) == 0;
 }
 
+int mxf_equals_rgba_layout(const mxfRGBALayout *layoutA, const mxfRGBALayout *layoutB)
+{
+    int i;
+    for (i = 0; i < 8; i++) {
+        if (layoutA->components[i].code == 0 || layoutB->components[i].code == 0)
+            return layoutA->components[i].code == layoutB->components[i].code;
+
+        if (layoutA->components[i].code  != layoutB->components[i].code ||
+            layoutA->components[i].depth != layoutB->components[i].depth)
+        {
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
 /* Note: this function only works if half-swapping is used
    a UL always has the MSB of the 1st byte == 0 and a UUID (non-NCS) has the MSB of the 9th byte == 1
    The UUID should be half swapped when used where a UL is expected
