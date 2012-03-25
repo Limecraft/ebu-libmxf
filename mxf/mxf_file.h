@@ -145,17 +145,6 @@ int mxf_write_array_header(MXFFile *mxfFile, uint32_t len, uint32_t eleLen);
 
 int mxf_write_zeros(MXFFile *mxfFile, uint64_t len);
 
-int mxf_equals_key(const mxfKey *keyA, const mxfKey *keyB);
-int mxf_equals_key_prefix(const mxfKey *keyA, const mxfKey *keyB, size_t cmpLen);
-int mxf_equals_key_mod_regver(const mxfKey *keyA, const mxfKey *keyB);
-int mxf_equals_ul(const mxfUL *labelA, const mxfUL *labelB);
-int mxf_equals_ul_mod_regver(const mxfUL *labelA, const mxfUL *labelB);
-int mxf_equals_uuid(const mxfUUID *uuidA, const mxfUUID *uuidB);
-int mxf_equals_uid(const mxfUID *uidA, const mxfUID *uidB);
-int mxf_equals_umid(const mxfUMID *umidA, const mxfUMID *umidB);
-
-int mxf_is_ul(const mxfUID *uid);
-
 void mxf_set_runin_len(MXFFile *mxfFile, uint16_t runinLen);
 uint16_t mxf_get_runin_len(MXFFile *mxfFile);
 

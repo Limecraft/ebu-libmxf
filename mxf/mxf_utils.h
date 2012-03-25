@@ -93,6 +93,18 @@ void mxf_regtest_generate_umid(mxfUMID *umid);
 void mxf_regtest_generate_key(mxfKey *key);
 
 
+int mxf_equals_key(const mxfKey *keyA, const mxfKey *keyB);
+int mxf_equals_key_prefix(const mxfKey *keyA, const mxfKey *keyB, size_t cmpLen);
+int mxf_equals_key_mod_regver(const mxfKey *keyA, const mxfKey *keyB);
+int mxf_equals_ul(const mxfUL *labelA, const mxfUL *labelB);
+int mxf_equals_ul_mod_regver(const mxfUL *labelA, const mxfUL *labelB);
+int mxf_equals_uuid(const mxfUUID *uuidA, const mxfUUID *uuidB);
+int mxf_equals_uid(const mxfUID *uidA, const mxfUID *uidB);
+int mxf_equals_umid(const mxfUMID *umidA, const mxfUMID *umidB);
+
+int mxf_is_ul(const mxfUID *uid);
+
+
 size_t mxf_utf16_to_utf8(char *u8_str, const mxfUTF16Char *u16_str, size_t u8_size);
 size_t mxf_utf8_to_utf16(mxfUTF16Char *u16_str, const char *u8_str, size_t u16_size);
 

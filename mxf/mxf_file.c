@@ -857,61 +857,6 @@ int mxf_write_zeros(MXFFile *mxfFile, uint64_t len)
 }
 
 
-int mxf_equals_key(const mxfKey *keyA, const mxfKey *keyB)
-{
-    return memcmp((const void*)keyA, (const void*)keyB, sizeof(mxfKey)) == 0;
-}
-
-int mxf_equals_key_prefix(const mxfKey *keyA, const mxfKey *keyB, size_t cmpLen)
-{
-    return memcmp((const void*)keyA, (const void*)keyB, cmpLen) == 0;
-}
-
-int mxf_equals_key_mod_regver(const mxfKey *keyA, const mxfKey *keyB)
-{
-    /* ignore difference in octet7, the registry version */
-    return memcmp((const void*)keyA, (const void*)keyB, 7) == 0 &&
-           memcmp((const void*)&keyA->octet8, (const void*)&keyB->octet8, 8) == 0;
-}
-
-int mxf_equals_ul(const mxfUL *labelA, const mxfUL *labelB)
-{
-    return memcmp((const void*)labelA, (const void*)labelB, sizeof(mxfUL)) == 0;
-}
-
-int mxf_equals_ul_mod_regver(const mxfUL *labelA, const mxfUL *labelB)
-{
-    /* ignore difference in octet7, the registry version */
-    return memcmp((const void*)labelA, (const void*)labelB, 7) == 0 &&
-           memcmp((const void*)&labelA->octet8, (const void*)&labelB->octet8, 8) == 0;
-}
-
-int mxf_equals_uuid(const mxfUUID *uuidA, const mxfUUID *uuidB)
-{
-    return memcmp((const void*)uuidA, (const void*)uuidB, sizeof(mxfUUID)) == 0;
-}
-
-int mxf_equals_uid(const mxfUID *uidA, const mxfUID *uidB)
-{
-    return memcmp((const void*)uidA, (const void*)uidB, sizeof(mxfUID)) == 0;
-}
-
-int mxf_equals_umid(const mxfUMID *umidA, const mxfUMID *umidB)
-{
-    return memcmp((const void*)umidA, (const void*)umidB, sizeof(mxfUMID)) == 0;
-}
-
-/* Note: this function only works if half-swapping is used
-   a UL always has the MSB of the 1st byte == 0 and a UUID (non-NCS) has the MSB of the 9th byte == 1
-   The UUID should be half swapped when used where a UL is expected
-   Note: the UL is half swapped in AAF AUIDs
-   Note: the UL is half swapped in UMIDs when using the UUID/UL material generation method */
-int mxf_is_ul(const mxfUID *uid)
-{
-    return (uid->octet0 & 0x80) == 0x00;
-}
-
-
 void mxf_set_runin_len(MXFFile *mxfFile, uint16_t runinLen)
 {
     mxfFile->runinLen = runinLen;
