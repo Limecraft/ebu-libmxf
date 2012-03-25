@@ -265,8 +265,7 @@ static int validate_set(MXFMetadataSet *set, MXFSetDef *setDef, int logErrors)
                     CHECK_ARRAY_ELEMENT_LEN(8)
                     break;
                 case MXF_RGBALAYOUT_TYPE:
-                    CHECK_ARRAY_HEADER_LENGTH
-                    CHECK_ARRAY_ELEMENT_LEN(2)
+                    CHECK_LENGTH(16)
                     break;
                 case MXF_RATIONAL_TYPE:
                     CHECK_LENGTH(8)
@@ -1210,10 +1209,13 @@ void mxf_get_product_version(const uint8_t *value, mxfProductVersion *result)
     mxf_get_uint16(&value[8], &result->release);
 }
 
-void mxf_get_rgba_layout_component(const uint8_t *value, mxfRGBALayoutComponent *result)
+void mxf_get_rgba_layout(const uint8_t *value, mxfRGBALayout *result)
 {
-    mxf_get_uint8(value, &result->code);
-    mxf_get_uint8(&value[1], &result->depth);
+    int i;
+    for (i = 0; i < 8; i++) {
+        result->components[i].code  = value[i * 2];
+        result->components[i].depth = value[i * 2 + 1];
+    }
 }
 
 void mxf_get_array_header(const uint8_t *value, uint32_t *arrayLen, uint32_t *arrayItemLen)
@@ -1539,10 +1541,13 @@ void mxf_set_product_version(const mxfProductVersion *value, uint8_t *result)
     mxf_set_uint16(value->release, &result[8]);
 }
 
-void mxf_set_rgba_layout_component(const mxfRGBALayoutComponent *value, uint8_t *result)
+void mxf_set_rgba_layout(const mxfRGBALayout *value, uint8_t *result)
 {
-    mxf_set_uint8(value->code, result);
-    mxf_set_uint8(value->depth, &result[1]);
+    int i;
+    for (i = 0; i < 8; i++) {
+        result[2 * i    ] = value->components[i].code;
+        result[2 * i + 1] = value->components[i].depth;
+    }
 }
 
 void mxf_set_array_header(uint32_t arrayLen, uint32_t arrayElementLen, uint8_t *result)
@@ -1748,9 +1753,9 @@ int mxf_set_product_version_item(MXFMetadataSet *set, const mxfKey *itemKey, con
     SET_VALUE(mxfProductVersion_extlen, mxf_set_product_version);
 }
 
-int mxf_set_rgba_layout_component_item(MXFMetadataSet *set, const mxfKey *itemKey, const mxfRGBALayoutComponent *value)
+int mxf_set_rgba_layout_item(MXFMetadataSet *set, const mxfKey *itemKey, const mxfRGBALayout *value)
 {
-    SET_VALUE(mxfRGBALayoutComponent_extlen, mxf_set_rgba_layout_component);
+    SET_VALUE(mxfRGBALayout_extlen, mxf_set_rgba_layout);
 }
 
 
@@ -2101,9 +2106,9 @@ int mxf_get_product_version_item(MXFMetadataSet *set, const mxfKey *itemKey, mxf
     GET_VALUE(mxfProductVersion_extlen, mxf_get_product_version);
 }
 
-int mxf_get_rgba_layout_component_item(MXFMetadataSet *set, const mxfKey *itemKey, mxfRGBALayoutComponent *value)
+int mxf_get_rgba_layout_item(MXFMetadataSet *set, const mxfKey *itemKey, mxfRGBALayout *value)
 {
-    GET_VALUE(mxfRGBALayoutComponent_extlen, mxf_get_rgba_layout_component);
+    GET_VALUE(mxfRGBALayout_extlen, mxf_get_rgba_layout);
 }
 
 

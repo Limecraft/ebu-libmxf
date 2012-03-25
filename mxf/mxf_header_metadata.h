@@ -158,7 +158,7 @@ void mxf_get_rational(const uint8_t *value, mxfRational *result);
 void mxf_get_position(const uint8_t *value, mxfPosition *result);
 void mxf_get_boolean(const uint8_t *value, mxfBoolean *result);
 void mxf_get_product_version(const uint8_t *value, mxfProductVersion *result);
-void mxf_get_rgba_layout_component(const uint8_t *value, mxfRGBALayoutComponent *result);
+void mxf_get_rgba_layout(const uint8_t *value, mxfRGBALayout *result);
 void mxf_get_array_header(const uint8_t *value, uint32_t *arrayLen, uint32_t *arrayItemLen);
 uint16_t mxf_get_utf16string_size(const uint8_t *value, uint16_t valueLen);
 void mxf_get_utf16string(const uint8_t *value, uint16_t valueLen, mxfUTF16Char *result);
@@ -200,7 +200,7 @@ void mxf_set_position(mxfPosition value, uint8_t *result);
 void mxf_set_length(mxfLength value, uint8_t *result);
 void mxf_set_boolean(mxfBoolean value, uint8_t *result);
 void mxf_set_product_version(const mxfProductVersion *value, uint8_t *result);
-void mxf_set_rgba_layout_component(const mxfRGBALayoutComponent *value, uint8_t *result);
+void mxf_set_rgba_layout(const mxfRGBALayout *value, uint8_t *result);
 void mxf_set_array_header(uint32_t arrayLen, uint32_t arrayElementLen, uint8_t *result);
 
 
@@ -233,7 +233,7 @@ int mxf_set_position_item(MXFMetadataSet *set, const mxfKey *itemKey, mxfPositio
 int mxf_set_length_item(MXFMetadataSet *set, const mxfKey *itemKey, mxfLength value);
 int mxf_set_boolean_item(MXFMetadataSet *set, const mxfKey *itemKey, mxfBoolean value);
 int mxf_set_product_version_item(MXFMetadataSet *set, const mxfKey *itemKey, const mxfProductVersion *value);
-int mxf_set_rgba_layout_component_item(MXFMetadataSet *set, const mxfKey *itemKey, const mxfRGBALayoutComponent *value);
+int mxf_set_rgba_layout_item(MXFMetadataSet *set, const mxfKey *itemKey, const mxfRGBALayout *value);
 
 int mxf_alloc_array_item_elements(MXFMetadataSet *set, const mxfKey *itemKey, uint32_t elementLen,
                                   uint32_t count, uint8_t **elements);
@@ -275,7 +275,7 @@ int mxf_get_rational_item(MXFMetadataSet *set, const mxfKey *itemKey, mxfRationa
 int mxf_get_position_item(MXFMetadataSet *set, const mxfKey *itemKey, mxfPosition *value);
 int mxf_get_boolean_item(MXFMetadataSet *set, const mxfKey *itemKey, mxfBoolean *value);
 int mxf_get_product_version_item(MXFMetadataSet *set, const mxfKey *itemKey, mxfProductVersion *value);
-int mxf_get_rgba_layout_component_item(MXFMetadataSet *set, const mxfKey *itemKey, mxfRGBALayoutComponent *value);
+int mxf_get_rgba_layout_item(MXFMetadataSet *set, const mxfKey *itemKey, mxfRGBALayout *value);
 
 int mxf_get_array_item_count(MXFMetadataSet *set, const mxfKey *itemKey, uint32_t *count);
 int mxf_get_array_item_element_len(MXFMetadataSet *set, const mxfKey *itemKey, uint32_t *elementLen);

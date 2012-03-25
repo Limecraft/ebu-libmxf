@@ -209,9 +209,13 @@ typedef struct
 
 typedef struct
 {
-    uint8_t code;
-    uint8_t depth;
-} mxfRGBALayoutComponent;
+    struct
+    {
+        uint8_t code;
+        uint8_t depth;
+    } components[8];
+} mxfRGBALayout;
+
 
 
 /* external MXF data lengths */
@@ -230,7 +234,7 @@ typedef struct
 #define mxfLength_extlen                8
 #define mxfBoolean_extlen               1
 #define mxfProductVersion_extlen        10
-#define mxfRGBALayoutComponent_extlen   2
+#define mxfRGBALayout_extlen            16
 
 
 static const mxfUUID g_Null_UUID =
