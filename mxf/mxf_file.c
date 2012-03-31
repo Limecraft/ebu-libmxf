@@ -55,6 +55,9 @@
 /* size of buffer used to skip data by reading and discarding */
 #define SKIP_BUFFER_SIZE        2048
 
+#define MAX_ZEROS_BUFFER_SIZE   16384
+#define ZEROS_BUFFER_INCREMENT  2048
+
 
 typedef enum
 {
@@ -325,6 +328,8 @@ void mxf_file_close_2(MXFFile **mxfFile, void (*free_func)(void*))
 {
     if (!(*mxfFile))
         return;
+
+    free((*mxfFile)->zerosBuffer);
 
     if ((*mxfFile)->sysData) {
         (*mxfFile)->close((*mxfFile)->sysData);
@@ -837,20 +842,41 @@ int mxf_write_array_header(MXFFile *mxfFile, uint32_t len, uint32_t eleLen)
 
 int mxf_write_zeros(MXFFile *mxfFile, uint64_t len)
 {
-    static const unsigned char zeros[1024] = {0};
-
-    uint64_t completeCount = len / sizeof(zeros);
-    uint32_t partialCount = (uint32_t)(len % sizeof(zeros));
+    uint64_t completeCount;
+    uint32_t partialCount;
     uint64_t i;
+
+    if (len == 0)
+        return 1;
+
+    if (mxfFile->zerosBufferSize < len &&
+        mxfFile->zerosBufferSize < MAX_ZEROS_BUFFER_SIZE)
+    {
+        uint8_t *newBuffer;
+        uint32_t newSize;
+        if (len >= MAX_ZEROS_BUFFER_SIZE)
+            newSize = MAX_ZEROS_BUFFER_SIZE;
+        else
+            newSize = (uint32_t)(len + (ZEROS_BUFFER_INCREMENT - (len % ZEROS_BUFFER_INCREMENT)));
+
+        CHK_ORET((newBuffer = realloc(mxfFile->zerosBuffer, newSize)) != NULL);
+        memset(newBuffer + mxfFile->zerosBufferSize, 0, newSize - mxfFile->zerosBufferSize);
+
+        mxfFile->zerosBuffer = newBuffer;
+        mxfFile->zerosBufferSize = newSize;
+    }
+
+    completeCount = len / mxfFile->zerosBufferSize;
+    partialCount = (uint32_t)(len % mxfFile->zerosBufferSize);
 
     for (i = 0; i < completeCount; i++)
     {
-        CHK_ORET(mxf_file_write(mxfFile, zeros, sizeof(zeros)) == sizeof(zeros));
+        CHK_ORET(mxf_file_write(mxfFile, mxfFile->zerosBuffer, mxfFile->zerosBufferSize) == mxfFile->zerosBufferSize);
     }
 
     if (partialCount > 0)
     {
-        CHK_ORET(mxf_file_write(mxfFile, zeros, partialCount) == partialCount);
+        CHK_ORET(mxf_file_write(mxfFile, mxfFile->zerosBuffer, partialCount) == partialCount);
     }
 
     return 1;

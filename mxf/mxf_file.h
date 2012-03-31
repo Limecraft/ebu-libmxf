@@ -67,6 +67,8 @@ typedef struct
     /* general data */
     uint8_t minLLen;
     uint16_t runinLen;
+    uint8_t *zerosBuffer;
+    uint32_t zerosBufferSize;
 } MXFFile;
 
 
