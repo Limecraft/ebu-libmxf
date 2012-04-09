@@ -80,10 +80,10 @@ extern "C"
 * Free the memory and set the variable to NULL
 */
 
-#define SAFE_FREE(d_ptr)    \
-    do {                    \
-        free(*d_ptr);       \
-        *d_ptr = NULL;      \
+#define SAFE_FREE(var)  \
+    do {                \
+        free(var);      \
+        var = NULL;     \
     } while (0)
 
 

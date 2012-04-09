@@ -208,7 +208,7 @@ void mxf_clear_dict_read_filter(MXFReadFilter *filter)
         return;
     }
 
-    SAFE_FREE(&filter->privateData);
+    SAFE_FREE(filter->privateData);
 }
 
 

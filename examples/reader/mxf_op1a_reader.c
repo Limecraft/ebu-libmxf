@@ -568,7 +568,7 @@ static int process_metadata(MXFReader *reader, MXFPartition *partition)
     return 1;
 
 fail:
-    SAFE_FREE(&newWrappedTrack);
+    SAFE_FREE(newWrappedTrack);
     mxf_clear_list(&wrappedTracks);
     mxf_clear_list(&sortedWrappedTracks);
     return 0;
@@ -687,7 +687,7 @@ static void op1a_close(MXFReader *reader)
 
     mxf_clear_list(&reader->essenceReader->data->partitions);
 
-    SAFE_FREE(&reader->essenceReader->data);
+    SAFE_FREE(reader->essenceReader->data);
 }
 
 static int read_content_package(MXFReader *reader, int skip, MXFReaderListener *listener)

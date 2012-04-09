@@ -158,8 +158,8 @@ static void cache_file_close(MXFFileSysData *sysData)
         mxf_file_close(&sysData->target);
     }
 
-    SAFE_FREE(&sysData->pages);
-    SAFE_FREE(&sysData->allocCacheData);
+    SAFE_FREE(sysData->pages);
+    SAFE_FREE(sysData->allocCacheData);
 }
 
 static uint32_t cache_file_read(MXFFileSysData *sysData, uint8_t *data, uint32_t count)
@@ -457,10 +457,10 @@ int mxf_cache_file_open(MXFFile *target, uint32_t in_cachePageSize, uint32_t cac
     return 1;
 
 fail:
-    SAFE_FREE(&newMXFFile);
-    SAFE_FREE(&newDiskFile);
-    SAFE_FREE(&newPages);
-    SAFE_FREE(&newCacheData);
+    SAFE_FREE(newMXFFile);
+    SAFE_FREE(newDiskFile);
+    SAFE_FREE(newPages);
+    SAFE_FREE(newCacheData);
     return 0;
 }
 

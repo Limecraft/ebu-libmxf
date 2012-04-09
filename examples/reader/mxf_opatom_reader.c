@@ -188,7 +188,7 @@ static int read_avid_mjpeg_index_segment(MXFReader *reader)
     uint64_t len;
     MXFIndexTableSegment *newSegment = NULL;
 
-    SAFE_FREE(&reader->essenceReader->data->avidFrameOffsets);
+    SAFE_FREE(reader->essenceReader->data->avidFrameOffsets);
     reader->essenceReader->data->numAvidFrameOffsets = 0;
 
     /* search for index table key and then read */
@@ -210,7 +210,7 @@ static int read_avid_mjpeg_index_segment(MXFReader *reader)
     }
 
 fail:
-    SAFE_FREE(&reader->essenceReader->data->avidFrameOffsets);
+    SAFE_FREE(reader->essenceReader->data->avidFrameOffsets);
     reader->essenceReader->data->numAvidFrameOffsets = 0;
     mxf_free_index_table_segment(&newSegment);
     return 0;
@@ -544,9 +544,9 @@ static void opatom_close(MXFReader *reader)
 
     mxf_free_header_metadata(&reader->essenceReader->data->headerMetadata);
     mxf_free_partition(&reader->essenceReader->data->headerPartition);
-    SAFE_FREE(&reader->essenceReader->data->avidFrameOffsets);
+    SAFE_FREE(reader->essenceReader->data->avidFrameOffsets);
 
-    SAFE_FREE(&reader->essenceReader->data);
+    SAFE_FREE(reader->essenceReader->data);
 }
 
 static int opatom_position_at_frame(MXFReader *reader, int64_t frameNumber)

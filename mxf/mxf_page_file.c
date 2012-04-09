@@ -225,7 +225,7 @@ static int open_file(MXFFileSysData *sysData, Page *page)
 
             sysData->fileDescriptorHead->page->fileDescriptor = NULL;
             disk_file_close(sysData->fileDescriptorHead);
-            SAFE_FREE(&sysData->fileDescriptorHead);
+            SAFE_FREE(sysData->fileDescriptorHead);
 
             sysData->fileDescriptorHead = NULL;
             sysData->fileDescriptorTail = NULL;
@@ -239,7 +239,7 @@ static int open_file(MXFFileSysData *sysData, Page *page)
 
             sysData->fileDescriptorHead->page->fileDescriptor = NULL;
             disk_file_close(sysData->fileDescriptorHead);
-            SAFE_FREE(&sysData->fileDescriptorHead);
+            SAFE_FREE(sysData->fileDescriptorHead);
 
             sysData->fileDescriptorHead = newHead;
             newHead->prev = NULL;
@@ -339,7 +339,7 @@ static Page* open_page(MXFFileSysData *sysData, int64_t position)
             Page *newPages;
             CHK_MALLOC_ARRAY_ORET(newPages, Page, sysData->numPagesAllocated + PAGE_ALLOC_INCR);
             memcpy(newPages, sysData->pages, sizeof(Page) * sysData->numPagesAllocated);
-            SAFE_FREE(&sysData->pages);
+            SAFE_FREE(sysData->pages);
             sysData->pages = newPages;
             sysData->numPagesAllocated += PAGE_ALLOC_INCR;
 
@@ -474,9 +474,9 @@ static void page_file_close(MXFFileSysData *sysData)
     FileDescriptor *fd;
     FileDescriptor *nextFd;
 
-    SAFE_FREE(&sysData->filenameTemplate);
+    SAFE_FREE(sysData->filenameTemplate);
 
-    SAFE_FREE(&sysData->pages);
+    SAFE_FREE(sysData->pages);
     sysData->numPages = 0;
     sysData->numPagesAllocated = 0;
 
@@ -485,7 +485,7 @@ static void page_file_close(MXFFileSysData *sysData)
     {
         disk_file_close(fd);
         nextFd = fd->next;
-        SAFE_FREE(&fd);
+        SAFE_FREE(fd);
         fd = nextFd;
     }
     sysData->fileDescriptorHead = NULL;
@@ -946,7 +946,7 @@ int mxf_page_file_forward_truncate(MXFPageFile *mxfPageFile)
             {
                 sysData->pages[i].fileDescriptor->next->prev = sysData->pages[i].fileDescriptor->prev;
             }
-            SAFE_FREE(&sysData->pages[i].fileDescriptor);
+            SAFE_FREE(sysData->pages[i].fileDescriptor);
         }
 
         /* truncate the file to zero length */

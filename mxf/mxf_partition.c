@@ -178,7 +178,7 @@ void mxf_free_partition(MXFPartition **partition)
     }
 
     mxf_clear_partition(*partition);
-    SAFE_FREE(partition);
+    SAFE_FREE(*partition);
 }
 
 void mxf_initialise_partition(MXFPartition *partition)
@@ -320,7 +320,7 @@ int mxf_append_partition_esscont_label(MXFPartition *partition, const mxfUL *lab
     return 1;
 
 fail:
-    SAFE_FREE(&newLabel);
+    SAFE_FREE(newLabel);
     return 0;
 }
 
@@ -799,7 +799,7 @@ int mxf_find_footer_partition(MXFFile *mxfFile)
                     if (!mxf_file_seek(mxfFile, offset - numRead + j, SEEK_SET))
                         goto fail;
 
-                    SAFE_FREE(&buffer);
+                    SAFE_FREE(buffer);
                     return 1;
                 } else if (buffer[j + 13] == 0x02 || buffer[j + 13] == 0x03) {
                     /* found a header or body partition pack key - continue search in this buffer only */
@@ -814,7 +814,7 @@ int mxf_find_footer_partition(MXFFile *mxfFile)
     }
 
 fail:
-    SAFE_FREE(&buffer);
+    SAFE_FREE(buffer);
     return 0;
 }
 

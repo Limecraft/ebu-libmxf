@@ -64,7 +64,7 @@ void mxf_free_list(MXFList **list)
     }
 
     mxf_clear_list(*list);
-    SAFE_FREE(list);
+    SAFE_FREE(*list);
 }
 
 void mxf_initialise_list(MXFList *list, free_func_type freeFunc)
@@ -92,7 +92,7 @@ void mxf_clear_list(MXFList *list)
         {
             list->freeFunc(element->data);
         }
-        SAFE_FREE(&element);
+        SAFE_FREE(element);
 
         element = nextElement;
     }
@@ -220,7 +220,7 @@ int mxf_insert_list_element(MXFList *list, long index, int before, void *data)
     return 1;
 
 fail:
-    SAFE_FREE(&newElement);
+    SAFE_FREE(newElement);
     return 0;
 }
 
@@ -274,7 +274,7 @@ void* mxf_remove_list_element(MXFList *list, void *info, eq_func_type eqFunc)
                     list->lastElement = prevElement;
                 }
             }
-            SAFE_FREE(&element); /* must free the wrapper element because we only return the data */
+            SAFE_FREE(element); /* must free the wrapper element because we only return the data */
             list->len--;
             break;
         }
@@ -323,7 +323,7 @@ void* mxf_remove_list_element_at_index(MXFList *list, long index)
             list->lastElement = prevElement;
         }
     }
-    SAFE_FREE(&element); /* must free the wrapper element because we only return the data */
+    SAFE_FREE(element); /* must free the wrapper element because we only return the data */
     list->len--;
 
     return result;

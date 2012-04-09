@@ -106,11 +106,11 @@ static int get_string_value(MXFMetadataSet *set, const mxfKey *itemKey, char **s
 
     CHECK_OFAIL(convert_string(utf16Str, str));
 
-    SAFE_FREE(&utf16Str);
+    SAFE_FREE(utf16Str);
     return 1;
 
 fail:
-    SAFE_FREE(&utf16Str);
+    SAFE_FREE(utf16Str);
     return 0;
 }
 
@@ -146,13 +146,13 @@ static int print_string_ext(const uint8_t *value, uint16_t len, int spaceCount)
         printf("L\"%s\"", str);
     }
 
-    SAFE_FREE(&utf16Str);
-    SAFE_FREE(&str);
+    SAFE_FREE(utf16Str);
+    SAFE_FREE(str);
     return 1;
 
 fail:
-    SAFE_FREE(&utf16Str);
-    SAFE_FREE(&str);
+    SAFE_FREE(utf16Str);
+    SAFE_FREE(str);
     return 0;
 }
 
@@ -182,7 +182,7 @@ static int print_string_item(MXFMetadataSet *set, const mxfKey *itemKey, int spa
 
     print_string(value, spaceCount);
 
-    SAFE_FREE(&value);
+    SAFE_FREE(value);
     return 1;
 }
 

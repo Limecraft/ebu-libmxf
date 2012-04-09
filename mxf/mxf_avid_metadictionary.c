@@ -84,7 +84,7 @@ static int add_weakref_to_list(MXFList *list, MXFMetadataItem *item, int recordM
     return 1;
 
 fail:
-    SAFE_FREE(&data);
+    SAFE_FREE(data);
     return 0;
 }
 
@@ -102,7 +102,7 @@ static int add_metadef_to_list(MXFList *list, const mxfUL *identification, const
     return 1;
 
 fail:
-    SAFE_FREE(&data);
+    SAFE_FREE(data);
     return 0;
 }
 
@@ -179,11 +179,11 @@ static int append_name_to_string_array(MXFMetadataSet *set, const mxfKey *itemKe
 
     CHK_OFAIL(mxf_set_item(set, itemKey, nameArray, nameArraySize));
 
-    SAFE_FREE(&nameArray);
+    SAFE_FREE(nameArray);
     return 1;
 
 fail:
-    SAFE_FREE(&nameArray);
+    SAFE_FREE(nameArray);
     return 0;
 }
 
@@ -230,7 +230,7 @@ static void free_avid_metadictionary(AvidMetaDictionary **metaDict)
     mxf_clear_list(&(*metaDict)->classWeakRefList);
     mxf_clear_list(&(*metaDict)->typeWeakRefList);
 
-    SAFE_FREE(metaDict);
+    SAFE_FREE(*metaDict);
 }
 
 

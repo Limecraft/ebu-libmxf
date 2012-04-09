@@ -202,7 +202,7 @@ static int mxf_win32_file_open(const char *in_filename, int flags, OpenMode mode
         goto fail;
 
 #if defined (_UNICODE)
-    SAFE_FREE(&filename);
+    SAFE_FREE(filename);
 #endif
 
     newMXFFile->close         = win32_file_close;
@@ -224,10 +224,10 @@ static int mxf_win32_file_open(const char *in_filename, int flags, OpenMode mode
     return 1;
 
 fail:
-    SAFE_FREE(&newMXFFile);
-    SAFE_FREE(&newDiskFile);
+    SAFE_FREE(newMXFFile);
+    SAFE_FREE(newDiskFile);
 #if defined (_UNICODE)
-    SAFE_FREE(&filename);
+    SAFE_FREE(filename);
 #endif
     return 0;
 }

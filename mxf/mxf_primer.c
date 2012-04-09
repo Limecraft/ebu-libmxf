@@ -111,7 +111,7 @@ static void free_primer_pack_entry(MXFPrimerPackEntry **entry)
         return;
     }
 
-    SAFE_FREE(entry);
+    SAFE_FREE(*entry);
 }
 
 
@@ -142,7 +142,7 @@ void mxf_free_primer_pack(MXFPrimerPack **primerPack)
     }
 
     mxf_clear_list(&(*primerPack)->entries);
-    SAFE_FREE(primerPack);
+    SAFE_FREE(*primerPack);
 }
 
 int mxf_register_primer_entry(MXFPrimerPack *primerPack, const mxfUID *itemUID, mxfLocalTag newTag,

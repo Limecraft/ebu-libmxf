@@ -195,12 +195,12 @@ static void free_object_directory(MXFAvidObjectDirectory **directory)
         while (entry != NULL)
         {
             MXFAvidObjectReference *tmpNextEntry = entry->next;
-            SAFE_FREE(&entry);
+            SAFE_FREE(entry);
             entry = tmpNextEntry;
         }
-        SAFE_FREE(&(*directory)->references);
+        SAFE_FREE((*directory)->references);
     }
-    SAFE_FREE(directory);
+    SAFE_FREE(*directory);
 }
 
 static int add_object_directory_entry(MXFAvidObjectDirectory *directory,
@@ -420,7 +420,7 @@ static int get_indirect_string(MXFMetadataSet *set, const mxfKey *itemKey, mxfUT
     return 1;
 
 fail:
-    SAFE_FREE(&newValue);
+    SAFE_FREE(newValue);
     return 0;
 }
 
@@ -492,14 +492,14 @@ static int get_indirect_int32(MXFMetadataSet *set, const mxfKey *itemKey, mxfUTF
     {
         newValue[i] = strValue[i];
     }
-    SAFE_FREE(&strValue);
+    SAFE_FREE(strValue);
 
     *value = newValue;
     return 1;
 
 fail:
-    SAFE_FREE(&newValue);
-    SAFE_FREE(&strValue);
+    SAFE_FREE(newValue);
+    SAFE_FREE(strValue);
     return 0;
 }
 
@@ -790,11 +790,11 @@ int mxf_avid_set_indirect_string_item(MXFMetadataSet *set, const mxfKey *itemKey
 
     CHK_OFAIL(mxf_set_item(set, itemKey, buffer, size));
 
-    SAFE_FREE(&buffer);
+    SAFE_FREE(buffer);
     return 1;
 
 fail:
-    SAFE_FREE(&buffer);
+    SAFE_FREE(buffer);
     return 0;
 }
 
@@ -828,11 +828,11 @@ int mxf_avid_set_rgb_color_item(MXFMetadataSet *set, const mxfKey *itemKey, cons
 
     CHK_OFAIL(mxf_set_item(set, itemKey, buffer, 3 * 2));
 
-    SAFE_FREE(&buffer);
+    SAFE_FREE(buffer);
     return 1;
 
 fail:
-    SAFE_FREE(&buffer);
+    SAFE_FREE(buffer);
     return 0;
 }
 
@@ -983,8 +983,8 @@ int mxf_avid_read_string_tagged_values(MXFMetadataSet *set, const mxfKey *itemKe
 fail:
     mxf_free_list(&newNames);
     mxf_free_list(&newValues);
-    SAFE_FREE(&taggedValueName);
-    SAFE_FREE(&taggedValueValue);
+    SAFE_FREE(taggedValueName);
+    SAFE_FREE(taggedValueValue);
     return 0;
 }
 
@@ -1017,8 +1017,8 @@ int mxf_avid_read_string_tagged_value(MXFMetadataSet *taggedValueSet, mxfUTF16Ch
     return 1;
 
 fail:
-    SAFE_FREE(&newName);
-    SAFE_FREE(&newValue);
+    SAFE_FREE(newName);
+    SAFE_FREE(newValue);
     return 0;
 }
 
@@ -1241,8 +1241,8 @@ int mxf_avid_read_index_table_segment_2(MXFFile *mxfFile, uint64_t segmentLen,
                     }
                     actualLen += indexEntryLen;
                 }
-                SAFE_FREE(&sliceOffset);
-                SAFE_FREE(&posTable);
+                SAFE_FREE(sliceOffset);
+                SAFE_FREE(posTable);
                 break;
             default:
                 mxf_log_warn("Unknown local item (%u) in index table segment\n", localTag);
@@ -1264,8 +1264,8 @@ int mxf_avid_read_index_table_segment_2(MXFFile *mxfFile, uint64_t segmentLen,
     return 1;
 
 fail:
-    SAFE_FREE(&sliceOffset);
-    SAFE_FREE(&posTable);
+    SAFE_FREE(sliceOffset);
+    SAFE_FREE(posTable);
     mxf_free_index_table_segment(&newSegment);
     return 0;
 }

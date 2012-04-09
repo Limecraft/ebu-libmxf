@@ -298,7 +298,7 @@ int mxf_uu_get_utf16string_item(MXFMetadataSet *set, const mxfKey *itemKey, mxfU
     return 1;
 
 fail:
-    SAFE_FREE(&newValue);
+    SAFE_FREE(newValue);
     return 0;
 }
 

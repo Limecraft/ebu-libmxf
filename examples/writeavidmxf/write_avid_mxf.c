@@ -281,8 +281,8 @@ static void free_offsets_array_in_list(void *data)
     }
 
     offsetsArray = (MJPEGOffsetsArray*)data;
-    SAFE_FREE(&offsetsArray->offsets);
-    SAFE_FREE(&offsetsArray);
+    SAFE_FREE(offsetsArray->offsets);
+    SAFE_FREE(offsetsArray);
 }
 
 static int create_avid_mjpeg_offsets_array(MXFList *mjpegFrameOffsets, MJPEGOffsetsArray **offsetsArray)
@@ -301,9 +301,9 @@ static int create_avid_mjpeg_offsets_array(MXFList *mjpegFrameOffsets, MJPEGOffs
 fail:
     if (newOffsetsArray != NULL)
     {
-        SAFE_FREE(&newOffsetsArray->offsets);
+        SAFE_FREE(newOffsetsArray->offsets);
     }
-    SAFE_FREE(&newOffsetsArray);
+    SAFE_FREE(newOffsetsArray);
     return 0;
 }
 
@@ -344,7 +344,7 @@ static void free_track_writer(TrackWriter **writer)
         return;
     }
 
-    SAFE_FREE(&(*writer)->filename);
+    SAFE_FREE((*writer)->filename);
 
     mxf_free_index_table_segment(&(*writer)->indexSegment);
     mxf_free_file_partitions(&(*writer)->partitions);
@@ -354,12 +354,12 @@ static void free_track_writer(TrackWriter **writer)
 
     mxf_clear_list(&(*writer)->mjpegFrameOffsets);
 
-    SAFE_FREE(&(*writer)->vbiData);
-    SAFE_FREE(&(*writer)->startOffsetData);
+    SAFE_FREE((*writer)->vbiData);
+    SAFE_FREE((*writer)->startOffsetData);
 
     mxf_file_close(&(*writer)->mxfFile);
 
-    SAFE_FREE(writer);
+    SAFE_FREE(*writer);
 }
 
 static void free_avid_clip_writer(AvidClipWriter **clipWriter)
@@ -371,17 +371,17 @@ static void free_avid_clip_writer(AvidClipWriter **clipWriter)
         return;
     }
 
-    SAFE_FREE(&(*clipWriter)->wProjectName);
+    SAFE_FREE((*clipWriter)->wProjectName);
 
     for (i = 0; i < (*clipWriter)->numTracks; i++)
     {
         free_track_writer(&(*clipWriter)->tracks[i]);
     }
 
-    SAFE_FREE(&(*clipWriter)->wTmpString);
-    SAFE_FREE(&(*clipWriter)->wTmpString2);
+    SAFE_FREE((*clipWriter)->wTmpString);
+    SAFE_FREE((*clipWriter)->wTmpString2);
 
-    SAFE_FREE(clipWriter);
+    SAFE_FREE(*clipWriter);
 }
 
 /* Take a char *string, convert to mxfUTF16Char *in wTmpString member */
@@ -397,12 +397,12 @@ static int convert_string(AvidClipWriter *clipWriter, const char *input)
 
     mxf_utf8_to_utf16(newOutput, input, len + 1);
 
-    SAFE_FREE(&clipWriter->wTmpString);
+    SAFE_FREE(clipWriter->wTmpString);
     clipWriter->wTmpString = newOutput;
     return 1;
 
 fail:
-    SAFE_FREE(&newOutput);
+    SAFE_FREE(newOutput);
     return 0;
 }
 
@@ -672,7 +672,7 @@ static int create_header_metadata(AvidClipWriter *clipWriter, PackageDefinitions
         if (userComment->name != NULL && userComment->value != NULL)
         {
             CHK_ORET(convert_string(clipWriter, userComment->name));
-            SAFE_FREE(&clipWriter->wTmpString2);
+            SAFE_FREE(clipWriter->wTmpString2);
             clipWriter->wTmpString2 = clipWriter->wTmpString;
             clipWriter->wTmpString = NULL;
             CHK_ORET(convert_string(clipWriter, userComment->value));
@@ -2577,7 +2577,7 @@ int update_and_complete_writing(AvidClipWriter **clipWriter, PackageDefinitions 
     {
         if (projectName != NULL)
         {
-            SAFE_FREE(&(*clipWriter)->wProjectName);
+            SAFE_FREE((*clipWriter)->wProjectName);
 
             CHK_ORET(convert_string((*clipWriter), projectName));
             (*clipWriter)->wProjectName = (*clipWriter)->wTmpString;

@@ -142,7 +142,7 @@ static int open_input_file(const char *filename, AvidMXFFile *input)
 {
     if (filename != NULL)
     {
-        SAFE_FREE(&input->filename);
+        SAFE_FREE(input->filename);
         CHK_ORET((input->filename = strdup(filename)) != NULL);
     }
 
@@ -171,7 +171,7 @@ static void clear_input_file(AvidMXFFile *input)
     }
 
     close_input_file(input);
-    SAFE_FREE(&input->filename);
+    SAFE_FREE(input->filename);
 
     mxf_close_essence_element(&input->essenceElement);
     mxf_free_header_metadata(&input->headerMetadata);
@@ -194,7 +194,7 @@ static int open_output_file(const char *filename, P2MXFFile *output)
 {
     if (filename != NULL)
     {
-        SAFE_FREE(&output->filename);
+        SAFE_FREE(output->filename);
         CHK_ORET((output->filename = strdup(filename)) != NULL);
     }
 
@@ -224,7 +224,7 @@ static void clear_output_file(P2MXFFile *output)
     }
 
     close_output_file(output);
-    SAFE_FREE(&output->filename);
+    SAFE_FREE(output->filename);
 
     mxf_close_essence_element(&output->essenceElement);
     mxf_free_header_metadata(&output->headerMetadata);
@@ -1676,6 +1676,6 @@ void free_transfer(AvidMXFToP2Transfer **transfer)
         clear_output_file(&(*transfer)->outputs[i]);
     }
 
-    SAFE_FREE(transfer);
+    SAFE_FREE(*transfer);
 }
 

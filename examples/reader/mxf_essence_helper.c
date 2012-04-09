@@ -983,7 +983,7 @@ int read_frame(MXFReader *reader, MXFReaderListener *listener, int trackIndex,
         /* allocate internal buffer if neccessary */
         if (reader->buffer == NULL || reader->bufferSize < frameSize)
         {
-            SAFE_FREE(&reader->buffer);
+            SAFE_FREE(reader->buffer);
             CHK_MALLOC_ARRAY_ORET(reader->buffer, uint8_t, frameSize);
         }
 

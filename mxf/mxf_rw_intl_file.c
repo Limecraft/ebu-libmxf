@@ -253,7 +253,7 @@ void mxf_free_rw_intl(MXFRWInterleaver **interleaver)
         return;
 
     free((*interleaver)->writers);
-    SAFE_FREE(interleaver);
+    SAFE_FREE(*interleaver);
 }
 
 int mxf_rw_intl_open(MXFRWInterleaver *interleaver, MXFFile *target, int isWriter, MXFFile **mxfFile)
@@ -294,8 +294,8 @@ int mxf_rw_intl_open(MXFRWInterleaver *interleaver, MXFFile *target, int isWrite
     return 1;
 
 fail:
-    SAFE_FREE(&newMXFFile);
-    SAFE_FREE(&newIntlFile);
+    SAFE_FREE(newMXFFile);
+    SAFE_FREE(newIntlFile);
     return 0;
 }
 

@@ -272,8 +272,8 @@ static int disk_file_open(const char *filename, OpenMode mode, MXFFile **mxfFile
     return 1;
 
 fail:
-    SAFE_FREE(&newMXFFile);
-    SAFE_FREE(&newDiskFile);
+    SAFE_FREE(newMXFFile);
+    SAFE_FREE(newDiskFile);
     return 0;
 }
 
@@ -312,8 +312,8 @@ int mxf_stdin_wrap_read(MXFFile **mxfFile)
     return 1;
 
 fail:
-    SAFE_FREE(&newMXFFile);
-    SAFE_FREE(&newStdInFile);
+    SAFE_FREE(newMXFFile);
+    SAFE_FREE(newStdInFile);
     return 0;
 }
 

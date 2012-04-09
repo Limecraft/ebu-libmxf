@@ -52,9 +52,9 @@ static void free_index_array(TimecodeIndexArray **indexArray)
         return;
     }
 
-    SAFE_FREE(&(*indexArray)->elements);
+    SAFE_FREE((*indexArray)->elements);
 
-    SAFE_FREE(indexArray);
+    SAFE_FREE(*indexArray);
 }
 
 static void free_index_array_in_list(void *data)

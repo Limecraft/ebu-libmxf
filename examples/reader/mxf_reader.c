@@ -443,7 +443,7 @@ static int read_timecode_component(MXFMetadataSet *timecodeComponentSet, Timecod
     return 1;
 
 fail:
-    SAFE_FREE(&newSegment);
+    SAFE_FREE(newSegment);
     return 0;
 }
 
@@ -654,11 +654,11 @@ void close_mxf_reader(MXFReader **reader)
         while (essenceTrack != NULL)
         {
             nextEssenceTrack = essenceTrack->next;
-            SAFE_FREE(&essenceTrack);
+            SAFE_FREE(essenceTrack);
             essenceTrack = nextEssenceTrack;
         }
         (*reader)->essenceReader->essenceTracks = NULL;
-        SAFE_FREE(&(*reader)->essenceReader);
+        SAFE_FREE((*reader)->essenceReader);
     }
 
     /* free the reader */
@@ -666,21 +666,21 @@ void close_mxf_reader(MXFReader **reader)
     while (track != NULL)
     {
         nextTrack = track->next;
-        SAFE_FREE(&track);
+        SAFE_FREE(track);
         track = nextTrack;
     }
     (*reader)->clip.tracks = NULL;
-    SAFE_FREE(&(*reader)->clip.tracksString);
+    SAFE_FREE((*reader)->clip.tracksString);
     mxf_clear_list(&(*reader)->playoutTimecodeIndex.segments);
     mxf_clear_list(&(*reader)->sourceTimecodeIndexes);
     if ((*reader)->ownDataModel)
     {
         mxf_free_data_model(&(*reader)->dataModel);
     }
-    SAFE_FREE(&(*reader)->buffer);
-    SAFE_FREE(&(*reader)->archiveCRC32);
+    SAFE_FREE((*reader)->buffer);
+    SAFE_FREE((*reader)->archiveCRC32);
 
-    SAFE_FREE(reader);
+    SAFE_FREE(*reader);
 }
 
 int is_metadata_only(MXFReader *reader)
@@ -1406,7 +1406,7 @@ int initialise_default_playout_timecode(MXFReader *reader)
     return 1;
 
 fail:
-    SAFE_FREE(&newSegment);
+    SAFE_FREE(newSegment);
     return 0;
 }
 
@@ -1632,7 +1632,7 @@ int initialise_source_timecodes(MXFReader *reader, MXFMetadataSet *sourcePackage
     return 1;
 
 fail:
-    SAFE_FREE(&timecodeIndex);
+    SAFE_FREE(timecodeIndex);
     mxf_clear_list(sourceTimecodeIndexes);
     return 0;
 }
@@ -1686,7 +1686,7 @@ int set_essence_container_timecode(MXFReader *reader, mxfPosition position,
     return 1;
 
 fail:
-    SAFE_FREE(&timecodeIndex);
+    SAFE_FREE(timecodeIndex);
     return 0;
 }
 
@@ -1694,7 +1694,7 @@ int allocate_archive_crc32(MXFReader *reader, uint32_t num)
 {
     if (reader->numArchiveCRC32Alloc < num)
     {
-        SAFE_FREE(&reader->archiveCRC32);
+        SAFE_FREE(reader->archiveCRC32);
         CHK_MALLOC_ARRAY_ORET(reader->archiveCRC32, uint32_t, num);
         reader->numArchiveCRC32Alloc = num;
     }

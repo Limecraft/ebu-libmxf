@@ -47,7 +47,7 @@
 
 static void free_metadata_item_value(MXFMetadataItem *item)
 {
-    SAFE_FREE(&item->value);
+    SAFE_FREE(item->value);
     item->length = 0;
 }
 
@@ -451,7 +451,7 @@ void mxf_free_header_metadata(MXFHeaderMetadata **headerMetadata)
 
     mxf_clear_list(&(*headerMetadata)->sets);
     mxf_free_primer_pack(&(*headerMetadata)->primerPack);
-    SAFE_FREE(headerMetadata);
+    SAFE_FREE(*headerMetadata);
 }
 
 void mxf_free_set(MXFMetadataSet **set)
@@ -462,7 +462,7 @@ void mxf_free_set(MXFMetadataSet **set)
     }
 
     mxf_clear_list(&(*set)->items);
-    SAFE_FREE(set);
+    SAFE_FREE(*set);
 }
 
 void mxf_free_item(MXFMetadataItem **item)
@@ -473,7 +473,7 @@ void mxf_free_item(MXFMetadataItem **item)
     }
 
     free_metadata_item_value(*item);
-    SAFE_FREE(item);
+    SAFE_FREE(*item);
 }
 
 
@@ -1788,11 +1788,11 @@ int mxf_alloc_array_item_elements(MXFMetadataSet *set, const mxfKey *itemKey, ui
     CHK_OFAIL(mxf_set_item_value(newItem, buffer, (uint16_t)(8 + count * elementLen)));
     *elements = &newItem->value[8];
 
-    SAFE_FREE(&buffer);
+    SAFE_FREE(buffer);
     return 1;
 
 fail:
-    SAFE_FREE(&buffer);
+    SAFE_FREE(buffer);
     return 0;
 }
 
@@ -1843,11 +1843,11 @@ int mxf_grow_array_item(MXFMetadataSet *set, const mxfKey *itemKey, uint32_t ele
     CHK_OFAIL(mxf_set_item_value(newItem, buffer, (uint16_t)(8 + arrayLen * elementLen)));
     *newElements = &newItem->value[8 + (arrayLen - count) * elementLen];
 
-    SAFE_FREE(&buffer);
+    SAFE_FREE(buffer);
     return 1;
 
 fail:
-    SAFE_FREE(&buffer);
+    SAFE_FREE(buffer);
     return 0;
 }
 
@@ -1865,11 +1865,11 @@ int mxf_set_empty_array_item(MXFMetadataSet *set, const mxfKey *itemKey, uint32_
 
     CHK_OFAIL(mxf_set_item_value(newItem, buffer, 8));
 
-    SAFE_FREE(&buffer);
+    SAFE_FREE(buffer);
     return 1;
 
 fail:
-    SAFE_FREE(&buffer);
+    SAFE_FREE(buffer);
     return 0;
 }
 

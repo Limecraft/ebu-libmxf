@@ -54,10 +54,10 @@ static void free_user_comment(UserComment **userComment)
         return;
     }
 
-    SAFE_FREE(&(*userComment)->name);
-    SAFE_FREE(&(*userComment)->value);
+    SAFE_FREE((*userComment)->name);
+    SAFE_FREE((*userComment)->value);
 
-    SAFE_FREE(userComment);
+    SAFE_FREE(*userComment);
 }
 
 static void free_tagged_value_in_list(void *data)
@@ -80,9 +80,9 @@ static void free_locator(Locator **locator)
         return;
     }
 
-    SAFE_FREE(&(*locator)->comment);
+    SAFE_FREE((*locator)->comment);
 
-    SAFE_FREE(locator);
+    SAFE_FREE(*locator);
 }
 
 static void free_locator_in_list(void *data)
@@ -148,9 +148,9 @@ static void free_track(Track **track)
         return;
     }
 
-    SAFE_FREE(&(*track)->name);
+    SAFE_FREE((*track)->name);
 
-    SAFE_FREE(track);
+    SAFE_FREE(*track);
 }
 
 static void free_track_in_list(void *data)
@@ -173,11 +173,11 @@ static void free_package(Package **package)
         return;
     }
 
-    SAFE_FREE(&(*package)->name);
+    SAFE_FREE((*package)->name);
     mxf_clear_list(&(*package)->tracks);
-    SAFE_FREE(&(*package)->filename);
+    SAFE_FREE((*package)->filename);
 
-    SAFE_FREE(package);
+    SAFE_FREE(*package);
 }
 
 static void free_package_in_list(void *data)
@@ -249,7 +249,7 @@ void free_package_definitions(PackageDefinitions **definitions)
     mxf_clear_list(&(*definitions)->locators);
     free_package(&(*definitions)->tapeSourcePackage);
 
-    SAFE_FREE(definitions);
+    SAFE_FREE(*definitions);
 }
 
 void init_essence_info(EssenceInfo *essenceInfo)
@@ -321,7 +321,7 @@ int set_user_comment(PackageDefinitions *definitions, const char *name, const ch
             }
             else
             {
-                SAFE_FREE(&userComment->value);
+                SAFE_FREE(userComment->value);
                 CHK_ORET((userComment->value = strdup(value)) != NULL);
             }
             return 1;

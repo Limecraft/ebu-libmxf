@@ -94,7 +94,7 @@ int xml_writer_open(const char *filename, XMLWriter **writer)
     return 1;
 
 fail:
-    SAFE_FREE(&newWriter);
+    SAFE_FREE(newWriter);
     return 0;
 }
 
@@ -110,7 +110,7 @@ void xml_writer_close(XMLWriter **writer)
         fprintf((*writer)->file, "\r\n");
         fclose((*writer)->file);
     }
-    SAFE_FREE(writer);
+    SAFE_FREE(*writer);
 }
 
 

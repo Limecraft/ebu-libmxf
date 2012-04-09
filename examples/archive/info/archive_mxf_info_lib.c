@@ -95,7 +95,7 @@ int archive_mxf_load_extensions(MXFDataModel *dataModel)
         CHK_OFAIL(mxf_uu_get_utf16string_item(dmFrameworkSet, &MXF_ITEM_K(APP_InfaxFramework, name), &tempWString)); \
         CHK_OFAIL(mxf_utf16_to_utf8(infaxData->cName, tempWString, sizeof(infaxData->cName)) != (size_t)(-1)); \
         infaxData->cName[sizeof(infaxData->cName) - 1] = '\0'; \
-        SAFE_FREE(&tempWString); \
+        SAFE_FREE(tempWString); \
     }
 
 #define GET_DATE_ITEM(name, cName) \
@@ -141,11 +141,11 @@ static int get_infax_data(MXFMetadataSet *dmFrameworkSet, InfaxData *infaxData)
     GET_STRING_ITEM(APP_CatalogueDetail, catDetail);
     GET_UINT32_ITEM(APP_ItemNumber, itemNo);
 
-    SAFE_FREE(&tempWString);
+    SAFE_FREE(tempWString);
     return 1;
 
 fail:
-    SAFE_FREE(&tempWString);
+    SAFE_FREE(tempWString);
     return 0;
 }
 
@@ -392,7 +392,7 @@ static int archive_mxf_get_package_pse_failures(MXFHeaderMetadata *headerMetadat
     return 1;
 
 fail:
-    SAFE_FREE(&newFailures);
+    SAFE_FREE(newFailures);
     return 0;
 }
 
@@ -488,7 +488,7 @@ static int archive_mxf_get_package_vtr_errors(MXFHeaderMetadata *headerMetadata,
     return 1;
 
 fail:
-    SAFE_FREE(&newErrors);
+    SAFE_FREE(newErrors);
     return 0;
 }
 
@@ -584,7 +584,7 @@ static int archive_mxf_get_package_digibeta_dropouts(MXFHeaderMetadata *headerMe
     return 1;
 
 fail:
-    SAFE_FREE(&newDigiBetaDropouts);
+    SAFE_FREE(newDigiBetaDropouts);
     return 0;
 }
 
@@ -680,7 +680,7 @@ static int archive_mxf_get_package_timecode_breaks(MXFHeaderMetadata *headerMeta
     return 1;
 
 fail:
-    SAFE_FREE(&newTimecodeBreaks);
+    SAFE_FREE(newTimecodeBreaks);
     return 0;
 }
 
@@ -800,7 +800,7 @@ int archive_mxf_get_info(MXFHeaderMetadata *headerMetadata, ArchiveMXFInfo *info
                 CHK_OFAIL(mxf_uu_get_utf16string_item(locatorSet, &MXF_ITEM_K(NetworkLocator, URLString), &tempWString));
                 CHK_OFAIL(mxf_utf16_to_utf8(info->filename, tempWString, sizeof(info->filename)) != (size_t)(-1));
                 info->filename[sizeof(info->filename) - 1] = '\0';
-                SAFE_FREE(&tempWString);
+                SAFE_FREE(tempWString);
                 break;
             }
         }
@@ -851,7 +851,7 @@ int archive_mxf_get_info(MXFHeaderMetadata *headerMetadata, ArchiveMXFInfo *info
     return haveSourceInfaxData;
 
 fail:
-    SAFE_FREE(&tempWString);
+    SAFE_FREE(tempWString);
     mxf_free_list(&list);
     mxf_free_list(&nameList);
     mxf_free_list(&valueList);

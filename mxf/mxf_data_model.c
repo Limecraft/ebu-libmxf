@@ -56,12 +56,12 @@ static void clear_type(MXFItemType *type)
 
     if (type->typeId != 0)
     {
-        SAFE_FREE(&type->name);
+        SAFE_FREE(type->name);
         if (type->category == MXF_COMPOUND_TYPE_CAT)
         {
             for (i = 0; i < ARRAY_SIZE(type->info.compound.members); i++)
             {
-                SAFE_FREE(&type->info.compound.members[i].name);
+                SAFE_FREE(type->info.compound.members[i].name);
             }
         }
     }
@@ -75,8 +75,8 @@ static void free_item_def(MXFItemDef **itemDef)
         return;
     }
 
-    SAFE_FREE(&(*itemDef)->name);
-    SAFE_FREE(itemDef);
+    SAFE_FREE((*itemDef)->name);
+    SAFE_FREE(*itemDef);
 }
 
 static void free_set_def(MXFSetDef **setDef)
@@ -86,8 +86,8 @@ static void free_set_def(MXFSetDef **setDef)
         return;
     }
 
-    SAFE_FREE(&(*setDef)->name);
-    SAFE_FREE(setDef);
+    SAFE_FREE((*setDef)->name);
+    SAFE_FREE(*setDef);
 }
 
 static void free_item_def_in_list(void *data)
@@ -337,7 +337,7 @@ void mxf_free_data_model(MXFDataModel **dataModel)
         clear_type(&(*dataModel)->types[i]);
     }
 
-    SAFE_FREE(dataModel);
+    SAFE_FREE(*dataModel);
 }
 
 int mxf_register_set_def(MXFDataModel *dataModel, const char *name, const mxfKey *parentKey, const mxfKey *key)

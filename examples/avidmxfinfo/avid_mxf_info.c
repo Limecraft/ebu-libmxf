@@ -482,14 +482,14 @@ static void free_avid_tagged_values(AvidTaggedValue *value, int numValues)
 
     for (i = 0; i < numValues; i++)
     {
-        SAFE_FREE(&value[i].name);
-        SAFE_FREE(&value[i].value);
+        SAFE_FREE(value[i].name);
+        SAFE_FREE(value[i].value);
         for (j = 0; j < value[i].numAttributes; j++)
         {
-            SAFE_FREE(&value[i].attributes[j].name);
-            SAFE_FREE(&value[i].attributes[j].value);
+            SAFE_FREE(value[i].attributes[j].name);
+            SAFE_FREE(value[i].attributes[j].value);
         }
-        SAFE_FREE(&value[i].attributes);
+        SAFE_FREE(value[i].attributes);
     }
 
     free(value);
@@ -506,11 +506,11 @@ static int get_string_value(MXFMetadataSet *set, const mxfKey *itemKey, char **s
 
     FCHECK(convert_string(utf16Str, str, printDebugError));
 
-    SAFE_FREE(&utf16Str);
+    SAFE_FREE(utf16Str);
     return 1;
 
 fail:
-    SAFE_FREE(&utf16Str);
+    SAFE_FREE(utf16Str);
     return 0;
 }
 
@@ -546,8 +546,8 @@ static int get_package_tagged_values(MXFMetadataSet *packageSet, const mxfKey *i
 
         FCHECK(convert_string(taggedValueName, &newValues[i].name, printDebugError));
         FCHECK(convert_string(taggedValueValue, &newValues[i].value, printDebugError));
-        SAFE_FREE(&taggedValueName);
-        SAFE_FREE(&taggedValueValue);
+        SAFE_FREE(taggedValueName);
+        SAFE_FREE(taggedValueValue);
 
         /* Check for any attributes */
         if (mxf_have_item(taggedValueSet, &MXF_ITEM_K(TaggedValue, TaggedValueAttributeList)))
@@ -582,8 +582,8 @@ static int get_package_tagged_values(MXFMetadataSet *packageSet, const mxfKey *i
 
 fail:
     free_avid_tagged_values(newValues, count);
-    SAFE_FREE(&taggedValueName);
-    SAFE_FREE(&taggedValueValue);
+    SAFE_FREE(taggedValueName);
+    SAFE_FREE(taggedValueValue);
     mxf_free_list(&taggedValueNames);
     mxf_free_list(&taggedValueValues);
     return 0;
@@ -1378,11 +1378,11 @@ fail:
 
 void ami_free_info(AvidMXFInfo *info)
 {
-    SAFE_FREE(&info->clipName);
-    SAFE_FREE(&info->projectName);
-    SAFE_FREE(&info->physicalPackageName);
-    SAFE_FREE(&info->tracksString);
-    SAFE_FREE(&info->physicalPackageLocator);
+    SAFE_FREE(info->clipName);
+    SAFE_FREE(info->projectName);
+    SAFE_FREE(info->physicalPackageName);
+    SAFE_FREE(info->tracksString);
+    SAFE_FREE(info->physicalPackageLocator);
 
     if (info->userComments != NULL)
     {

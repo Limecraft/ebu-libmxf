@@ -92,11 +92,11 @@ static void free_index_entry(MXFIndexEntry **entry)
         return;
     }
 
-    SAFE_FREE(&(*entry)->sliceOffset);
-    SAFE_FREE(&(*entry)->posTable);
+    SAFE_FREE((*entry)->sliceOffset);
+    SAFE_FREE((*entry)->posTable);
     // free of list is done in mxf_free_index_table_segment
     (*entry)->next = NULL;
-    SAFE_FREE(entry);
+    SAFE_FREE(*entry);
 }
 
 static int create_index_entry(MXFIndexTableSegment *segment, MXFIndexEntry **entry)
@@ -135,7 +135,7 @@ static void free_delta_entry(MXFDeltaEntry **entry)
 
     // free of list is done in mxf_free_index_table_segment
     (*entry)->next = NULL;
-    SAFE_FREE(entry);
+    SAFE_FREE(*entry);
 }
 
 static int create_delta_entry(MXFIndexTableSegment *segment, MXFDeltaEntry **entry)
@@ -199,7 +199,7 @@ void mxf_free_index_table_segment(MXFIndexTableSegment **segment)
         deltaEntry = tmpNextDeltaEntry;
     }
 
-    SAFE_FREE(segment);
+    SAFE_FREE(*segment);
 }
 
 int mxf_default_add_delta_entry(void *data, uint32_t numEntries, MXFIndexTableSegment *segment, int8_t posTableIndex,
@@ -485,8 +485,8 @@ int mxf_read_index_table_segment_2(MXFFile *mxfFile, uint64_t segmentLen,
                         CHK_OFAIL(mxf_skip(mxfFile, indexEntryLen - actualEntryLen));
                     }
                 }
-                SAFE_FREE(&sliceOffset);
-                SAFE_FREE(&posTable);
+                SAFE_FREE(sliceOffset);
+                SAFE_FREE(posTable);
                 break;
             default:
                 mxf_log_warn("Unknown local item (%u) in index table segment\n", localTag);
@@ -501,8 +501,8 @@ int mxf_read_index_table_segment_2(MXFFile *mxfFile, uint64_t segmentLen,
     return 1;
 
 fail:
-    SAFE_FREE(&sliceOffset);
-    SAFE_FREE(&posTable);
+    SAFE_FREE(sliceOffset);
+    SAFE_FREE(posTable);
     mxf_free_index_table_segment(&newSegment);
     return 0;
 }

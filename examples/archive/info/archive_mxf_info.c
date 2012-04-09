@@ -457,9 +457,9 @@ static void free_writer_ident_in_list(void *data)
     }
 
     ident = (WriterIdentification*)data;
-    SAFE_FREE(&ident->companyName);
-    SAFE_FREE(&ident->productName);
-    SAFE_FREE(&ident->versionString);
+    SAFE_FREE(ident->companyName);
+    SAFE_FREE(ident->productName);
+    SAFE_FREE(ident->versionString);
 
     free(data);
 }
@@ -476,7 +476,7 @@ static int create_pse_failure(Reader *reader, PSEFailure **failure)
     return 1;
 
 fail:
-    SAFE_FREE(&newFailure);
+    SAFE_FREE(newFailure);
     return 0;
 }
 
@@ -492,7 +492,7 @@ static int create_vtr_error(Reader *reader, VTRErrorAtPos **error)
     return 1;
 
 fail:
-    SAFE_FREE(&newError);
+    SAFE_FREE(newError);
     return 0;
 }
 
@@ -508,7 +508,7 @@ static int create_digibeta_dropout(Reader *reader, DigiBetaDropout **digiBetaDro
     return 1;
 
 fail:
-    SAFE_FREE(&newDigiBetaDropout);
+    SAFE_FREE(newDigiBetaDropout);
     return 0;
 }
 
@@ -524,7 +524,7 @@ static int create_timecode_break(Reader *reader, TimecodeBreak **timecodeBreak)
     return 1;
 
 fail:
-    SAFE_FREE(&newTimecodeBreak);
+    SAFE_FREE(newTimecodeBreak);
     return 0;
 }
 
@@ -540,7 +540,7 @@ static int create_writer_ident(Reader *reader, WriterIdentification **ident)
     return 1;
 
 fail:
-    SAFE_FREE(&newIdent);
+    SAFE_FREE(newIdent);
     return 0;
 }
 
@@ -567,7 +567,7 @@ static void free_reader(Reader **reader)
         return;
     }
 
-    SAFE_FREE(&(*reader)->tempWString);
+    SAFE_FREE((*reader)->tempWString);
 
     mxf_clear_list(&(*reader)->writerIdents);
     mxf_clear_list(&(*reader)->pseFailures);
@@ -583,7 +583,7 @@ static void free_reader(Reader **reader)
 
     mxf_file_close(&(*reader)->mxfFile);
 
-    SAFE_FREE(reader);
+    SAFE_FREE(*reader);
 }
 
 
@@ -592,7 +592,7 @@ static void free_reader(Reader **reader)
     { \
         CHK_ORET(mxf_uu_get_utf16string_item(reader->dmFrameworkSet, &MXF_ITEM_K(APP_InfaxFramework, name), &reader->tempWString)); \
         CHK_ORET(convert_string(reader->tempWString, infaxData->cName, sizeof(infaxData->cName))); \
-        SAFE_FREE(&reader->tempWString); \
+        SAFE_FREE(reader->tempWString); \
     }
 
 #define GET_DATE_ITEM(name, cName) \

@@ -147,7 +147,7 @@ static int create_partition_index_entry(MXFFile *mxfFile, MXFPartition **partiti
     return 1;
 
 fail:
-    SAFE_FREE(&newEntry);
+    SAFE_FREE(newEntry);
     return 0;
 }
 
@@ -229,7 +229,7 @@ static int add_partition_index_entry(MXFFile *mxfFile, FileIndex *index, const m
 
 fail:
     mxf_free_partition(&partition);
-    SAFE_FREE(&newEntry);
+    SAFE_FREE(newEntry);
     return 0;
 }
 
@@ -512,7 +512,7 @@ int create_index(MXFFile *mxfFile, MXFList *partitions, uint32_t indexSID, uint3
     return 1;
 
 fail:
-    SAFE_FREE(&entry);
+    SAFE_FREE(entry);
     return 0;
 }
 
@@ -525,7 +525,7 @@ void free_index(FileIndex **index)
 
     mxf_clear_list(&(*index)->partitionIndex);
 
-    SAFE_FREE(index);
+    SAFE_FREE(*index);
 }
 
 int set_position(MXFFile *mxfFile, FileIndex *index, mxfPosition position)

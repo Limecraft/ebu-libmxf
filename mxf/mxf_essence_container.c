@@ -101,7 +101,7 @@ static void free_essence_element(MXFEssenceElement **essenceElement)
         return;
     }
 
-    SAFE_FREE(essenceElement);
+    SAFE_FREE(*essenceElement);
 }
 
 
@@ -124,7 +124,7 @@ int mxf_open_essence_element_write(MXFFile *mxfFile, const mxfKey *key, uint8_t 
     return 1;
 
 fail:
-    SAFE_FREE(&newEssenceElement);
+    SAFE_FREE(newEssenceElement);
     return 0;
 }
 
@@ -176,7 +176,7 @@ int mxf_open_essence_element_read(MXFFile *mxfFile, const mxfKey *key, uint8_t l
     return 1;
 
 fail:
-    SAFE_FREE(&newEssenceElement);
+    SAFE_FREE(newEssenceElement);
     return 0;
 }
 

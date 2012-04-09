@@ -460,7 +460,7 @@ static int convert_string(const char *input, mxfUTF16Char **tempString)
     size_t len = mxf_utf8_to_utf16(NULL, input, 0);
     CHK_ORET(len != (size_t)(-1));
 
-    SAFE_FREE(tempString);
+    SAFE_FREE(*tempString);
     CHK_MALLOC_ARRAY_ORET(*tempString, mxfUTF16Char, len + 1);
     memset(*tempString, 0, sizeof(mxfUTF16Char) * (len + 1));
 
@@ -476,7 +476,7 @@ static void free_archive_mxf_file(ArchiveMXFWriter **output)
         return;
     }
 
-    SAFE_FREE(&(*output)->tempString);
+    SAFE_FREE((*output)->tempString);
 
     clear_timecode_index(&(*output)->vitcIndex);
     clear_timecode_index(&(*output)->ltcIndex);
@@ -493,7 +493,7 @@ static void free_archive_mxf_file(ArchiveMXFWriter **output)
 
     mxf_file_close(&(*output)->mxfFile);
 
-    SAFE_FREE(output);
+    SAFE_FREE(*output);
 }
 
 
@@ -662,11 +662,11 @@ static int set_infax_data(MXFMetadataSet *dmFrameworkSet, const InfaxData *infax
     SET_INT_ITEM(itemNo, INVALID_ITEM_NO, mxf_set_uint32_item, APP_ItemNumber)
 
 
-    SAFE_FREE(&tempString);
+    SAFE_FREE(tempString);
     return 1;
 
 fail:
-    SAFE_FREE(&tempString);
+    SAFE_FREE(tempString);
     return 0;
 }
 
@@ -2175,13 +2175,13 @@ static int update_header_metadata(MXFFile *mxfFile, uint64_t headerByteCount, co
     CHK_OFAIL(ltoInfaxSetFoundAndUpdated && networkLocatorSetFoundAndUpdated);
 
 
-    SAFE_FREE(&tempString);
+    SAFE_FREE(tempString);
     mxf_free_header_metadata(&headerMetadata);
     mxf_free_data_model(&dataModel);
     return 1;
 
 fail:
-    SAFE_FREE(&tempString);
+    SAFE_FREE(tempString);
     mxf_free_header_metadata(&headerMetadata);
     mxf_free_data_model(&dataModel);
     return 0;
