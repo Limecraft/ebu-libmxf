@@ -66,16 +66,16 @@ extern "C"
     } while (0)
 
 #define CHK_MALLOC_ORET(var, type) \
-    CHK_ORET((var = (type*)malloc(sizeof(type))) != NULL);
+    CHK_ORET((var = (type*)malloc(sizeof(type))) != NULL)
 
 #define CHK_MALLOC_OFAIL(var, type) \
-    CHK_OFAIL((var = (type*)malloc(sizeof(type))) != NULL);
+    CHK_OFAIL((var = (type*)malloc(sizeof(type))) != NULL)
 
 #define CHK_MALLOC_ARRAY_ORET(var, type, length) \
-    CHK_ORET((var = (type*)malloc(sizeof(type) * (length))) != NULL);
+    CHK_ORET((var = (type*)malloc(sizeof(type) * (length))) != NULL)
 
 #define CHK_MALLOC_ARRAY_OFAIL(var, type, length) \
-    CHK_OFAIL((var = (type*)malloc(sizeof(type) * (length))) != NULL);
+    CHK_OFAIL((var = (type*)malloc(sizeof(type) * (length))) != NULL)
 
 
 /*
