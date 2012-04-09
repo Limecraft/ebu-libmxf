@@ -84,11 +84,8 @@ extern "C"
 
 #define SAFE_FREE(d_ptr) \
     do { \
-    if (*d_ptr != NULL) \
-    { \
         free(*d_ptr); \
         *d_ptr = NULL; \
-    } \
     } while (0)
 
 
