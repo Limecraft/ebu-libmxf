@@ -48,18 +48,22 @@ extern "C"
 */
 
 #define CHK_ORET(cmd) \
+    do { \
     if (!(cmd)) \
     { \
         mxf_log_error("'%s' failed, in %s:%d\n", #cmd, __FILE__, __LINE__); \
         return 0; \
-    }
+    } \
+    } while (0)
 
 #define CHK_OFAIL(cmd) \
+    do { \
     if (!(cmd)) \
     { \
         mxf_log_error("'%s' failed, in %s:%d\n", #cmd, __FILE__, __LINE__); \
         goto fail; \
-    }
+    } \
+    } while (0)
 
 #define CHK_MALLOC_ORET(var, type) \
     CHK_ORET((var = (type*)malloc(sizeof(type))) != NULL);
@@ -79,11 +83,13 @@ extern "C"
 */
 
 #define SAFE_FREE(d_ptr) \
+    do { \
     if (*d_ptr != NULL) \
     { \
         free(*d_ptr); \
         *d_ptr = NULL; \
-    }
+    } \
+    } while (0)
 
 
 /*
