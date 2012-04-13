@@ -81,9 +81,10 @@ static const mxfUL MXF_OP_L(1a, MultiTrack_Stream_External) = MXF_1A_OP_L(0x0b);
 #define MXF_1B_OP_L(qualifier) \
     MXF_OP_L_LABEL(0x01, 0x01, 0x02, qualifier)
 
-static const mxfUL MXF_OP_L(1b, UniTrack_Stream_Internal)   = MXF_1B_OP_L(0x01);
-static const mxfUL MXF_OP_L(1b, MultiTrack_Stream_Internal) = MXF_1B_OP_L(0x09);
-static const mxfUL MXF_OP_L(1b, MultiTrack_Stream_External) = MXF_1B_OP_L(0x0b);
+static const mxfUL MXF_OP_L(1b, UniTrack_Stream_Internal)       = MXF_1B_OP_L(0x01);
+static const mxfUL MXF_OP_L(1b, UniTrack_NonStream_External)    = MXF_1B_OP_L(0x07);
+static const mxfUL MXF_OP_L(1b, MultiTrack_Stream_Internal)     = MXF_1B_OP_L(0x09);
+static const mxfUL MXF_OP_L(1b, MultiTrack_NonStream_External)  = MXF_1B_OP_L(0x0f);
 
 
 int is_op_atom(const mxfUL *label);
