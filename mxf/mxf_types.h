@@ -44,6 +44,9 @@ extern "C"
 #endif
 
 
+#define MXF_PREFACE_VER(major, minor)   (((major) << 8) | (minor))
+
+
 
 typedef enum
 {

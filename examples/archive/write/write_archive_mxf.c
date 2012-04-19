@@ -839,7 +839,7 @@ int prepare_archive_mxf_file_2(MXFFile **mxfFile, const char *filename, const mx
     /* Preface */
     CHK_OFAIL(mxf_create_set(newOutput->headerMetadata, &MXF_SET_K(Preface), &newOutput->prefaceSet));
     CHK_OFAIL(mxf_set_timestamp_item(newOutput->prefaceSet, &MXF_ITEM_K(Preface, LastModifiedDate), &newOutput->now));
-    CHK_OFAIL(mxf_set_version_type_item(newOutput->prefaceSet, &MXF_ITEM_K(Preface, Version), 0x0102));
+    CHK_OFAIL(mxf_set_version_type_item(newOutput->prefaceSet, &MXF_ITEM_K(Preface, Version), MXF_PREFACE_VER(1, 2)));
     CHK_OFAIL(mxf_set_ul_item(newOutput->prefaceSet, &MXF_ITEM_K(Preface, OperationalPattern), &MXF_OP_L(1a, MultiTrack_Stream_Internal)));
     if (newOutput->numAudioTracks > 0)
     {

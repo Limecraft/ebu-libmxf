@@ -501,7 +501,7 @@ static int create_header_metadata(AvidClipWriter *clipWriter, PackageDefinitions
     CHK_ORET(mxf_create_set(writer->headerMetadata, &MXF_SET_K(Preface), &writer->prefaceSet));
     CHK_ORET(mxf_set_int16_item(writer->prefaceSet, &MXF_ITEM_K(Preface, ByteOrder), 0x4949)); /* little-endian */
     CHK_ORET(mxf_set_uint32_item(writer->prefaceSet, &MXF_ITEM_K(Preface, ObjectModelVersion), 0x00000001));
-    CHK_ORET(mxf_set_version_type_item(writer->prefaceSet, &MXF_ITEM_K(Preface, Version), 0x0101)); /* AAF SDK version */
+    CHK_ORET(mxf_set_version_type_item(writer->prefaceSet, &MXF_ITEM_K(Preface, Version), MXF_PREFACE_VER(1, 1))); /* AAF SDK version */
     CHK_ORET(mxf_set_timestamp_item(writer->prefaceSet, &MXF_ITEM_K(Preface, LastModifiedDate), &clipWriter->now));
     CHK_ORET(mxf_set_ul_item(writer->prefaceSet, &MXF_ITEM_K(Preface, OperationalPattern), &MXF_OP_L(atom, NTracks_NSourceClips)));
     CHK_ORET(mxf_alloc_array_item_elements(writer->prefaceSet, &MXF_ITEM_K(Preface, EssenceContainers), mxfUL_extlen, 1, &arrayElement));

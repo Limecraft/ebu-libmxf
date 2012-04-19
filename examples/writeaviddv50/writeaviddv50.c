@@ -172,7 +172,7 @@ int write_dv50(FILE *dv50File, MXFFile *mxfFile)
     /* Preface */
     CHK_ORET(mxf_create_set(headerMetadata, &MXF_SET_K(Preface), &prefaceSet));
     CHK_ORET(mxf_set_timestamp_item(prefaceSet, &MXF_ITEM_K(Preface, LastModifiedDate), &now));
-    CHK_ORET(mxf_set_version_type_item(prefaceSet, &MXF_ITEM_K(Preface, Version), 0x0102));
+    CHK_ORET(mxf_set_version_type_item(prefaceSet, &MXF_ITEM_K(Preface, Version), MXF_PREFACE_VER(1, 2)));
     CHK_ORET(mxf_set_ul_item(prefaceSet, &MXF_ITEM_K(Preface, OperationalPattern), &MXF_OP_L(atom, NTracks_1SourceClip)));
     CHK_ORET(mxf_alloc_array_item_elements(prefaceSet, &MXF_ITEM_K(Preface, EssenceContainers), mxfUL_extlen, 1, &arrayElement));
     mxf_set_ul(&MXF_EC_L(DVBased_50_625_50_ClipWrapped), arrayElement);
