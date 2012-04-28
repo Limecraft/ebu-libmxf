@@ -439,6 +439,8 @@ void mxf_set_regtest_funcs(void)
     mxf_get_version = mxf_regtest_get_version;
     mxf_get_platform_string = mxf_regtest_get_platform_string;
     mxf_get_platform_wstring = mxf_regtest_get_platform_wstring;
+    mxf_get_scm_version_string = mxf_regtest_get_scm_version_string;
+    mxf_get_scm_version_wstring = mxf_regtest_get_scm_version_wstring;
 
     mxf_generate_uuid = mxf_regtest_generate_uuid;
     mxf_get_timestamp_now = mxf_regtest_get_timestamp_now;

@@ -35,7 +35,10 @@
 #include "config.h"
 #endif
 
+#include "scm_version.h"
+
 #include <mxf/mxf.h>
+
 
 
 static mxfProductVersion g_libmxfVersion = {LIBMXF_VERSION_MAJOR,     /* major */
@@ -79,13 +82,20 @@ static const char *g_libmxfPlatformString           =     LIBMXF_LIBRARY_NAME   
 static const mxfUTF16Char *g_libmxfPlatformWString  = L"" LIBMXF_LIBRARY_WNAME L" (Unknown)";
 #endif
 
-static const char *g_regtestPlatformString           =  "libMXF (Linux)";
-static const mxfUTF16Char *g_regtestPlatformWString  = L"libMXF (Linux)";
+static const char *g_libmxfSCMVersionString             =     LIBMXF_SCM_VERSION;
+static const mxfUTF16Char *g_libmxfSCMVersionWString    = L"" LIBMXF_SCM_VERSION;
+
+static const char *g_regtestPlatformString              =  "libMXF (Linux)";
+static const mxfUTF16Char *g_regtestPlatformWString     = L"libMXF (Linux)";
+static const char *g_regtestSCMVersionString            =  "regtest-head";
+static const mxfUTF16Char *g_regtestSCMVersionWString   = L"regtest-head";
 
 
-mxf_get_version_func            mxf_get_version = mxf_default_get_version;
-mxf_get_platform_string_func    mxf_get_platform_string = mxf_default_get_platform_string;
-mxf_get_platform_wstring_func   mxf_get_platform_wstring = mxf_default_get_platform_wstring;
+mxf_get_version_func mxf_get_version                            = mxf_default_get_version;
+mxf_get_platform_string_func mxf_get_platform_string            = mxf_default_get_platform_string;
+mxf_get_platform_wstring_func mxf_get_platform_wstring          = mxf_default_get_platform_wstring;
+mxf_get_scm_version_string_func mxf_get_scm_version_string      = mxf_default_get_scm_version_string;
+mxf_get_scm_version_wstring_func mxf_get_scm_version_wstring    = mxf_default_get_scm_version_wstring;
 
 
 
@@ -104,6 +114,16 @@ const mxfUTF16Char* mxf_default_get_platform_wstring(void)
     return g_libmxfPlatformWString;
 }
 
+const char* mxf_default_get_scm_version_string(void)
+{
+    return g_libmxfSCMVersionString;
+}
+
+const mxfUTF16Char* mxf_default_get_scm_version_wstring(void)
+{
+    return g_libmxfSCMVersionWString;
+}
+
 
 const mxfProductVersion* mxf_regtest_get_version(void)
 {
@@ -118,5 +138,15 @@ const char* mxf_regtest_get_platform_string(void)
 const mxfUTF16Char* mxf_regtest_get_platform_wstring(void)
 {
     return g_regtestPlatformWString;
+}
+
+const char* mxf_regtest_get_scm_version_string(void)
+{
+    return g_regtestSCMVersionString;
+}
+
+const mxfUTF16Char* mxf_regtest_get_scm_version_wstring(void)
+{
+    return g_regtestSCMVersionWString;
 }
 

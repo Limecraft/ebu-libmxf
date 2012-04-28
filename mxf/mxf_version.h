@@ -60,19 +60,27 @@ extern "C"
 typedef const mxfProductVersion* (*mxf_get_version_func)(void);
 typedef const char* (*mxf_get_platform_string_func)(void);
 typedef const mxfUTF16Char* (*mxf_get_platform_wstring_func)(void);
+typedef const char* (*mxf_get_scm_version_string_func)(void);
+typedef const mxfUTF16Char* (*mxf_get_scm_version_wstring_func)(void);
 
 extern mxf_get_version_func mxf_get_version;
 extern mxf_get_platform_string_func mxf_get_platform_string;
 extern mxf_get_platform_wstring_func mxf_get_platform_wstring;
+extern mxf_get_scm_version_string_func mxf_get_scm_version_string;
+extern mxf_get_scm_version_wstring_func mxf_get_scm_version_wstring;
 
 
 const mxfProductVersion* mxf_default_get_version(void);
 const char* mxf_default_get_platform_string(void);
 const mxfUTF16Char* mxf_default_get_platform_wstring(void);
+const char* mxf_default_get_scm_version_string(void);
+const mxfUTF16Char* mxf_default_get_scm_version_wstring(void);
 
 const mxfProductVersion* mxf_regtest_get_version(void);
 const char* mxf_regtest_get_platform_string(void);
 const mxfUTF16Char* mxf_regtest_get_platform_wstring(void);
+const char* mxf_regtest_get_scm_version_string(void);
+const mxfUTF16Char* mxf_regtest_get_scm_version_wstring(void);
 
 
 
