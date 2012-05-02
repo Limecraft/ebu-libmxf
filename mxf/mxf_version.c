@@ -83,7 +83,7 @@ static const mxfUTF16Char *g_libmxfPlatformWString  = L"" LIBMXF_LIBRARY_WNAME L
 #endif
 
 static const char *g_libmxfSCMVersionString             =     LIBMXF_SCM_VERSION;
-static const mxfUTF16Char *g_libmxfSCMVersionWString    = L"" LIBMXF_SCM_VERSION;
+static const mxfUTF16Char *g_libmxfSCMVersionWString    = L"" LIBMXF_SCM_WVERSION;
 
 static const char *g_regtestPlatformString              =  "libMXF (Linux)";
 static const mxfUTF16Char *g_regtestPlatformWString     = L"libMXF (Linux)";
