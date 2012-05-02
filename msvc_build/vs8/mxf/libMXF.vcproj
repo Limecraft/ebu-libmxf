@@ -251,7 +251,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\scm_version.h"
+				RelativePath="..\..\..\mxf_scm_version.h"
 				>
 			</File>
 			<File

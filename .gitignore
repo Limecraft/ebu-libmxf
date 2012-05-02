@@ -23,4 +23,4 @@ config.status
 *.deps
 libtool
 stamp-h1
-scm_version.h
+mxf_scm_version.h

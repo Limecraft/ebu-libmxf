@@ -35,7 +35,7 @@
 #include "config.h"
 #endif
 
-#include "scm_version.h"
+#include "mxf_scm_version.h"
 
 #include <mxf/mxf.h>
 

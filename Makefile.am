@@ -12,18 +12,18 @@ libMXF-$(LIBMXF_MAJORMINOR).pc: libMXF.pc
 CLEANFILES = libMXF-$(LIBMXF_MAJORMINOR).pc
 
 
-BUILT_SOURCES = scm_version.h
+BUILT_SOURCES = mxf_scm_version.h
 
-scm_version.h:
+mxf_scm_version.h:
 	sh $(top_srcdir)/gen_scm_version.sh
 
-.PHONY: scm_version.h
+.PHONY: mxf_scm_version.h
 
-DISTCLEANFILES = scm_version.h
+DISTCLEANFILES = mxf_scm_version.h
 
 
 EXTRA_DIST = \
 	autogen.sh \
 	gen_scm_version.sh \
-	scm_version.h
+	mxf_scm_version.h
 
