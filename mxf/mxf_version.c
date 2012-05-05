@@ -40,6 +40,10 @@
 #include <mxf/mxf.h>
 
 
+#define LPREF(s)    L ## s
+#define WSTR(s)     LPREF(s)
+
+
 
 static mxfProductVersion g_libmxfVersion = {LIBMXF_VERSION_MAJOR,     /* major */
                                             LIBMXF_VERSION_MINOR,     /* minor */
@@ -82,8 +86,8 @@ static const char *g_libmxfPlatformString           =     LIBMXF_LIBRARY_NAME   
 static const mxfUTF16Char *g_libmxfPlatformWString  = L"" LIBMXF_LIBRARY_WNAME L" (Unknown)";
 #endif
 
-static const char *g_libmxfSCMVersionString             =     LIBMXF_SCM_VERSION;
-static const mxfUTF16Char *g_libmxfSCMVersionWString    = L"" LIBMXF_SCM_WVERSION;
+static const char *g_libmxfSCMVersionString             =      LIBMXF_SCM_VERSION;
+static const mxfUTF16Char *g_libmxfSCMVersionWString    = WSTR(LIBMXF_SCM_VERSION);
 
 static const char *g_regtestPlatformString              =  "libMXF (Linux)";
 static const mxfUTF16Char *g_regtestPlatformWString     = L"libMXF (Linux)";

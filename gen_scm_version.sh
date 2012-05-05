@@ -15,7 +15,7 @@ if test -z "$GIT_VER"; then
 	exit 0
 fi
 
-OUTSTR=`echo -e "#define LIBMXF_SCM_VERSION \"$GIT_VER\"\n#define LIBMXF_SCM_WVERSION L\"$GIT_VER\""`
+OUTSTR="#define LIBMXF_SCM_VERSION \"$GIT_VER\""
 
 if test -e "$SCM_VER_FILE"; then
     EXISTING_STR=`cat $SCM_VER_FILE`
