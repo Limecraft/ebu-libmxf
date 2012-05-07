@@ -101,6 +101,7 @@ int mxf_equals_ul_mod_regver(const mxfUL *labelA, const mxfUL *labelB);
 int mxf_equals_uuid(const mxfUUID *uuidA, const mxfUUID *uuidB);
 int mxf_equals_uid(const mxfUID *uidA, const mxfUID *uidB);
 int mxf_equals_umid(const mxfUMID *umidA, const mxfUMID *umidB);
+int mxf_equals_ext_umid(const mxfExtendedUMID *extUMIDA, const mxfExtendedUMID *extUMIDB);
 int mxf_equals_rgba_layout(const mxfRGBALayout *layoutA, const mxfRGBALayout *layoutB);
 
 int mxf_is_ul(const mxfUID *uid);

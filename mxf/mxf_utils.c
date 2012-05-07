@@ -536,6 +536,11 @@ int mxf_equals_umid(const mxfUMID *umidA, const mxfUMID *umidB)
     return memcmp((const void*)umidA, (const void*)umidB, sizeof(mxfUMID)) == 0;
 }
 
+int mxf_equals_ext_umid(const mxfExtendedUMID *extUMIDA, const mxfExtendedUMID *extUMIDB)
+{
+    return memcmp(extUMIDA->bytes, extUMIDB->bytes, sizeof(extUMIDA->bytes)) == 0;
+}
+
 int mxf_equals_rgba_layout(const mxfRGBALayout *layoutA, const mxfRGBALayout *layoutB)
 {
     int i;
