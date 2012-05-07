@@ -234,9 +234,6 @@ static const mxfUTF16Char *IDENT_PRODUCT_NAME   = L"BBC Archive MXF Writer";
 static const mxfUTF16Char *IDENT_VERSION_STRING = L"Version August 2011";
 
 
-static const mxfUL MXF_DM_L(APP_PreservationDescriptiveScheme) =
-    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01, 0x0d, 0x04, 0x01, 0x01, 0x01, 0x01, 0x01, 0x00};
-
 static const mxfKey UNC_BASE_ELEMENT_KEY          = MXF_UNC_EE_K(0x00, 0x00, 0x00);
 static const mxfKey WAV_BASE_ELEMENT_KEY          = MXF_AES3BWF_EE_K(0x00, 0x00, 0x00);
 static const mxfKey TIMECODE_SYS_ITEM_ELEMENT_KEY = MXF_SS1_ELEMENT_KEY(0x01, 0x00);

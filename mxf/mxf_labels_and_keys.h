@@ -452,6 +452,12 @@ static const mxfUL MXF_DM_L(DMS1_Scene_NoExtensions)      = MXF_DMS1_L(0x03, 0x0
 static const mxfUL MXF_DM_L(DMS1_Scene_Extensions)        = MXF_DMS1_L(0x03, 0x02);
 
 
+/* BBC Archive Preservation Project */
+
+static const mxfUL MXF_DM_L(APP_PreservationDescriptiveScheme) =
+    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01, 0x0d, 0x04, 0x01, 0x01, 0x01, 0x01, 0x01, 0x00};
+
+
 /*
  *
  * Miscellaneous labels

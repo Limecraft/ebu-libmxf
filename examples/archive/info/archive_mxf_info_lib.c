@@ -66,10 +66,6 @@
 
 #include <bbc_archive_extensions_data_model.h>
 
-/* TODO: move this somewhere shared */
-static const mxfUL MXF_DM_L(APP_PreservationDescriptiveScheme) =
-    {0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01, 0x0D, 0x04, 0x01, 0x01, 0x01, 0x01, 0x01, 0x00};
-
 
 
 #define MXF_LABEL(d0, d1, d2, d3, d4, d5, d6, d7, d8, d9, d10, d11, d12, d13, d14, d15) \
