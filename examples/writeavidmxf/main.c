@@ -913,6 +913,31 @@ static int parse_boolean(const char *boolStr, int *value)
     return 0;
 }
 
+static int parse_frame_rate(const char *rateStr, mxfRational *frameRate)
+{
+    unsigned int value;
+    if (sscanf(rateStr, "%u", &value) != 1)
+        return 0;
+
+    if (value == 24 || value == 25 || value == 50) {
+        frameRate->numerator   = (int32_t)value;
+        frameRate->denominator = 1;
+    } else if (value == 23976) {
+        frameRate->numerator   = 24000;
+        frameRate->denominator = 1001;
+    } else if (value == 2997) {
+        frameRate->numerator   = 30000;
+        frameRate->denominator = 1001;
+    } else if (value == 5994) {
+        frameRate->numerator   = 60000;
+        frameRate->denominator = 1001;
+    } else {
+        return 0;
+    }
+
+    return 1;
+}
+
 static void usage(const char *cmd)
 {
     fprintf(stderr, "Usage: %s <<options>> <<inputs>>\n", cmd);
@@ -926,6 +951,8 @@ static void usage(const char *cmd)
     fprintf(stderr, "  --ntsc                     NTSC framerate and frame size. Default is DV file frame rate or PAL\n");
     fprintf(stderr, "  --film24                   use framerate of 24 instead of default 25fps\n");
     fprintf(stderr, "  --film23.976               use framerate of 23.976 (24000/1001) instead of default 25fps\n");
+    fprintf(stderr, "  --fps <rate>               set frame rate: 23976 (24000/1001), 24, 25, 2997 (30000/1001), 50 or 5994 (60000/1001).\n");
+    fprintf(stderr, "                             Default is the DV file frame rate, 50 for progressive video, otherwise 25\n");
     fprintf(stderr, "  --legacy                   use legacy DataDefs, for DV essence use legacy descriptor properties\n");
     fprintf(stderr, "  --legacy-umid              use the legacy UMID generation method (e.g. for Pro Tools v5.3.1)\n");
     fprintf(stderr, "  --aspect <ratio>           video aspect ratio x:y. Default is DV file aspect ratio or 4:3\n");
@@ -1111,6 +1138,21 @@ int main(int argc, const char *argv[])
         {
             isFilm23_976 = 1;
             cmdlnIndex++;
+        }
+        else if (strcmp(argv[cmdlnIndex], "--fps") == 0)
+        {
+            if (cmdlnIndex + 1 >= argc)
+            {
+                usage(argv[0]);
+                fprintf(stderr, "Missing argument for %s\n", argv[cmdlnIndex]);
+                return 1;
+            }
+            if (!parse_frame_rate(argv[cmdlnIndex + 1], &videoSampleRate)) {
+                usage(argv[0]);
+                fprintf(stderr, "Invalid value '%s' for option '%s'\n", argv[cmdlnIndex + 1], argv[cmdlnIndex]);
+                return 1;
+            }
+            cmdlnIndex += 2;
         }
         else if (strcmp(argv[cmdlnIndex], "--legacy") == 0)
         {
@@ -2005,6 +2047,18 @@ int main(int argc, const char *argv[])
     }
 
     /* set the video sample rate */
+    if (videoSampleRate.numerator != 0)
+    {
+        isFilm24                = (videoSampleRate.numerator == 24);
+        isFilm23_976            = (videoSampleRate.numerator == 24000);
+        /* TODO: isPAL is defined here as !'NTSC' to keep existing code logic. Longer term fix would be to
+                 use a mxfRational rather than a isPAL boolean
+        */
+        isPAL                   = (videoSampleRate.numerator != 30000 && videoSampleRate.numerator != 60000);
+        haveProgressive2Video   = (videoSampleRate.numerator == 50 || videoSampleRate.numerator == 60000);
+    }
+    else
+    {
     if (isPAL)
     {
         if (haveProgressive2Video)
@@ -2043,6 +2097,7 @@ int main(int argc, const char *argv[])
     {
         videoSampleRate.numerator = 24000;
         videoSampleRate.denominator = 1001;
+    }
     }
 
     /* set the image aspect ratio */
