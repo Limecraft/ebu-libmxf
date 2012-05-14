@@ -2059,45 +2059,45 @@ int main(int argc, const char *argv[])
     }
     else
     {
-    if (isPAL)
-    {
-        if (haveProgressive2Video)
+        if (isPAL)
         {
-            /* TODO: this is yet just another sample/edit rate hack! */
-            videoSampleRate.numerator = 50;
-            videoSampleRate.denominator = 1;
+            if (haveProgressive2Video)
+            {
+                /* TODO: this is yet just another sample/edit rate hack! */
+                videoSampleRate.numerator = 50;
+                videoSampleRate.denominator = 1;
+            }
+            else
+            {
+                videoSampleRate.numerator = 25;
+                videoSampleRate.denominator = 1;
+            }
         }
-        else
+        else /* NTSC */
         {
-            videoSampleRate.numerator = 25;
-            videoSampleRate.denominator = 1;
+            if (haveProgressive2Video)
+            {
+                /* TODO: this is yet just another sample/edit rate hack! */
+                videoSampleRate.numerator = 60000;
+                videoSampleRate.denominator = 1001;
+            }
+            else
+            {
+                videoSampleRate.numerator = 30000;
+                videoSampleRate.denominator = 1001;
+            }
         }
-    }
-    else /* NTSC */
-    {
-        if (haveProgressive2Video)
-        {
-            /* TODO: this is yet just another sample/edit rate hack! */
-            videoSampleRate.numerator = 60000;
-            videoSampleRate.denominator = 1001;
-        }
-        else
-        {
-            videoSampleRate.numerator = 30000;
-            videoSampleRate.denominator = 1001;
-        }
-    }
 
-    if (isFilm24)
-    {
-        videoSampleRate.numerator = 24;
-        videoSampleRate.denominator = 1;
-    }
-    if (isFilm23_976)
-    {
-        videoSampleRate.numerator = 24000;
-        videoSampleRate.denominator = 1001;
-    }
+        if (isFilm24)
+        {
+            videoSampleRate.numerator = 24;
+            videoSampleRate.denominator = 1;
+        }
+        if (isFilm23_976)
+        {
+            videoSampleRate.numerator = 24000;
+            videoSampleRate.denominator = 1001;
+        }
     }
 
     /* set the image aspect ratio */
