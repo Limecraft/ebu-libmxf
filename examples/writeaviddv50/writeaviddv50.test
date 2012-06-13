@@ -1,8 +1,8 @@
 #!/bin/sh
 
-if type -P md5sum &>/dev/null; then
+if command -v md5sum \&>/dev/null; then
   MD5TOOL=md5sum
-elif type -P md5 &>/dev/null; then
+elif command -v md5 \&>/dev/null; then
   MD5TOOL=md5
 else
   echo "ERROR: require md5/md5sum tool"
