@@ -1320,7 +1320,7 @@ static int write_info(Reader *reader, int showPSEFailures, int showVTRErrors, in
     else
     {
         mxf_snprintf(rateStr, sizeof(rateStr), "%.2f",
-                 reader->editRate.numerator / (float)reader->editRate.denominator);
+                     reader->editRate.numerator / (float)reader->editRate.denominator);
     }
 
     if (reader->audioSamplingRate.numerator == 48000 && reader->audioSamplingRate.denominator == 1)
@@ -1330,7 +1330,7 @@ static int write_info(Reader *reader, int showPSEFailures, int showVTRErrors, in
     else if (reader->audioSamplingRate.denominator > 0)
     {
         mxf_snprintf(audioSamplingRateStr, sizeof(audioSamplingRateStr), "%.2fkHz",
-                 reader->audioSamplingRate.numerator / (float)(1000 * reader->audioSamplingRate.denominator));
+                     reader->audioSamplingRate.numerator / (float)(1000 * reader->audioSamplingRate.denominator));
     }
     else
     {

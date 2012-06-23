@@ -293,12 +293,12 @@ void mxf_print_key(const mxfKey *key)
 void mxf_sprint_key(char *str, const mxfKey *key)
 {
     mxf_snprintf(str, KEY_STR_SIZE,
-             "%02x %02x %02x %02x %02x %02x %02x %02x "
-             "%02x %02x %02x %02x %02x %02x %02x %02x",
-             key->octet0, key->octet1, key->octet2, key->octet3,
-             key->octet4, key->octet5, key->octet6, key->octet7,
-             key->octet8, key->octet9, key->octet10, key->octet11,
-             key->octet12, key->octet13, key->octet14, key->octet15);
+                 "%02x %02x %02x %02x %02x %02x %02x %02x "
+                 "%02x %02x %02x %02x %02x %02x %02x %02x",
+                 key->octet0, key->octet1, key->octet2, key->octet3,
+                 key->octet4, key->octet5, key->octet6, key->octet7,
+                 key->octet8, key->octet9, key->octet10, key->octet11,
+                 key->octet12, key->octet13, key->octet14, key->octet15);
 }
 
 void mxf_print_label(const mxfUL *label)
@@ -321,18 +321,18 @@ void mxf_print_umid(const mxfUMID *umid)
 void mxf_sprint_umid(char *str, const mxfUMID *umid)
 {
     mxf_snprintf(str, UMID_STR_SIZE,
-             "%02x %02x %02x %02x %02x %02x %02x %02x "
-             "%02x %02x %02x %02x %02x %02x %02x %02x "
-             "%02x %02x %02x %02x %02x %02x %02x %02x "
-             "%02x %02x %02x %02x %02x %02x %02x %02x",
-             umid->octet0, umid->octet1, umid->octet2, umid->octet3,
-             umid->octet4, umid->octet5, umid->octet6, umid->octet7,
-             umid->octet8, umid->octet9, umid->octet10, umid->octet11,
-             umid->octet12, umid->octet13, umid->octet14, umid->octet15,
-             umid->octet16, umid->octet17, umid->octet18, umid->octet19,
-             umid->octet20, umid->octet21, umid->octet22, umid->octet23,
-             umid->octet24, umid->octet25, umid->octet26, umid->octet27,
-             umid->octet28, umid->octet29, umid->octet30, umid->octet31);
+                 "%02x %02x %02x %02x %02x %02x %02x %02x "
+                 "%02x %02x %02x %02x %02x %02x %02x %02x "
+                 "%02x %02x %02x %02x %02x %02x %02x %02x "
+                 "%02x %02x %02x %02x %02x %02x %02x %02x",
+                 umid->octet0, umid->octet1, umid->octet2, umid->octet3,
+                 umid->octet4, umid->octet5, umid->octet6, umid->octet7,
+                 umid->octet8, umid->octet9, umid->octet10, umid->octet11,
+                 umid->octet12, umid->octet13, umid->octet14, umid->octet15,
+                 umid->octet16, umid->octet17, umid->octet18, umid->octet19,
+                 umid->octet20, umid->octet21, umid->octet22, umid->octet23,
+                 umid->octet24, umid->octet25, umid->octet26, umid->octet27,
+                 umid->octet28, umid->octet29, umid->octet30, umid->octet31);
 }
 
 void mxf_default_generate_uuid(mxfUUID *uuid)
