@@ -35,6 +35,8 @@
 #define __MXF_UTILS_H__
 
 
+#include <stdarg.h>
+
 
 #ifdef __cplusplus
 extern "C"
@@ -45,12 +47,6 @@ extern "C"
 /* strdup was deprecated in Visual C++ 2005 */
 #if defined(_MSC_VER) && (_MSC_VER >= 1400)
 #define strdup _strdup
-#endif
-
-/* Visual C++ doesn't have snprintf, vsnprintf */
-#if defined(_MSC_VER)
-#define snprintf _snprintf
-#define vsnprintf _vsnprintf
 #endif
 
 
@@ -64,6 +60,9 @@ typedef void (*mxf_get_timestamp_now_func)(mxfTimestamp *now);
 typedef void (*mxf_generate_umid_func)(mxfUMID *umid);
 typedef void (*mxf_generate_key_func)(mxfKey *key);
 
+
+void mxf_snprintf(char *str, size_t size, const char *format, ...);
+void mxf_vsnprintf(char *str, size_t size, const char *format, va_list ap);
 
 
 void mxf_print_key(const mxfKey *key);

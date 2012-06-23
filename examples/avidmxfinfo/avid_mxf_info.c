@@ -718,13 +718,15 @@ static size_t get_range_string(char *buffer, size_t maxSize, int isFirst, int is
 
     if (isFirst)
     {
-        strLen = snprintf(buffer, maxSize, "%s", (isVideo) ? "V" : "A");
+        mxf_snprintf(buffer, maxSize, "%s", (isVideo) ? "V" : "A");
+        strLen = strlen(buffer);
         buffer += strLen;
         maxSize -= strLen;
     }
     else
     {
-        strLen = snprintf(buffer, maxSize, ",");
+        mxf_snprintf(buffer, maxSize, ",");
+        strLen = strlen(buffer);
         buffer += strLen;
         maxSize -= strLen;
     }
@@ -732,11 +734,13 @@ static size_t get_range_string(char *buffer, size_t maxSize, int isFirst, int is
 
     if (range->first == range->last)
     {
-        strLen += snprintf(buffer, maxSize, "%d", range->first);
+        mxf_snprintf(buffer, maxSize, "%d", range->first);
+        strLen += strlen(buffer);
     }
     else
     {
-        strLen += snprintf(buffer, maxSize, "%d-%d", range->first, range->last);
+        mxf_snprintf(buffer, maxSize, "%d-%d", range->first, range->last);
+        strLen += strlen(buffer);
     }
 
     return strLen;
@@ -1144,7 +1148,8 @@ int ami_read_info(const char *filename, AvidMXFInfo *info, int printDebugError)
     }
     if (numVideoTrackNumberRanges > 0 && numAudioTrackNumberRanges > 0)
     {
-        strLen = snprintf(tracksStringPtr, remSize, " ");
+        mxf_snprintf(tracksStringPtr, remSize, " ");
+        strLen = strlen(tracksStringPtr);
         tracksStringPtr += strLen;
         remSize -= strLen;
     }

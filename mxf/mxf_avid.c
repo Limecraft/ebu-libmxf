@@ -484,7 +484,7 @@ static int get_indirect_int32(MXFMetadataSet *set, const mxfKey *itemKey, mxfUTF
 
     CHK_MALLOC_ARRAY_OFAIL(strValue, char, strSize);
     memset(strValue, 0, strSize);
-    snprintf(strValue, strSize, "%d", intValue);
+    mxf_snprintf(strValue, strSize, "%d", intValue);
 
     CHK_MALLOC_ARRAY_OFAIL(newValue, mxfUTF16Char, strSize);
     memset(newValue, 0, sizeof(mxfUTF16Char) * strSize);

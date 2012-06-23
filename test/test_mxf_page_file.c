@@ -65,7 +65,7 @@ static void remove_test_files()
 
     while (1)
     {
-        snprintf(filename, sizeof(filename), g_testFile, count);
+        mxf_snprintf(filename, sizeof(filename), g_testFile, count);
         if (remove(filename) != 0)
         {
             break;

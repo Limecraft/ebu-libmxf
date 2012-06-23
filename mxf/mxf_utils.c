@@ -259,6 +259,29 @@ static size_t utf8_strlen_from_utf16(const mxfUTF16Char *u16_str)
 
 
 
+void mxf_snprintf(char *str, size_t size, const char *format, ...)
+{
+    va_list ap;
+    va_start(ap, format);
+    mxf_vsnprintf(str, size, format, ap);
+    va_end(ap);
+}
+
+void mxf_vsnprintf(char *str, size_t size, const char *format, va_list ap)
+{
+#if defined(_MSC_VER)
+    int res = _vsnprintf(str, size, format, ap);
+    if (str && size > 0) {
+        if (res == -1 && errno == EINVAL)
+            str[0] = 0;
+        else
+            str[size - 1] = 0;
+    }
+#else
+    if (vsnprintf(str, size, format, ap) < 0 && str && size > 0)
+        str[0] = 0;
+#endif
+}
 
 void mxf_print_key(const mxfKey *key)
 {
@@ -269,7 +292,7 @@ void mxf_print_key(const mxfKey *key)
 
 void mxf_sprint_key(char *str, const mxfKey *key)
 {
-    snprintf(str, KEY_STR_SIZE,
+    mxf_snprintf(str, KEY_STR_SIZE,
              "%02x %02x %02x %02x %02x %02x %02x %02x "
              "%02x %02x %02x %02x %02x %02x %02x %02x",
              key->octet0, key->octet1, key->octet2, key->octet3,
@@ -297,7 +320,7 @@ void mxf_print_umid(const mxfUMID *umid)
 
 void mxf_sprint_umid(char *str, const mxfUMID *umid)
 {
-    snprintf(str, UMID_STR_SIZE,
+    mxf_snprintf(str, UMID_STR_SIZE,
              "%02x %02x %02x %02x %02x %02x %02x %02x "
              "%02x %02x %02x %02x %02x %02x %02x %02x "
              "%02x %02x %02x %02x %02x %02x %02x %02x "

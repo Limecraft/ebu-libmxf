@@ -333,8 +333,8 @@ static int preprocess_avid_input(AvidMXFToP2Transfer *transfer, int inputFileInd
         output->isPicture = 1;
         output->sourceTrackNumber = MXF_DV_TRACK_NUM(0x01, 0x02, 0x01);
         output->essElementKey = MXF_EE_K(DVClipWrapped);
-        snprintf(output->codecString, sizeof(output->codecString), "DV25_420");
-        snprintf(output->frameRateString, sizeof(output->frameRateString), "50i");
+        mxf_snprintf(output->codecString, sizeof(output->codecString), "DV25_420");
+        mxf_snprintf(output->frameRateString, sizeof(output->frameRateString), "50i");
         output->frameRate.numerator = 25;
         output->frameRate.denominator = 1;
         output->editRate = output->frameRate;
@@ -358,8 +358,8 @@ static int preprocess_avid_input(AvidMXFToP2Transfer *transfer, int inputFileInd
         output->isPicture = 1;
         output->sourceTrackNumber = MXF_DV_TRACK_NUM(0x01, 0x02, 0x01);
         output->essElementKey = MXF_EE_K(DVClipWrapped);
-        snprintf(output->codecString, sizeof(output->codecString), "DV25_411");
-        snprintf(output->frameRateString, sizeof(output->frameRateString), "59.94i");
+        mxf_snprintf(output->codecString, sizeof(output->codecString), "DV25_411");
+        mxf_snprintf(output->frameRateString, sizeof(output->frameRateString), "59.94i");
         output->frameRate.numerator = 30000;
         output->frameRate.denominator = 1001;
         output->editRate = output->frameRate;
@@ -383,8 +383,8 @@ static int preprocess_avid_input(AvidMXFToP2Transfer *transfer, int inputFileInd
         output->isPicture = 1;
         output->sourceTrackNumber = MXF_DV_TRACK_NUM(0x01, 0x02, 0x01);
         output->essElementKey = MXF_EE_K(DVClipWrapped);
-        snprintf(output->codecString, sizeof(output->codecString), "DV25_411");
-        snprintf(output->frameRateString, sizeof(output->frameRateString), "50i");
+        mxf_snprintf(output->codecString, sizeof(output->codecString), "DV25_411");
+        mxf_snprintf(output->frameRateString, sizeof(output->frameRateString), "50i");
         output->frameRate.numerator = 25;
         output->frameRate.denominator = 1;
         output->editRate = output->frameRate;
@@ -408,8 +408,8 @@ static int preprocess_avid_input(AvidMXFToP2Transfer *transfer, int inputFileInd
         output->isPicture = 1;
         output->sourceTrackNumber = MXF_DV_TRACK_NUM(0x01, 0x02, 0x01);
         output->essElementKey = MXF_EE_K(DVClipWrapped);
-        snprintf(output->codecString, sizeof(output->codecString), "DV25_411");
-        snprintf(output->frameRateString, sizeof(output->frameRateString), "59.94i");
+        mxf_snprintf(output->codecString, sizeof(output->codecString), "DV25_411");
+        mxf_snprintf(output->frameRateString, sizeof(output->frameRateString), "59.94i");
         output->frameRate.numerator = 30000;
         output->frameRate.denominator = 1001;
         output->editRate = output->frameRate;
@@ -433,8 +433,8 @@ static int preprocess_avid_input(AvidMXFToP2Transfer *transfer, int inputFileInd
         output->isPicture = 1;
         output->sourceTrackNumber = MXF_DV_TRACK_NUM(0x01, 0x02, 0x01);
         output->essElementKey = MXF_EE_K(DVClipWrapped);
-        snprintf(output->codecString, sizeof(output->codecString), "DV50_422");
-        snprintf(output->frameRateString, sizeof(output->frameRateString), "50i");
+        mxf_snprintf(output->codecString, sizeof(output->codecString), "DV50_422");
+        mxf_snprintf(output->frameRateString, sizeof(output->frameRateString), "50i");
         output->frameRate.numerator = 25;
         output->frameRate.denominator = 1;
         output->editRate = output->frameRate;
@@ -458,8 +458,8 @@ static int preprocess_avid_input(AvidMXFToP2Transfer *transfer, int inputFileInd
         output->isPicture = 1;
         output->sourceTrackNumber = MXF_DV_TRACK_NUM(0x01, 0x02, 0x01);
         output->essElementKey = MXF_EE_K(DVClipWrapped);
-        snprintf(output->codecString, sizeof(output->codecString), "DV50_422");
-        snprintf(output->frameRateString, sizeof(output->frameRateString), "59.94i");
+        mxf_snprintf(output->codecString, sizeof(output->codecString), "DV50_422");
+        mxf_snprintf(output->frameRateString, sizeof(output->frameRateString), "59.94i");
         output->frameRate.numerator = 30000;
         output->frameRate.denominator = 1001;
         output->editRate = output->frameRate;
@@ -1078,7 +1078,7 @@ static int write_icon_bmp(AvidMXFToP2Transfer *transfer)
     FILE *iconFile;
     char filename[FILENAME_MAX];
 
-    snprintf(filename, sizeof(filename), "%s%s%s%s%s%s%s.BMP",
+    mxf_snprintf(filename, sizeof(filename), "%s%s%s%s%s%s%s.BMP",
         transfer->p2path, g_fileSeparator,
         g_contentsDirname, g_fileSeparator,
         g_iconDirname, g_fileSeparator,
@@ -1117,11 +1117,11 @@ static int write_clip_document(AvidMXFToP2Transfer *transfer)
         sprintf(&globalClipIDString[i*2], "%02x", ((uint8_t*)&transfer->globalClipID)[i]);
     }
 
-    snprintf(timestampString, sizeof(timestampString), "%04d-%02u-%02uT%02u:%02u:%02u+00:00",
+    mxf_snprintf(timestampString, sizeof(timestampString), "%04d-%02u-%02uT%02u:%02u:%02u+00:00",
         transfer->now.year, transfer->now.month, transfer->now.day, transfer->now.hour,
         transfer->now.min, transfer->now.sec);
 
-    snprintf(filename, sizeof(filename), "%s%s%s%s%s%s%s.XML",
+    mxf_snprintf(filename, sizeof(filename), "%s%s%s%s%s%s%s.XML",
         transfer->p2path, g_fileSeparator,
         g_contentsDirname, g_fileSeparator,
         g_clipDirname, g_fileSeparator,
@@ -1148,12 +1148,12 @@ static int write_clip_document(AvidMXFToP2Transfer *transfer)
     CHK_OFAIL(xml_writer_element_end(writer, "GlobalClipID"));
 
     CHK_OFAIL(xml_writer_element_start(writer, "Duration"));
-    snprintf(buffer, sizeof(buffer), "%"PRId64, transfer->duration);
+    mxf_snprintf(buffer, sizeof(buffer), "%"PRId64, transfer->duration);
     CHK_OFAIL(xml_writer_character_data(writer, buffer));
     CHK_OFAIL(xml_writer_element_end(writer, "Duration"));
 
     CHK_OFAIL(xml_writer_element_start(writer, "EditUnit"));
-    snprintf(buffer, sizeof(buffer), "%d/%d", transfer->editUnit.numerator, transfer->editUnit.denominator);
+    mxf_snprintf(buffer, sizeof(buffer), "%d/%d", transfer->editUnit.numerator, transfer->editUnit.denominator);
     CHK_OFAIL(xml_writer_character_data(writer, buffer));
     CHK_OFAIL(xml_writer_element_end(writer, "EditUnit"));
 
@@ -1200,7 +1200,7 @@ static int write_clip_document(AvidMXFToP2Transfer *transfer)
             convert_frames_to_timecode(transfer->timecodeStart, 30, transfer->dropFrameFlag, &timecode);
         }
         CHK_OFAIL(xml_writer_element_start(writer, "StartTimecode"));
-        snprintf(buffer, sizeof(buffer), "%02u:%02u:%02u:%02u", timecode.hour, timecode.min, timecode.sec, timecode.frame);
+        mxf_snprintf(buffer, sizeof(buffer), "%02u:%02u:%02u:%02u", timecode.hour, timecode.min, timecode.sec, timecode.frame);
         CHK_OFAIL(xml_writer_character_data(writer, buffer));
         CHK_OFAIL(xml_writer_element_end(writer, "StartTimecode"));
 
@@ -1209,17 +1209,17 @@ static int write_clip_document(AvidMXFToP2Transfer *transfer)
         CHK_OFAIL(xml_writer_element_end(writer, "StartBinaryGroup"));
 
         CHK_OFAIL(xml_writer_element_start(writer, "AspectRatio"));
-        snprintf(buffer, sizeof(buffer), "%d:%d", output->aspectRatio.numerator, output->aspectRatio.denominator);
+        mxf_snprintf(buffer, sizeof(buffer), "%d:%d", output->aspectRatio.numerator, output->aspectRatio.denominator);
         CHK_OFAIL(xml_writer_character_data(writer, buffer));
         CHK_OFAIL(xml_writer_element_end(writer, "AspectRatio"));
 
         CHK_OFAIL(xml_writer_element_start(writer, "VideoIndex"));
         CHK_OFAIL(xml_writer_element_start(writer, "StartByteOffset"));
-        snprintf(buffer, sizeof(buffer), "%"PRId64, output->startByteOffset);
+        mxf_snprintf(buffer, sizeof(buffer), "%"PRId64, output->startByteOffset);
         CHK_OFAIL(xml_writer_character_data(writer, buffer));
         CHK_OFAIL(xml_writer_element_end(writer, "StartByteOffset"));
         CHK_OFAIL(xml_writer_element_start(writer, "DataSize"));
-        snprintf(buffer, sizeof(buffer), "%"PRId64, output->dataSize);
+        mxf_snprintf(buffer, sizeof(buffer), "%"PRId64, output->dataSize);
         CHK_OFAIL(xml_writer_character_data(writer, buffer));
         CHK_OFAIL(xml_writer_element_end(writer, "DataSize"));
         CHK_OFAIL(xml_writer_element_end(writer, "VideoIndex"));
@@ -1246,17 +1246,17 @@ static int write_clip_document(AvidMXFToP2Transfer *transfer)
             CHK_OFAIL(xml_writer_element_end(writer, "SamplingRate"));
 
             CHK_OFAIL(xml_writer_element_start(writer, "BitsPerSample"));
-            snprintf(buffer, sizeof(buffer), "%u", output->bitsPerSample);
+            mxf_snprintf(buffer, sizeof(buffer), "%u", output->bitsPerSample);
             CHK_OFAIL(xml_writer_character_data(writer, buffer));
             CHK_OFAIL(xml_writer_element_end(writer, "BitsPerSample"));
 
             CHK_OFAIL(xml_writer_element_start(writer, "AudioIndex"));
             CHK_OFAIL(xml_writer_element_start(writer, "StartByteOffset"));
-            snprintf(buffer, sizeof(buffer), "%"PRId64, output->startByteOffset);
+            mxf_snprintf(buffer, sizeof(buffer), "%"PRId64, output->startByteOffset);
             CHK_OFAIL(xml_writer_character_data(writer, buffer));
             CHK_OFAIL(xml_writer_element_end(writer, "StartByteOffset"));
             CHK_OFAIL(xml_writer_element_start(writer, "DataSize"));
-            snprintf(buffer, sizeof(buffer), "%"PRId64, output->dataSize);
+            mxf_snprintf(buffer, sizeof(buffer), "%"PRId64, output->dataSize);
             CHK_OFAIL(xml_writer_character_data(writer, buffer));
             CHK_OFAIL(xml_writer_element_end(writer, "DataSize"));
             CHK_OFAIL(xml_writer_element_end(writer, "AudioIndex"));
@@ -1331,7 +1331,7 @@ static int create_p2_clipname(AvidMXFToP2Transfer *transfer)
     const uint8_t *globalClipIDPtr;
     int pastLimitAlready;
 
-    snprintf(filename, sizeof(filename), "%s%s%s", transfer->p2path, g_fileSeparator, g_lastClipFilename);
+    mxf_snprintf(filename, sizeof(filename), "%s%s%s", transfer->p2path, g_fileSeparator, g_lastClipFilename);
 
     if ((lastClipFile = fopen(filename, "r+b")) == NULL)
     {
@@ -1416,9 +1416,9 @@ static int create_p2_clipname(AvidMXFToP2Transfer *transfer)
     {
         FILE *file = NULL;
 
-        snprintf(transfer->clipName, sizeof(transfer->clipName), "%04u%c%c", xxxx, yy1, yy2);
+        mxf_snprintf(transfer->clipName, sizeof(transfer->clipName), "%04u%c%c", xxxx, yy1, yy2);
 
-        snprintf(filename, sizeof(filename), "%s%s%s%s%s%s%s.XML",
+        mxf_snprintf(filename, sizeof(filename), "%s%s%s%s%s%s%s.XML",
                             transfer->p2path, g_fileSeparator,
                             g_contentsDirname, g_fileSeparator,
                             g_clipDirname, g_fileSeparator,
@@ -1612,7 +1612,7 @@ int transfer_avid_mxf_to_p2(const char *p2path, AvidMXFToP2Transfer *transfer, i
     {
         if (transfer->outputs[i].isPicture)
         {
-            snprintf(outputFilename, sizeof(outputFilename), "%s%s%s%s%s%s%s.MXF",
+            mxf_snprintf(outputFilename, sizeof(outputFilename), "%s%s%s%s%s%s%s.MXF",
                 transfer->p2path, g_fileSeparator,
                 g_contentsDirname, g_fileSeparator,
                 g_videoDirname, g_fileSeparator,
@@ -1620,7 +1620,7 @@ int transfer_avid_mxf_to_p2(const char *p2path, AvidMXFToP2Transfer *transfer, i
         }
         else
         {
-            snprintf(outputFilename, sizeof(outputFilename), "%s%s%s%s%s%s%s%02u.MXF",
+            mxf_snprintf(outputFilename, sizeof(outputFilename), "%s%s%s%s%s%s%s%02u.MXF",
                 transfer->p2path, g_fileSeparator,
                 g_contentsDirname, g_fileSeparator,
                 g_audioDirname, g_fileSeparator,

@@ -895,7 +895,7 @@ int prepare_archive_mxf_file_2(MXFFile **mxfFile, const char *filename, const mx
     /* Preface - ContentStorage - MaterialPackage - Timecode Track */
     CHK_OFAIL(mxf_create_set(newOutput->headerMetadata, &MXF_SET_K(Track), &newOutput->materialPackageTrackSet));
     CHK_OFAIL(mxf_add_array_item_strongref(newOutput->materialPackageSet, &MXF_ITEM_K(GenericPackage, Tracks), newOutput->materialPackageTrackSet));
-    snprintf(nameBuffer, sizeof(nameBuffer), "TC%d", 1);
+    mxf_snprintf(nameBuffer, sizeof(nameBuffer), "TC%d", 1);
     CHK_OFAIL(convert_string(nameBuffer, &newOutput->tempString));
     CHK_OFAIL(mxf_set_utf16string_item(newOutput->materialPackageTrackSet, &MXF_ITEM_K(GenericTrack, TrackName), newOutput->tempString));
     CHK_OFAIL(mxf_set_uint32_item(newOutput->materialPackageTrackSet, &MXF_ITEM_K(GenericTrack, TrackID), 1));
@@ -925,13 +925,13 @@ int prepare_archive_mxf_file_2(MXFFile **mxfFile, const char *filename, const mx
         CHK_OFAIL(mxf_add_array_item_strongref(newOutput->materialPackageSet, &MXF_ITEM_K(GenericPackage, Tracks), newOutput->materialPackageTrackSet));
         if (isPicture)
         {
-            snprintf(nameBuffer, sizeof(nameBuffer), "V%d", 1);
+            mxf_snprintf(nameBuffer, sizeof(nameBuffer), "V%d", 1);
             CHK_OFAIL(convert_string(nameBuffer, &newOutput->tempString));
             CHK_OFAIL(mxf_set_utf16string_item(newOutput->materialPackageTrackSet, &MXF_ITEM_K(GenericTrack, TrackName), newOutput->tempString));
         }
         else
         {
-            snprintf(nameBuffer, sizeof(nameBuffer), "A%d", i);
+            mxf_snprintf(nameBuffer, sizeof(nameBuffer), "A%d", i);
             CHK_OFAIL(convert_string(nameBuffer, &newOutput->tempString));
             CHK_OFAIL(mxf_set_utf16string_item(newOutput->materialPackageTrackSet, &MXF_ITEM_K(GenericTrack, TrackName), newOutput->tempString));
         }
@@ -1003,13 +1003,13 @@ int prepare_archive_mxf_file_2(MXFFile **mxfFile, const char *filename, const mx
         CHK_OFAIL(mxf_add_array_item_strongref(newOutput->sourcePackageSet, &MXF_ITEM_K(GenericPackage, Tracks), newOutput->sourcePackageTrackSet));
         if (isPicture)
         {
-            snprintf(nameBuffer, sizeof(nameBuffer), "V%d", 1);
+            mxf_snprintf(nameBuffer, sizeof(nameBuffer), "V%d", 1);
             CHK_OFAIL(convert_string(nameBuffer, &newOutput->tempString));
             CHK_OFAIL(mxf_set_utf16string_item(newOutput->sourcePackageTrackSet, &MXF_ITEM_K(GenericTrack, TrackName), newOutput->tempString));
         }
         else
         {
-            snprintf(nameBuffer, sizeof(nameBuffer), "A%d", i);
+            mxf_snprintf(nameBuffer, sizeof(nameBuffer), "A%d", i);
             CHK_OFAIL(convert_string(nameBuffer, &newOutput->tempString));
             CHK_OFAIL(mxf_set_utf16string_item(newOutput->sourcePackageTrackSet, &MXF_ITEM_K(GenericTrack, TrackName), newOutput->tempString));
         }
@@ -1146,7 +1146,7 @@ int prepare_archive_mxf_file_2(MXFFile **mxfFile, const char *filename, const mx
     /* Preface - ContentStorage - SourcePackage - DM Track */
     CHK_OFAIL(mxf_create_set(newOutput->headerMetadata, &MXF_SET_K(StaticTrack), &newOutput->sourcePackageTrackSet));
     CHK_OFAIL(mxf_add_array_item_strongref(newOutput->sourcePackageSet, &MXF_ITEM_K(GenericPackage, Tracks), newOutput->sourcePackageTrackSet));
-    snprintf(nameBuffer, sizeof(nameBuffer), "DM%d", 1);
+    mxf_snprintf(nameBuffer, sizeof(nameBuffer), "DM%d", 1);
     CHK_OFAIL(convert_string(nameBuffer, &newOutput->tempString));
     CHK_OFAIL(mxf_set_utf16string_item(newOutput->sourcePackageTrackSet, &MXF_ITEM_K(GenericTrack, TrackName), newOutput->tempString));
     CHK_OFAIL(mxf_set_uint32_item(newOutput->sourcePackageTrackSet, &MXF_ITEM_K(GenericTrack, TrackID), newOutput->numAudioTracks + 2));
@@ -1183,7 +1183,7 @@ int prepare_archive_mxf_file_2(MXFFile **mxfFile, const char *filename, const mx
     CHK_ORET(mxf_create_set(newOutput->headerMetadata, &MXF_SET_K(Track), &newOutput->sourcePackageTrackSet));
     CHK_ORET(mxf_add_array_item_strongref(newOutput->tapeSourcePackageSet, &MXF_ITEM_K(GenericPackage, Tracks), newOutput->sourcePackageTrackSet));
     CHK_ORET(mxf_set_uint32_item(newOutput->sourcePackageTrackSet, &MXF_ITEM_K(GenericTrack, TrackID), 1));
-    snprintf(nameBuffer, sizeof(nameBuffer), "V%d", 1);
+    mxf_snprintf(nameBuffer, sizeof(nameBuffer), "V%d", 1);
     CHK_ORET(convert_string(nameBuffer, &newOutput->tempString));
     CHK_ORET(mxf_set_utf16string_item(newOutput->sourcePackageTrackSet, &MXF_ITEM_K(GenericTrack, TrackName), newOutput->tempString));
     CHK_ORET(mxf_set_uint32_item(newOutput->sourcePackageTrackSet, &MXF_ITEM_K(GenericTrack, TrackNumber), 1));
@@ -1212,7 +1212,7 @@ int prepare_archive_mxf_file_2(MXFFile **mxfFile, const char *filename, const mx
         CHK_ORET(mxf_create_set(newOutput->headerMetadata, &MXF_SET_K(Track), &newOutput->sourcePackageTrackSet));
         CHK_ORET(mxf_add_array_item_strongref(newOutput->tapeSourcePackageSet, &MXF_ITEM_K(GenericPackage, Tracks), newOutput->sourcePackageTrackSet));
         CHK_ORET(mxf_set_uint32_item(newOutput->sourcePackageTrackSet, &MXF_ITEM_K(GenericTrack, TrackID), i + 2));
-        snprintf(nameBuffer, sizeof(nameBuffer), "A%d", i + 1);
+        mxf_snprintf(nameBuffer, sizeof(nameBuffer), "A%d", i + 1);
         CHK_ORET(convert_string(nameBuffer, &newOutput->tempString));
         CHK_ORET(mxf_set_utf16string_item(newOutput->sourcePackageTrackSet, &MXF_ITEM_K(GenericTrack, TrackName), newOutput->tempString));
         CHK_ORET(mxf_set_uint32_item(newOutput->sourcePackageTrackSet, &MXF_ITEM_K(GenericTrack, TrackNumber), i + 1));
@@ -1240,7 +1240,7 @@ int prepare_archive_mxf_file_2(MXFFile **mxfFile, const char *filename, const mx
     CHK_ORET(mxf_add_array_item_strongref(newOutput->tapeSourcePackageSet, &MXF_ITEM_K(GenericPackage, Tracks), newOutput->sourcePackageTrackSet));
     CHK_ORET(mxf_set_uint32_item(newOutput->sourcePackageTrackSet, &MXF_ITEM_K(GenericTrack, TrackID), newOutput->numAudioTracks + 2));
     CHK_ORET(mxf_set_uint32_item(newOutput->sourcePackageTrackSet, &MXF_ITEM_K(GenericTrack, TrackNumber), 0));
-    snprintf(nameBuffer, sizeof(nameBuffer), "T%d", 1);
+    mxf_snprintf(nameBuffer, sizeof(nameBuffer), "T%d", 1);
     CHK_ORET(convert_string(nameBuffer, &newOutput->tempString));
     CHK_ORET(mxf_set_utf16string_item(newOutput->sourcePackageTrackSet, &MXF_ITEM_K(GenericTrack, TrackName), newOutput->tempString));
     CHK_ORET(mxf_set_rational_item(newOutput->sourcePackageTrackSet, &MXF_ITEM_K(Track, EditRate), frameRate));
@@ -1265,7 +1265,7 @@ int prepare_archive_mxf_file_2(MXFFile **mxfFile, const char *filename, const mx
     /* Preface - ContentStorage - tape SourcePackage - DM Track */
     CHK_OFAIL(mxf_create_set(newOutput->headerMetadata, &MXF_SET_K(StaticTrack), &newOutput->sourcePackageTrackSet));
     CHK_OFAIL(mxf_add_array_item_strongref(newOutput->tapeSourcePackageSet, &MXF_ITEM_K(GenericPackage, Tracks), newOutput->sourcePackageTrackSet));
-    snprintf(nameBuffer, sizeof(nameBuffer), "DM%d", 1);
+    mxf_snprintf(nameBuffer, sizeof(nameBuffer), "DM%d", 1);
     CHK_OFAIL(convert_string(nameBuffer, &newOutput->tempString));
     CHK_OFAIL(mxf_set_utf16string_item(newOutput->sourcePackageTrackSet, &MXF_ITEM_K(GenericTrack, TrackName), newOutput->tempString));
     CHK_OFAIL(mxf_set_uint32_item(newOutput->sourcePackageTrackSet, &MXF_ITEM_K(GenericTrack, TrackID), newOutput->numAudioTracks + 3));
@@ -1524,7 +1524,7 @@ int complete_archive_mxf_file(ArchiveMXFWriter **outputRef, const InfaxData *sou
     CHK_ORET(convert_string(sourceInfaxData->spoolNo, &output->tempString));
     CHK_ORET(mxf_set_utf16string_item(output->tapeSourcePackageSet, &MXF_ITEM_K(GenericPackage, Name), output->tempString));
 
-    snprintf(mpName, sizeof(mpName), "Archive preservation %s", sourceInfaxData->spoolNo);
+    mxf_snprintf(mpName, sizeof(mpName), "Archive preservation %s", sourceInfaxData->spoolNo);
     CHK_ORET(convert_string(mpName, &output->tempString));
     CHK_ORET(mxf_set_utf16string_item(output->materialPackageSet, &MXF_ITEM_K(GenericPackage, Name), output->tempString));
 

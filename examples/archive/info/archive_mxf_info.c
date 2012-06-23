@@ -434,8 +434,8 @@ static int read_time_string_at_position(Reader *reader, int64_t position,
 
     CHK_ORET(read_timecode_at_position(reader, position, &vitc, &ltc));
 
-    snprintf(vitcStr, vitcStrSize, "%02d:%02d:%02d:%02d", vitc.hour, vitc.min, vitc.sec, vitc.frame);
-    snprintf(ltcStr,  ltcStrSize,  "%02d:%02d:%02d:%02d", ltc.hour, ltc.min, ltc.sec, ltc.frame);
+    mxf_snprintf(vitcStr, vitcStrSize, "%02d:%02d:%02d:%02d", vitc.hour, vitc.min, vitc.sec, vitc.frame);
+    mxf_snprintf(ltcStr,  ltcStrSize,  "%02d:%02d:%02d:%02d", ltc.hour, ltc.min, ltc.sec, ltc.frame);
 
     return 1;
 }
@@ -1315,21 +1315,21 @@ static int write_info(Reader *reader, int showPSEFailures, int showVTRErrors, in
 
     if (reader->editRate.denominator == 1)
     {
-        snprintf(rateStr, sizeof(rateStr), "%d", reader->editRate.numerator);
+        mxf_snprintf(rateStr, sizeof(rateStr), "%d", reader->editRate.numerator);
     }
     else
     {
-        snprintf(rateStr, sizeof(rateStr), "%.2f",
+        mxf_snprintf(rateStr, sizeof(rateStr), "%.2f",
                  reader->editRate.numerator / (float)reader->editRate.denominator);
     }
 
     if (reader->audioSamplingRate.numerator == 48000 && reader->audioSamplingRate.denominator == 1)
     {
-        snprintf(audioSamplingRateStr, sizeof(audioSamplingRateStr), "48kHz");
+        mxf_snprintf(audioSamplingRateStr, sizeof(audioSamplingRateStr), "48kHz");
     }
     else if (reader->audioSamplingRate.denominator > 0)
     {
-        snprintf(audioSamplingRateStr, sizeof(audioSamplingRateStr), "%.2fkHz",
+        mxf_snprintf(audioSamplingRateStr, sizeof(audioSamplingRateStr), "%.2fkHz",
                  reader->audioSamplingRate.numerator / (float)(1000 * reader->audioSamplingRate.denominator));
     }
     else

@@ -657,11 +657,11 @@ static void get_filename(const char *filenamePrefix, int isVideo, int typeTrackN
 {
     if (isVideo)
     {
-        snprintf(filename, filenameSize, "%s_v%d.mxf", filenamePrefix, typeTrackNum);
+        mxf_snprintf(filename, filenameSize, "%s_v%d.mxf", filenamePrefix, typeTrackNum);
     }
     else
     {
-        snprintf(filename, filenameSize, "%s_a%d.mxf", filenamePrefix, typeTrackNum);
+        mxf_snprintf(filename, filenameSize, "%s_a%d.mxf", filenamePrefix, typeTrackNum);
     }
 }
 
@@ -669,11 +669,11 @@ static void get_track_name(int isVideo, int typeTrackNum, char *trackName, size_
 {
     if (isVideo)
     {
-        snprintf(trackName, trackNameSize, "V%d", typeTrackNum);
+        mxf_snprintf(trackName, trackNameSize, "V%d", typeTrackNum);
     }
     else
     {
-        snprintf(trackName, trackNameSize, "A%d", typeTrackNum);
+        mxf_snprintf(trackName, trackNameSize, "A%d", typeTrackNum);
     }
 }
 

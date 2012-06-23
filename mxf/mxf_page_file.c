@@ -248,7 +248,7 @@ static int open_file(MXFFileSysData *sysData, Page *page)
     }
 
     /* open the file */
-    snprintf(filename, sizeof(filename), sysData->filenameTemplate, page->index);
+    mxf_snprintf(filename, sizeof(filename), sysData->filenameTemplate, page->index);
     switch (sysData->mode)
     {
         case READ_MODE:
@@ -690,7 +690,7 @@ int mxf_page_file_open_read(const char *filenameTemplate, MXFPageFile **mxfPageF
     pageCount = 0;
     for(;;)
     {
-        snprintf(filename, sizeof(filename), filenameTemplate, pageCount);
+        mxf_snprintf(filename, sizeof(filename), filenameTemplate, pageCount);
         if ((file = fopen(filename, "rb")) == NULL)
         {
             break;
@@ -732,7 +732,7 @@ int mxf_page_file_open_read(const char *filenameTemplate, MXFPageFile **mxfPageF
 
 
     /* get the page size from the first file */
-    snprintf(filename, sizeof(filename), filenameTemplate, 0);
+    mxf_snprintf(filename, sizeof(filename), filenameTemplate, 0);
     if (stat(filename, &st) != 0)
     {
         mxf_log_error("Failed to stat file '%s': %s\n", filename, strerror(errno));
@@ -753,7 +753,7 @@ int mxf_page_file_open_read(const char *filenameTemplate, MXFPageFile **mxfPageF
     }
 
     /* set the file size of the last file, which could be less than newMXFFile->sysData->pageSize */
-    snprintf(filename, sizeof(filename), filenameTemplate, newMXFFile->sysData->numPages - 1);
+    mxf_snprintf(filename, sizeof(filename), filenameTemplate, newMXFFile->sysData->numPages - 1);
     if (stat(filename, &st) != 0)
     {
         mxf_log_error("Failed to stat file '%s': %s\n", filename, strerror(errno));
@@ -793,7 +793,7 @@ int mxf_page_file_open_modify(const char *filenameTemplate, int64_t pageSize, MX
     pageCount = 0;
     for(;;)
     {
-        snprintf(filename, sizeof(filename), filenameTemplate, pageCount);
+        mxf_snprintf(filename, sizeof(filename), filenameTemplate, pageCount);
         if ((file = fopen(filename, "rb")) == NULL)
         {
             break;
@@ -811,7 +811,7 @@ int mxf_page_file_open_modify(const char *filenameTemplate, int64_t pageSize, MX
     /* check the size of the first file equals the pageSize */
     if (pageCount > 1)
     {
-        snprintf(filename, sizeof(filename), filenameTemplate, 0);
+        mxf_snprintf(filename, sizeof(filename), filenameTemplate, 0);
         fileSize = disk_file_size(filename);
         if (fileSize < 0)
         {
@@ -864,7 +864,7 @@ int mxf_page_file_open_modify(const char *filenameTemplate, int64_t pageSize, MX
     }
 
     /* set the files size of the last file, which could have size < pageSize */
-    snprintf(filename, sizeof(filename), filenameTemplate, newMXFFile->sysData->numPages - 1);
+    mxf_snprintf(filename, sizeof(filename), filenameTemplate, newMXFFile->sysData->numPages - 1);
     fileSize = disk_file_size(filename);
     if (fileSize < 0)
     {
@@ -950,7 +950,7 @@ int mxf_page_file_forward_truncate(MXFPageFile *mxfPageFile)
         }
 
         /* truncate the file to zero length */
-        snprintf(filename, sizeof(filename), sysData->filenameTemplate, sysData->pages[i].index);
+        mxf_snprintf(filename, sizeof(filename), sysData->filenameTemplate, sysData->pages[i].index);
 
 #if defined(_WIN32)
         /* WIN32 does not have truncate() so open the file with _O_TRUNC then close it */
@@ -975,7 +975,7 @@ int mxf_page_file_remove(const char *filenameTemplate)
 
     for(;;)
     {
-        snprintf(filename, sizeof(filename), filenameTemplate, index);
+        mxf_snprintf(filename, sizeof(filename), filenameTemplate, index);
         if (remove(filename) != 0)
         {
             break;
@@ -1002,7 +1002,7 @@ int64_t mxf_page_file_get_size(const char *filenameTemplate)
 
     for(;;)
     {
-        snprintf(filename, sizeof(filename), filenameTemplate, index);
+        mxf_snprintf(filename, sizeof(filename), filenameTemplate, index);
         if (stat(filename, &statBuf) != 0)
             break;
 

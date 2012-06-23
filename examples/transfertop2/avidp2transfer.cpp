@@ -248,7 +248,7 @@ APTException::APTException(const char *format, ...)
 
     va_list p_arg;
     va_start(p_arg, format);
-    vsnprintf(message, 512, format, p_arg);
+    mxf_vsnprintf(message, 512, format, p_arg);
     va_end(p_arg);
 
     _message = message;
