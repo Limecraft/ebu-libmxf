@@ -6,6 +6,7 @@ libwritearchivemxf_@LIBMXF_MAJORMINOR@_la_SOURCES = \
 	timecode_index.c \
 	write_archive_mxf.c
 libwritearchivemxf_@LIBMXF_MAJORMINOR@_la_LDFLAGS = -version-info $(LIBMXF_LIBVERSION)
+libwritearchivemxf_@LIBMXF_MAJORMINOR@_la_LIBADD = $(LIBMXF_LDADDLIBS)
 
 
 if ENABLE_ARCHIVE

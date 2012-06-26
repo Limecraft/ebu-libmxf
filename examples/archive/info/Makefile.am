@@ -4,6 +4,7 @@ endif
 
 libarchivemxfinfo_@LIBMXF_MAJORMINOR@_la_SOURCES = archive_mxf_info_lib.c
 libarchivemxfinfo_@LIBMXF_MAJORMINOR@_la_LDFLAGS = -version-info $(LIBMXF_LIBVERSION)
+libarchivemxfinfo_@LIBMXF_MAJORMINOR@_la_LIBADD = $(LIBMXF_LDADDLIBS)
 
 
 if ENABLE_ARCHIVE

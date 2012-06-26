@@ -9,6 +9,7 @@ libmxfreader_@LIBMXF_MAJORMINOR@_la_SOURCES = \
 	mxf_opatom_reader.c \
 	mxf_reader.c
 libmxfreader_@LIBMXF_MAJORMINOR@_la_LDFLAGS = -version-info $(LIBMXF_LIBVERSION)
+libmxfreader_@LIBMXF_MAJORMINOR@_la_LIBADD = $(LIBMXF_LDADDLIBS)
 
 
 if ENABLE_READER

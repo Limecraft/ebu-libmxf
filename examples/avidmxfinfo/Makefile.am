@@ -4,6 +4,7 @@ endif
 
 libavidmxfinfo_@LIBMXF_MAJORMINOR@_la_SOURCES = avid_mxf_info.c
 libavidmxfinfo_@LIBMXF_MAJORMINOR@_la_LDFLAGS = -version-info $(LIBMXF_LIBVERSION)
+libavidmxfinfo_@LIBMXF_MAJORMINOR@_la_LIBADD = $(LIBMXF_LDADDLIBS)
 
 
 if ENABLE_AVIDMXFINFO
