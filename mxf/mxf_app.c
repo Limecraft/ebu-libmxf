@@ -665,7 +665,7 @@ int mxf_app_load_extensions(MXFDataModel *dataModel)
     return 1;
 }
 
-int is_archive_mxf(MXFHeaderMetadata *headerMetadata)
+int mxf_app_is_app_mxf(MXFHeaderMetadata *headerMetadata)
 {
     MXFMetadataSet *prefaceSet;
     MXFArrayItemIterator arrayIter;
@@ -710,7 +710,7 @@ fail:
     return 0;
 }
 
-int archive_mxf_get_info(MXFHeaderMetadata *headerMetadata, ArchiveMXFInfo *info)
+int mxf_app_get_info(MXFHeaderMetadata *headerMetadata, ArchiveMXFInfo *info)
 {
     MXFList *list = NULL;
     MXFListIterator iter;
@@ -837,7 +837,7 @@ fail:
     return 0;
 }
 
-int archive_mxf_get_pse_failures(MXFHeaderMetadata *headerMetadata, PSEFailure **failures, long *numFailures)
+int mxf_app_get_pse_failures(MXFHeaderMetadata *headerMetadata, PSEFailure **failures, long *numFailures)
 {
     MXFMetadataSet *materialPackageSet;
     MXFMetadataSet *fileSourcePackageSet;
@@ -851,7 +851,7 @@ int archive_mxf_get_pse_failures(MXFHeaderMetadata *headerMetadata, PSEFailure *
     return archive_mxf_get_package_pse_failures(headerMetadata, fileSourcePackageSet, failures, numFailures);
 }
 
-int archive_mxf_get_vtr_errors(MXFHeaderMetadata *headerMetadata, VTRErrorAtPos **errors, long *numErrors)
+int mxf_app_get_vtr_errors(MXFHeaderMetadata *headerMetadata, VTRErrorAtPos **errors, long *numErrors)
 {
     MXFMetadataSet *materialPackageSet;
     MXFMetadataSet *fileSourcePackageSet;
@@ -865,7 +865,7 @@ int archive_mxf_get_vtr_errors(MXFHeaderMetadata *headerMetadata, VTRErrorAtPos 
     return archive_mxf_get_package_vtr_errors(headerMetadata, fileSourcePackageSet, errors, numErrors);
 }
 
-int archive_mxf_get_digibeta_dropouts(MXFHeaderMetadata *headerMetadata, DigiBetaDropout **digiBetaDropouts, long *numDigiBetaDropouts)
+int mxf_app_get_digibeta_dropouts(MXFHeaderMetadata *headerMetadata, DigiBetaDropout **digiBetaDropouts, long *numDigiBetaDropouts)
 {
     MXFMetadataSet *materialPackageSet;
     MXFMetadataSet *fileSourcePackageSet;
@@ -879,7 +879,7 @@ int archive_mxf_get_digibeta_dropouts(MXFHeaderMetadata *headerMetadata, DigiBet
     return archive_mxf_get_package_digibeta_dropouts(headerMetadata, fileSourcePackageSet, digiBetaDropouts, numDigiBetaDropouts);
 }
 
-int archive_mxf_get_timecode_breaks(MXFHeaderMetadata *headerMetadata, TimecodeBreak **timecodeBreaks, long *numTimecodeBreaks)
+int mxf_app_get_timecode_breaks(MXFHeaderMetadata *headerMetadata, TimecodeBreak **timecodeBreaks, long *numTimecodeBreaks)
 {
     MXFMetadataSet *materialPackageSet;
     MXFMetadataSet *fileSourcePackageSet;
@@ -893,7 +893,7 @@ int archive_mxf_get_timecode_breaks(MXFHeaderMetadata *headerMetadata, TimecodeB
     return archive_mxf_get_package_timecode_breaks(headerMetadata, fileSourcePackageSet, timecodeBreaks, numTimecodeBreaks);
 }
 
-int archive_mxf_read_footer_metadata(const char *filename, MXFDataModel *dataModel, MXFHeaderMetadata **headerMetadata)
+int mxf_app_read_footer_metadata(const char *filename, MXFDataModel *dataModel, MXFHeaderMetadata **headerMetadata)
 {
     MXFPageFile *mxfPageFile = NULL;
     MXFFile *mxfFile = NULL;
@@ -958,7 +958,7 @@ fail:
     return result;
 }
 
-int archive_mxf_is_metadata_only(const char *filename)
+int mxf_app_is_metadata_only(const char *filename)
 {
     MXFPageFile *mxfPageFile = NULL;
     MXFFile *mxfFile = NULL;

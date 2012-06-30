@@ -65,20 +65,20 @@ typedef struct
 
 int mxf_app_load_extensions(MXFDataModel *dataModel);
 
-int is_archive_mxf(MXFHeaderMetadata *headerMetadata);
-int archive_mxf_get_info(MXFHeaderMetadata *headerMetadata, ArchiveMXFInfo *info);
-int archive_mxf_get_pse_failures(MXFHeaderMetadata *headerMetadata, PSEFailure **failures, long *numFailures);
-int archive_mxf_get_vtr_errors(MXFHeaderMetadata *headerMetadata, VTRErrorAtPos **errors, long *numErrors);
-int archive_mxf_get_digibeta_dropouts(MXFHeaderMetadata *headerMetadata, DigiBetaDropout **digibetaDropouts,
+int mxf_app_is_app_mxf(MXFHeaderMetadata *headerMetadata);
+int mxf_app_get_info(MXFHeaderMetadata *headerMetadata, ArchiveMXFInfo *info);
+int mxf_app_get_pse_failures(MXFHeaderMetadata *headerMetadata, PSEFailure **failures, long *numFailures);
+int mxf_app_get_vtr_errors(MXFHeaderMetadata *headerMetadata, VTRErrorAtPos **errors, long *numErrors);
+int mxf_app_get_digibeta_dropouts(MXFHeaderMetadata *headerMetadata, DigiBetaDropout **digibetaDropouts,
                                       long *numDigiBetaDropouts);
-int archive_mxf_get_timecode_breaks(MXFHeaderMetadata *headerMetadata, TimecodeBreak **timecodeBreaks,
+int mxf_app_get_timecode_breaks(MXFHeaderMetadata *headerMetadata, TimecodeBreak **timecodeBreaks,
                                     long *numTimecodeBreaks);
 
 
 /* returns 1 if footer headermetadata was read, return 2 if none is present (*headerMetadata is NULL) */
-int archive_mxf_read_footer_metadata(const char *filename, MXFDataModel *dataModel, MXFHeaderMetadata **headerMetadata);
+int mxf_app_read_footer_metadata(const char *filename, MXFDataModel *dataModel, MXFHeaderMetadata **headerMetadata);
 
-int archive_mxf_is_metadata_only(const char *filename);
+int mxf_app_is_metadata_only(const char *filename);
 
 
 
