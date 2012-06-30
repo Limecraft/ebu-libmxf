@@ -42,6 +42,15 @@ extern "C"
 #endif
 
 
+typedef struct
+{
+    mxfTimestamp creationDate;
+    char filename[256];
+    InfaxData sourceInfaxData;
+    InfaxData ltoInfaxData;
+} ArchiveMXFInfo;
+
+
 #define MXF_LABEL(d0, d1, d2, d3, d4, d5, d6, d7, d8, d9, d10, d11, d12, d13, d14, d15) \
     {d0, d1, d2, d3, d4, d5, d6, d7, d8, d9, d10, d11, d12, d13, d14, d15}
 
@@ -55,6 +64,22 @@ extern "C"
 
 
 int mxf_app_load_extensions(MXFDataModel *dataModel);
+
+int is_archive_mxf(MXFHeaderMetadata *headerMetadata);
+int archive_mxf_get_info(MXFHeaderMetadata *headerMetadata, ArchiveMXFInfo *info);
+int archive_mxf_get_pse_failures(MXFHeaderMetadata *headerMetadata, PSEFailure **failures, long *numFailures);
+int archive_mxf_get_vtr_errors(MXFHeaderMetadata *headerMetadata, VTRErrorAtPos **errors, long *numErrors);
+int archive_mxf_get_digibeta_dropouts(MXFHeaderMetadata *headerMetadata, DigiBetaDropout **digibetaDropouts,
+                                      long *numDigiBetaDropouts);
+int archive_mxf_get_timecode_breaks(MXFHeaderMetadata *headerMetadata, TimecodeBreak **timecodeBreaks,
+                                    long *numTimecodeBreaks);
+
+
+/* returns 1 if footer headermetadata was read, return 2 if none is present (*headerMetadata is NULL) */
+int archive_mxf_read_footer_metadata(const char *filename, MXFDataModel *dataModel, MXFHeaderMetadata **headerMetadata);
+
+int archive_mxf_is_metadata_only(const char *filename);
+
 
 
 #ifdef __cplusplus
