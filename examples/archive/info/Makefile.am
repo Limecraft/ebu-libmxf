@@ -15,7 +15,7 @@ archive_mxf_info_SOURCES = archive_mxf_info.c
 archive_mxf_info_LDADD = libarchivemxfinfo-@LIBMXF_MAJORMINOR@.la $(LIBMXF_LDADDLIBS)
 
 
-AM_CFLAGS = $(LIBMXF_CFLAGS) "-I${top_srcdir}/examples/archive"
+AM_CFLAGS = $(LIBMXF_CFLAGS)
 
 
 

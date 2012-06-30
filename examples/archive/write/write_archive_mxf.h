@@ -39,7 +39,7 @@ extern "C"
 #endif
 
 
-#include "archive_types.h"
+#include <mxf/mxf_app_types.h>
 #include <mxf/mxf_file.h>
 
 

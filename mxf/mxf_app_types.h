@@ -29,17 +29,17 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __ARCHIVE_TYPES_H__
-#define __ARCHIVE_TYPES_H__
+#ifndef __MXF_APP_TYPES_H__
+#define __MXF_APP_TYPES_H__
+
+
+#include <mxf/mxf_types.h>
 
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
-
-
-#include <mxf/mxf_types.h>
 
 
 #define INVALID_TIMECODE_HOUR           0xff
@@ -58,10 +58,18 @@ extern "C"
 #define ACCNO_SIZE                      15
 #define CATDETAIL_SIZE                  11
 
-/* "the string sizes above" * 2 (utf16) + 2 * "timestamp size" + "duration size" + "item no size" +
-16 * ("local tag" + "local length")
-= 433 * 2 + 2 * 8 + 8 + 4 + 16 * (2 + 2)
-= 958 */
+/* External size = "the string sizes above" * 2 (utf16) +
+                   2 * "timestamp size" +
+                   "duration size" +
+                   "item no size" +
+                   16 * ("local tag" + "local length")
+                 = 433 * 2 +
+                   2 * 8 +
+                   8 +
+                   4 +
+                   16 * (2 + 2)
+                 = 958
+*/
 #define COMPLETE_INFAX_EXTERNAL_SIZE    958
 
 /* use for TimecodeBreak::timecodeType */
@@ -121,22 +129,21 @@ typedef struct
     char format[FORMAT_SIZE];
     char progTitle[PROGTITLE_SIZE];
     char epTitle[EPTITLE_SIZE];
-    mxfTimestamp txDate; /* only date part is relevant */
+    mxfTimestamp txDate;                /* only date part is relevant */
     char magPrefix[MAGPREFIX_SIZE];
     char progNo[PROGNO_SIZE];
     char prodCode[PRODCODE_SIZE];
     char spoolStatus[SPOOLSTATUS_SIZE];
-    mxfTimestamp stockDate; /* only date part is relevant */
+    mxfTimestamp stockDate;             /* only date part is relevant */
     char spoolDesc[SPOOLDESC_SIZE];
     char memo[MEMO_SIZE];
-    int64_t duration; /* number of seconds */
-    char spoolNo[SPOOLNO_SIZE]; /* max 4 character prefix followed by integer (max 10 digits) */
-                      /* used as the tape SourcePackage name and part of the MaterialPackage name */
-    char accNo[ACCNO_SIZE]; /* max 4 character prefix followed by integer (max 10 digits) */
+    int64_t duration;                   /* number of seconds */
+    char spoolNo[SPOOLNO_SIZE];         /* max 4 character prefix followed by integer (max 10 digits) */
+                                        /* used as the tape SourcePackage name and part of the MaterialPackage name */
+    char accNo[ACCNO_SIZE];             /* max 4 character prefix followed by integer (max 10 digits) */
     char catDetail[CATDETAIL_SIZE];
     uint32_t itemNo;
 } InfaxData;
-
 
 
 

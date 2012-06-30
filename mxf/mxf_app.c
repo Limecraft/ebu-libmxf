@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2007, British Broadcasting Corporation
- * All Rights Reserved.
+ * Copyright (C) 2012, British Broadcasting Corporation
+ * All rights reserved.
  *
  * Author: Philip de Nier
  *
@@ -29,49 +29,26 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __ARCHIVE_MXF_INFO_LIB_H__
-#define __ARCHIVE_MXF_INFO_LIB_H__
-
-
-#ifdef __cplusplus
-extern "C"
-{
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
-
 
 #include <mxf/mxf.h>
-#include <mxf/mxf_app_types.h>
+#include <mxf/mxf_app.h>
+#include <mxf/mxf_macros.h>
 
 
-typedef struct
+
+#define MXF_SET_DEFINITION(parentName, name, label) \
+    CHK_ORET(mxf_register_set_def(dataModel, #name, &MXF_SET_K(parentName), &MXF_SET_K(name)));
+
+#define MXF_ITEM_DEFINITION(setName, name, label, tag, typeId, isRequired) \
+    CHK_ORET(mxf_register_item_def(dataModel, #name, &MXF_SET_K(setName), &MXF_ITEM_K(setName, name), tag, typeId, isRequired));
+
+int mxf_app_load_extensions(MXFDataModel *dataModel)
 {
-    mxfTimestamp creationDate;
-    char filename[256];
-    InfaxData sourceInfaxData;
-    InfaxData ltoInfaxData;
-} ArchiveMXFInfo;
+#include <mxf/mxf_app_extensions_data_model.h>
 
-int archive_mxf_load_extensions(MXFDataModel *dataModel);
-
-int is_archive_mxf(MXFHeaderMetadata *headerMetadata);
-int archive_mxf_get_info(MXFHeaderMetadata *headerMetadata, ArchiveMXFInfo *info);
-int archive_mxf_get_pse_failures(MXFHeaderMetadata *headerMetadata, PSEFailure **failures, long *numFailures);
-int archive_mxf_get_vtr_errors(MXFHeaderMetadata *headerMetadata, VTRErrorAtPos **errors, long *numErrors);
-int archive_mxf_get_digibeta_dropouts(MXFHeaderMetadata *headerMetadata, DigiBetaDropout **digibetaDropouts, long *numDigiBetaDropouts);
-int archive_mxf_get_timecode_breaks(MXFHeaderMetadata *headerMetadata, TimecodeBreak **timecodeBreaks, long *numTimecodeBreaks);
-
-
-/* returns 1 if footer headermetadata was read, return 2 if none is present (*headerMetadata is NULL) */
-int archive_mxf_read_footer_metadata(const char *filename, MXFDataModel *dataModel, MXFHeaderMetadata **headerMetadata);
-
-int archive_mxf_is_metadata_only(const char *filename);
-
-
-#ifdef __cplusplus
+    return 1;
 }
-#endif
-
-
-
-#endif
 

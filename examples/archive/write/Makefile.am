@@ -17,7 +17,7 @@ update_archive_mxf_SOURCES = update_archive_mxf.c
 update_archive_mxf_LDADD = libwritearchivemxf-@LIBMXF_MAJORMINOR@.la $(LIBMXF_LDADDLIBS)
 
 
-AM_CFLAGS = $(LIBMXF_CFLAGS) "-I${top_srcdir}/examples/archive"
+AM_CFLAGS = $(LIBMXF_CFLAGS)
 
 
 

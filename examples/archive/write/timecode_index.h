@@ -40,7 +40,7 @@ extern "C"
 
 #include <mxf/mxf_list.h>
 #include <mxf/mxf_types.h>
-#include "archive_types.h"
+#include <mxf/mxf_app_types.h>
 
 
 typedef struct

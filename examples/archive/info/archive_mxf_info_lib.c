@@ -40,6 +40,7 @@
 #include <assert.h>
 
 #include "archive_mxf_info_lib.h"
+#include <mxf/mxf_app.h>
 #include <mxf/mxf_uu_metadata.h>
 #include <mxf/mxf_page_file.h>
 #include <mxf/mxf_avid.h>
@@ -52,37 +53,6 @@
         goto fail; \
     }
 
-
-/* declare the BBC archive extensions */
-
-#define MXF_LABEL(d0, d1, d2, d3, d4, d5, d6, d7, d8, d9, d10, d11, d12, d13, d14, d15) \
-    {d0, d1, d2, d3, d4, d5, d6, d7, d8, d9, d10, d11, d12, d13, d14, d15}
-
-#define MXF_SET_DEFINITION(parentName, name, label) \
-    static const mxfUL MXF_SET_K(name) = label;
-
-#define MXF_ITEM_DEFINITION(setName, name, label, localTag, typeId, isRequired) \
-    static const mxfUL MXF_ITEM_K(setName, name) = label;
-
-#include <bbc_archive_extensions_data_model.h>
-
-
-
-#define MXF_LABEL(d0, d1, d2, d3, d4, d5, d6, d7, d8, d9, d10, d11, d12, d13, d14, d15) \
-    {d0, d1, d2, d3, d4, d5, d6, d7, d8, d9, d10, d11, d12, d13, d14, d15}
-
-#define MXF_SET_DEFINITION(parentName, name, label) \
-    CHK_ORET(mxf_register_set_def(dataModel, #name, &MXF_SET_K(parentName), &MXF_SET_K(name)));
-
-#define MXF_ITEM_DEFINITION(setName, name, label, tag, typeId, isRequired) \
-    CHK_ORET(mxf_register_item_def(dataModel, #name, &MXF_SET_K(setName), &MXF_ITEM_K(setName, name), tag, typeId, isRequired));
-
-int archive_mxf_load_extensions(MXFDataModel *dataModel)
-{
-#include <bbc_archive_extensions_data_model.h>
-
-    return 1;
-}
 
 
 #define GET_STRING_ITEM(name, cName) \

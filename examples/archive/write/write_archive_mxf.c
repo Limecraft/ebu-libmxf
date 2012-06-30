@@ -41,24 +41,11 @@
 #include <assert.h>
 
 #include <mxf/mxf.h>
+#include <mxf/mxf_app.h>
 #include <mxf/mxf_uu_metadata.h>
 #include <mxf/mxf_macros.h>
 #include "write_archive_mxf.h"
 #include "timecode_index.h"
-
-
-/* declare the BBC Archive extensions */
-
-#define MXF_LABEL(d0, d1, d2, d3, d4, d5, d6, d7, d8, d9, d10, d11, d12, d13, d14, d15) \
-    {d0, d1, d2, d3, d4, d5, d6, d7, d8, d9, d10, d11, d12, d13, d14, d15}
-
-#define MXF_SET_DEFINITION(parentName, name, label) \
-    static const mxfUL MXF_SET_K(name) = label;
-
-#define MXF_ITEM_DEFINITION(setName, name, label, localTag, typeId, isRequired) \
-    static const mxfUL MXF_ITEM_K(setName, name) = label;
-
-#include <../bbc_archive_extensions_data_model.h>
 
 
 /* (2^16 - 8) / 16*/
@@ -256,25 +243,6 @@ static const int INFAX_DATA_STRING_SEPARATOR = '|';
 /* size of infax data set (including InstanceUID) with all fields + the minimum KLV fill + 32 (error margin) */
 static const uint64_t FIXED_INFAX_SET_ALLOCATION_SIZE =
     (16 + MIN_LLEN + 4 + 16 + COMPLETE_INFAX_EXTERNAL_SIZE + 16 + MIN_LLEN + 32);
-
-
-/* functions for loading the BBC Archive extensions */
-
-#define MXF_LABEL(d0, d1, d2, d3, d4, d5, d6, d7, d8, d9, d10, d11, d12, d13, d14, d15) \
-    {d0, d1, d2, d3, d4, d5, d6, d7, d8, d9, d10, d11, d12, d13, d14, d15}
-
-#define MXF_SET_DEFINITION(parentName, name, label) \
-    CHK_ORET(mxf_register_set_def(dataModel, #name, &MXF_SET_K(parentName), &MXF_SET_K(name)));
-
-#define MXF_ITEM_DEFINITION(setName, name, label, tag, typeId, isRequired) \
-    CHK_ORET(mxf_register_item_def(dataModel, #name, &MXF_SET_K(setName), &MXF_ITEM_K(setName, name), tag, typeId, isRequired));
-
-static int load_bbc_archive_extensions(MXFDataModel *dataModel)
-{
-#include <../bbc_archive_extensions_data_model.h>
-
-    return 1;
-}
 
 
 
@@ -797,7 +765,7 @@ int prepare_archive_mxf_file_2(MXFFile **mxfFile, const char *filename, const mx
 
     /* load the baseline data model and BBC extensions */
     CHK_OFAIL(mxf_load_data_model(&newOutput->dataModel));
-    CHK_OFAIL(load_bbc_archive_extensions(newOutput->dataModel));
+    CHK_OFAIL(mxf_app_load_extensions(newOutput->dataModel));
     CHK_OFAIL(mxf_finalise_data_model(newOutput->dataModel));
 
 
@@ -2081,7 +2049,7 @@ static int update_header_metadata(MXFFile *mxfFile, uint64_t headerByteCount, co
     /* load the data model */
 
     CHK_OFAIL(mxf_load_data_model(&dataModel));
-    CHK_OFAIL(load_bbc_archive_extensions(dataModel));
+    CHK_OFAIL(mxf_app_load_extensions(dataModel));
     CHK_OFAIL(mxf_finalise_data_model(dataModel));
 
 

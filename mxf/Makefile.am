@@ -1,6 +1,7 @@
 lib_LTLIBRARIES = libMXF-@LIBMXF_MAJORMINOR@.la
 
 libMXF_@LIBMXF_MAJORMINOR@_la_SOURCES = \
+	mxf_app.c \
 	mxf_avid.c \
 	mxf_avid_dictionary.c \
 	mxf_avid_dictionary_data.h \
@@ -36,6 +37,9 @@ libMXF_@LIBMXF_MAJORMINOR@_la_LIBADD = $(LIBMXF_LIBADDLIBS)
 library_includedir = $(includedir)/libMXF-@LIBMXF_MAJORMINOR@/mxf
 library_include_HEADERS = \
 	mxf.h \
+	mxf_app.h \
+	mxf_app_extensions_data_model.h \
+	mxf_app_types.h \
 	mxf_avid.h \
 	mxf_avid_dictionary.h \
 	mxf_avid_extensions_data_model.h \

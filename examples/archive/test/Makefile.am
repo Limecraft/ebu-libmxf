@@ -29,7 +29,7 @@ TESTS = test_timecode_index \
 endif
 
 
-AM_CFLAGS = $(LIBMXF_CFLAGS) "-I${top_srcdir}/examples/archive" "-I${top_srcdir}/examples/archive/write"
+AM_CFLAGS = $(LIBMXF_CFLAGS) "-I${top_srcdir}/examples/archive/write"
 
 
 if ENABLE_ARCHIVE
