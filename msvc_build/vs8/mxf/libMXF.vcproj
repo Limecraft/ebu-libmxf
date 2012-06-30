@@ -157,6 +157,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\..\..\mxf\mxf_app.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\mxf\mxf_avid.c"
 				>
 			</File>
@@ -256,6 +260,18 @@
 			</File>
 			<File
 				RelativePath="..\..\..\mxf\mxf.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\mxf\mxf_app.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\mxf\mxf_app_extensions_data_model.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\mxf\mxf_app_types.h"
 				>
 			</File>
 			<File

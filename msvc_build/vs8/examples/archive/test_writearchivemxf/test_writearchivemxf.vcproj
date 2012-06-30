@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\..\..;..\..\..;..\..\..\..\..\examples\archive;..\..\..\..\..\examples\archive\write"
+				AdditionalIncludeDirectories="..\..\..\..\..;..\..\..;..\..\..\..\..\examples\archive\write"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="true"
 				ExceptionHandling="0"
@@ -123,7 +123,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\..\..\..;..\..\..;..\..\..\..\..\examples\archive;..\..\..\..\..\examples\archive\write"
+				AdditionalIncludeDirectories="..\..\..\..\..;..\..\..;..\..\..\..\..\examples\archive\write"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"

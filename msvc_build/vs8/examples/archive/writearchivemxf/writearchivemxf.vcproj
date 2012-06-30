@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\..\..;..\..\..;..\..\..\..\..\examples\archive;..\..\..\..\..\examples\archive\write"
+				AdditionalIncludeDirectories="..\..\..\..\..;..\..\..;..\..\..\..\..\examples\archive\write"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="true"
 				ExceptionHandling="0"
@@ -107,7 +107,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\..\..\..;..\..\..;..\..\..\..\..\examples\archive;..\..\..\..\..\examples\archive\write"
+				AdditionalIncludeDirectories="..\..\..\..\..;..\..\..;..\..\..\..\..\examples\archive\write"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -169,14 +169,6 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath="..\..\..\..\..\examples\archive\archive_types.h"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\..\..\examples\archive\bbc_archive_extensions_data_model.h"
-				>
-			</File>
 			<File
 				RelativePath="..\..\..\..\..\examples\archive\write\timecode_index.h"
 				>
