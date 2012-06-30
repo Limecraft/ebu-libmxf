@@ -50,6 +50,10 @@ typedef struct
     int haveSourceInfaxData;
     InfaxData ltoInfaxData;
     int haveLTOInfaxData;
+    uint32_t vtrErrorCount;
+    uint32_t pseFailureCount;
+    uint32_t digibetaDropoutCount;
+    uint32_t timecodeBreakCount;
 } ArchiveMXFInfo;
 
 

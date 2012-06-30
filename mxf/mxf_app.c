@@ -729,8 +729,22 @@ int mxf_app_get_info(MXFHeaderMetadata *headerMetadata, ArchiveMXFInfo *info)
     MXFMetadataSet *descriptorSet;
     MXFMetadataSet *locatorSet;
     MXFMetadataSet *materialPackageSet;
+    MXFMetadataSet *prefaceSet;
 
     memset(info, 0, sizeof(*info));
+
+
+    /* read event counts in Preface */
+    CHK_ORET(mxf_find_singular_set_by_key(headerMetadata, &MXF_SET_K(Preface), &prefaceSet));
+
+#define GET_EVENT_COUNT(name, var)                                                              \
+    if (mxf_have_item(prefaceSet, &MXF_ITEM_K(Preface, name)))                                  \
+        CHK_ORET(mxf_get_uint32_item(prefaceSet, &MXF_ITEM_K(Preface, name), &var));
+
+    GET_EVENT_COUNT(APP_VTRErrorCount,        info->vtrErrorCount)
+    GET_EVENT_COUNT(APP_PSEFailureCount,      info->pseFailureCount)
+    GET_EVENT_COUNT(APP_DigiBetaDropoutCount, info->digibetaDropoutCount)
+    GET_EVENT_COUNT(APP_TimecodeBreakCount,   info->timecodeBreakCount)
 
 
     /* if metadata only then only try reading infax user comments */
