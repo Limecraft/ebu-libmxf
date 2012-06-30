@@ -730,6 +730,8 @@ int mxf_app_get_info(MXFHeaderMetadata *headerMetadata, ArchiveMXFInfo *info)
     MXFMetadataSet *locatorSet;
     MXFMetadataSet *materialPackageSet;
 
+    memset(info, 0, sizeof(*info));
+
 
     /* if metadata only then only try reading infax user comments */
 
