@@ -721,13 +721,11 @@ int mxf_app_get_info(MXFHeaderMetadata *headerMetadata, ArchiveMXFInfo *info)
     uint8_t *arrayElement;
     uint32_t arrayElementLen;
     mxfUTF16Char *tempWString = NULL;
-    int haveSourceInfaxData = 0;
     MXFList *nameList = NULL;
     MXFList *valueList = NULL;
     MXFMetadataSet *identSet;
     MXFMetadataSet *fileSourcePackageSet;
     MXFMetadataSet *sourcePackageSet;
-
     MXFMetadataSet *descriptorSet;
     MXFMetadataSet *locatorSet;
     MXFMetadataSet *materialPackageSet;
@@ -739,7 +737,7 @@ int mxf_app_get_info(MXFHeaderMetadata *headerMetadata, ArchiveMXFInfo *info)
     {
         if (mxf_avid_read_string_user_comments(materialPackageSet, &nameList, &valueList))
         {
-            haveSourceInfaxData = parse_infax_user_comments(nameList, valueList, &info->sourceInfaxData);
+            info->haveSourceInfaxData = parse_infax_user_comments(nameList, valueList, &info->sourceInfaxData);
 
             mxf_free_list(&nameList);
             mxf_free_list(&valueList);
@@ -764,7 +762,8 @@ int mxf_app_get_info(MXFHeaderMetadata *headerMetadata, ArchiveMXFInfo *info)
     /* LTO Infax data */
 
     CHK_OFAIL(mxf_uu_get_top_file_package(headerMetadata, &fileSourcePackageSet));
-    archive_mxf_get_package_infax_data(headerMetadata, fileSourcePackageSet, &info->ltoInfaxData);
+    info->haveLTOInfaxData = archive_mxf_get_package_infax_data(headerMetadata, fileSourcePackageSet,
+                                                                &info->ltoInfaxData);
 
 
     /* original filename */
@@ -801,27 +800,27 @@ int mxf_app_get_info(MXFHeaderMetadata *headerMetadata, ArchiveMXFInfo *info)
         CHK_OFAIL(mxf_get_strongref_item(sourcePackageSet, &MXF_ITEM_K(SourcePackage, Descriptor), &descriptorSet));
         if (mxf_is_subclass_of(headerMetadata->dataModel, &descriptorSet->key, &MXF_SET_K(TapeDescriptor)))
         {
-            haveSourceInfaxData = archive_mxf_get_package_infax_data(headerMetadata, sourcePackageSet,
-                                                                     &info->sourceInfaxData);
+            info->haveSourceInfaxData = archive_mxf_get_package_infax_data(headerMetadata, sourcePackageSet,
+                                                                           &info->sourceInfaxData);
             break;
         }
     }
     mxf_free_list(&list);
 
     /* try alternative locations for source Infax data */
-    if (!haveSourceInfaxData)
+    if (!info->haveSourceInfaxData)
     {
         /* framework in the material package */
         CHK_OFAIL(mxf_find_singular_set_by_key(headerMetadata, &MXF_SET_K(MaterialPackage), &materialPackageSet));
-        haveSourceInfaxData = archive_mxf_get_package_infax_data(headerMetadata, materialPackageSet,
-                                                                 &info->sourceInfaxData);
+        info->haveSourceInfaxData = archive_mxf_get_package_infax_data(headerMetadata, materialPackageSet,
+                                                                       &info->sourceInfaxData);
 
         /* UserComments in the MaterialPackage */
-        if (!haveSourceInfaxData)
+        if (!info->haveSourceInfaxData)
         {
             if (mxf_avid_read_string_user_comments(materialPackageSet, &nameList, &valueList))
             {
-                haveSourceInfaxData = parse_infax_user_comments(nameList, valueList, &info->sourceInfaxData);
+                info->haveSourceInfaxData = parse_infax_user_comments(nameList, valueList, &info->sourceInfaxData);
 
                 mxf_free_list(&nameList);
                 mxf_free_list(&valueList);
@@ -830,7 +829,7 @@ int mxf_app_get_info(MXFHeaderMetadata *headerMetadata, ArchiveMXFInfo *info)
     }
 
 
-    return haveSourceInfaxData;
+    return info->haveSourceInfaxData;
 
 fail:
     SAFE_FREE(tempWString);

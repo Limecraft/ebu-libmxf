@@ -47,7 +47,9 @@ typedef struct
     mxfTimestamp creationDate;
     char filename[256];
     InfaxData sourceInfaxData;
+    int haveSourceInfaxData;
     InfaxData ltoInfaxData;
+    int haveLTOInfaxData;
 } ArchiveMXFInfo;
 
 
