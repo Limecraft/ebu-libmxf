@@ -167,7 +167,7 @@ int mxf_get_strongref(MXFHeaderMetadata *headerMetadata, const uint8_t *value, M
 int mxf_get_weakref(MXFHeaderMetadata *headerMetadata, const uint8_t *value, MXFMetadataSet **set);
 int mxf_dereference(MXFHeaderMetadata *headerMetadata, const mxfUUID *uuid, MXFMetadataSet **set);
 
-void initialise_sets_iter(MXFHeaderMetadata *headerMetadata, MXFListIterator *setsIter);
+void mxf_initialise_sets_iter(MXFHeaderMetadata *headerMetadata, MXFListIterator *setsIter);
 int mxf_get_strongref_s(MXFHeaderMetadata *headerMetadata, MXFListIterator *setsIter, const uint8_t *value,
                         MXFMetadataSet **set);
 int mxf_get_weakref_s(MXFHeaderMetadata *headerMetadata, MXFListIterator *setsIter, const uint8_t *value,

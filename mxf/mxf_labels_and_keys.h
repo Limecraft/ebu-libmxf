@@ -87,9 +87,9 @@ static const mxfUL MXF_OP_L(1b, MultiTrack_Stream_Internal)     = MXF_1B_OP_L(0x
 static const mxfUL MXF_OP_L(1b, MultiTrack_NonStream_External)  = MXF_1B_OP_L(0x0f);
 
 
-int is_op_atom(const mxfUL *label);
-int is_op_1a(const mxfUL *label);
-int is_op_1b(const mxfUL *label);
+int mxf_is_op_atom(const mxfUL *label);
+int mxf_is_op_1a(const mxfUL *label);
+int mxf_is_op_1b(const mxfUL *label);
 
 
 

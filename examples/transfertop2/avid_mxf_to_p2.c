@@ -310,7 +310,7 @@ static int preprocess_avid_input(AvidMXFToP2Transfer *transfer, int inputFileInd
 
     /* check the operational pattern is OP Atom */
 
-    if (!is_op_atom(&input->headerPartition->operationalPattern) &&
+    if (!mxf_is_op_atom(&input->headerPartition->operationalPattern) &&
         !is_invalid_aafsdk_op_atom_label(&input->headerPartition->operationalPattern))
     {
         mxf_log_error("Input file is not OP Atom" LOG_LOC_FORMAT, LOG_LOC_PARAMS);

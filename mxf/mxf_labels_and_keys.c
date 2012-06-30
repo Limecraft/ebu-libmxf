@@ -47,21 +47,21 @@ mxfKey g_KLVFill_key = /* g_LegacyKLVFill_key */
 
 
 
-int is_op_atom(const mxfUL *label)
+int mxf_is_op_atom(const mxfUL *label)
 {
     static const mxfUL opAtomPrefix = MXF_ATOM_OP_L(0);
 
     return memcmp(label, &opAtomPrefix, 13) == 0;
 }
 
-int is_op_1a(const mxfUL *label)
+int mxf_is_op_1a(const mxfUL *label)
 {
     static const mxfUL op1APrefix = MXF_1A_OP_L(0);
 
     return memcmp(label, &op1APrefix, 13) == 0;
 }
 
-int is_op_1b(const mxfUL *label)
+int mxf_is_op_1b(const mxfUL *label)
 {
     static const mxfUL op1BPrefix = MXF_1B_OP_L(0);
 

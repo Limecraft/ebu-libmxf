@@ -360,7 +360,7 @@ static int archive_mxf_get_package_pse_failures(MXFHeaderMetadata *headerMetadat
                         newFailures = tmp;
 
                         /* extract the PSE failures */
-                        initialise_sets_iter(headerMetadata, &setsIter);
+                        mxf_initialise_sets_iter(headerMetadata, &setsIter);
                         i = 0;
                         mxf_initialise_array_item_iterator(sequenceSet, &MXF_ITEM_K(Sequence, StructuralComponents), &arrayIter2);
                         while (mxf_next_array_item_element(&arrayIter2, &arrayElement, &arrayElementLen))
@@ -460,7 +460,7 @@ static int archive_mxf_get_package_vtr_errors(MXFHeaderMetadata *headerMetadata,
                         newErrors = tmp;
 
                         /* extract the VTR errors */
-                        initialise_sets_iter(headerMetadata, &setsIter);
+                        mxf_initialise_sets_iter(headerMetadata, &setsIter);
                         mxf_initialise_array_item_iterator(sequenceSet, &MXF_ITEM_K(Sequence, StructuralComponents), &arrayIter2);
                         while (mxf_next_array_item_element(&arrayIter2, &arrayElement, &arrayElementLen))
                         {
@@ -556,7 +556,7 @@ static int archive_mxf_get_package_digibeta_dropouts(MXFHeaderMetadata *headerMe
                         newDigiBetaDropouts = tmp;
 
                         /* extract the digibeta dropouts */
-                        initialise_sets_iter(headerMetadata, &setsIter);
+                        mxf_initialise_sets_iter(headerMetadata, &setsIter);
                         mxf_initialise_array_item_iterator(sequenceSet, &MXF_ITEM_K(Sequence, StructuralComponents), &arrayIter2);
                         while (mxf_next_array_item_element(&arrayIter2, &arrayElement, &arrayElementLen))
                         {
@@ -652,7 +652,7 @@ static int archive_mxf_get_package_timecode_breaks(MXFHeaderMetadata *headerMeta
                         newTimecodeBreaks = tmp;
 
                         /* extract the digibeta dropouts */
-                        initialise_sets_iter(headerMetadata, &setsIter);
+                        mxf_initialise_sets_iter(headerMetadata, &setsIter);
                         mxf_initialise_array_item_iterator(sequenceSet, &MXF_ITEM_K(Sequence, StructuralComponents), &arrayIter2);
                         while (mxf_next_array_item_element(&arrayIter2, &arrayElement, &arrayElementLen))
                         {
@@ -695,7 +695,7 @@ int is_archive_mxf(MXFHeaderMetadata *headerMetadata)
 
     /* check is OP-1A */
     CHK_OFAIL(mxf_get_ul_item(prefaceSet, &MXF_ITEM_K(Preface, OperationalPattern), &ul));
-    if (!is_op_1a(&ul))
+    if (!mxf_is_op_1a(&ul))
     {
         return 0;
     }

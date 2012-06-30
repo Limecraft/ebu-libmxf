@@ -403,7 +403,7 @@ int test_read(const char *filename)
 
 
     /* test using the speedy dereferencing */
-    initialise_sets_iter(headerMetadata, &setsIter);
+    mxf_initialise_sets_iter(headerMetadata, &setsIter);
     CHK_OFAIL(mxf_dereference_s(headerMetadata, &setsIter, &prefaceSet->instanceUID, &prefaceSet));
     CHK_OFAIL(mxf_dereference_s(headerMetadata, &setsIter, &prefaceSet->instanceUID, &prefaceSet));
     CHK_OFAIL(mxf_next_list_iter_element(&setsIter)); /* move it past the Preface */

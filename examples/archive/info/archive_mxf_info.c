@@ -680,7 +680,7 @@ static int get_info(Reader *reader, int showPSEFailures, int showVTRErrors, int 
 
 
     /* check the operational pattern is OP 1A */
-    if (!is_op_1a(&reader->headerPartition->operationalPattern))
+    if (!mxf_is_op_1a(&reader->headerPartition->operationalPattern))
     {
         mxf_log_error("Input file is not OP 1A" LOG_LOC_FORMAT, LOG_LOC_PARAMS);
         return 0;
@@ -937,7 +937,7 @@ static int get_info(Reader *reader, int showPSEFailures, int showVTRErrors, int 
                                 knownDMTrack = 1;
                                 if (showPSEFailures)
                                 {
-                                    initialise_sets_iter(reader->headerMetadata, &setsIter);
+                                    mxf_initialise_sets_iter(reader->headerMetadata, &setsIter);
 
                                     mxf_initialise_array_item_iterator(reader->sequenceSet, &MXF_ITEM_K(Sequence, StructuralComponents), &arrayIter2);
                                     while (mxf_next_array_item_element(&arrayIter2, &arrayElement, &arrayElementLen))
@@ -959,7 +959,7 @@ static int get_info(Reader *reader, int showPSEFailures, int showVTRErrors, int 
                                 knownDMTrack = 1;
                                 if (showVTRErrors)
                                 {
-                                    initialise_sets_iter(reader->headerMetadata, &setsIter);
+                                    mxf_initialise_sets_iter(reader->headerMetadata, &setsIter);
 
                                     mxf_initialise_array_item_iterator(reader->sequenceSet, &MXF_ITEM_K(Sequence, StructuralComponents), &arrayIter2);
                                     while (mxf_next_array_item_element(&arrayIter2, &arrayElement, &arrayElementLen))
@@ -978,7 +978,7 @@ static int get_info(Reader *reader, int showPSEFailures, int showVTRErrors, int 
                                 knownDMTrack = 1;
                                 if (showDigiBetaDropouts)
                                 {
-                                    initialise_sets_iter(reader->headerMetadata, &setsIter);
+                                    mxf_initialise_sets_iter(reader->headerMetadata, &setsIter);
 
                                     mxf_initialise_array_item_iterator(reader->sequenceSet, &MXF_ITEM_K(Sequence, StructuralComponents), &arrayIter2);
                                     while (mxf_next_array_item_element(&arrayIter2, &arrayElement, &arrayElementLen))
@@ -997,7 +997,7 @@ static int get_info(Reader *reader, int showPSEFailures, int showVTRErrors, int 
                                 knownDMTrack = 1;
                                 if (showTimecodeBreaks)
                                 {
-                                    initialise_sets_iter(reader->headerMetadata, &setsIter);
+                                    mxf_initialise_sets_iter(reader->headerMetadata, &setsIter);
 
                                     mxf_initialise_array_item_iterator(reader->sequenceSet, &MXF_ITEM_K(Sequence, StructuralComponents), &arrayIter2);
                                     while (mxf_next_array_item_element(&arrayIter2, &arrayElement, &arrayElementLen))

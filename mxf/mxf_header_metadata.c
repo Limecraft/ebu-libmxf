@@ -1307,7 +1307,7 @@ int mxf_dereference(MXFHeaderMetadata *headerMetadata, const mxfUUID *uuid, MXFM
 }
 
 
-void initialise_sets_iter(MXFHeaderMetadata *headerMetadata, MXFListIterator *setsIter)
+void mxf_initialise_sets_iter(MXFHeaderMetadata *headerMetadata, MXFListIterator *setsIter)
 {
     mxf_initialise_list_iter(setsIter, &headerMetadata->sets);
 }
@@ -1361,7 +1361,7 @@ int mxf_dereference_s(MXFHeaderMetadata *headerMetadata, MXFListIterator *setsIt
     }
 
     /* go back to beginning and try find it before the previous position in the list */
-    initialise_sets_iter(headerMetadata, setsIter);
+    mxf_initialise_sets_iter(headerMetadata, setsIter);
     while (mxf_next_list_iter_element(setsIter) && mxf_get_list_iter_index(setsIter) < startIndex)
     {
         setInList = (MXFMetadataSet*)mxf_get_iter_element(setsIter);

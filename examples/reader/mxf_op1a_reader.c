@@ -1007,7 +1007,7 @@ int op1a_is_supported(MXFPartition *headerPartition)
     mxfUL *label;
     int supportCount = 0;
 
-    if (!is_op_1a(&headerPartition->operationalPattern))
+    if (!mxf_is_op_1a(&headerPartition->operationalPattern))
     {
         return 0;
     }

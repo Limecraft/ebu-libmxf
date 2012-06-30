@@ -790,9 +790,9 @@ int opa_is_supported(MXFPartition *headerPartition)
     }
     label = (mxfUL*)mxf_get_list_element(&headerPartition->essenceContainers, 0);
 
-    if (!is_op_atom(&headerPartition->operationalPattern))
+    if (!mxf_is_op_atom(&headerPartition->operationalPattern))
     {
-        if (is_op_1a(&headerPartition->operationalPattern) &&
+        if (mxf_is_op_1a(&headerPartition->operationalPattern) &&
                 (mxf_equals_ul(label, &MXF_EC_L(BWFClipWrapped)) ||
                     mxf_equals_ul(label, &MXF_EC_L(AES3ClipWrapped))))
         {

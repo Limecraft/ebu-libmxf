@@ -827,7 +827,7 @@ int ami_read_info(const char *filename, AvidMXFInfo *info, int printDebugError)
 
     /* check is OP-Atom */
 
-    CHECK(is_op_atom(&headerPartition->operationalPattern), -4);
+    CHECK(mxf_is_op_atom(&headerPartition->operationalPattern), -4);
 
 
     /* read the header metadata (filter out meta-dictionary and dictionary except data defs) */
