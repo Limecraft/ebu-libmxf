@@ -505,13 +505,8 @@ fail:
 
 
 
-#if defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(disable:4706)
-#endif
-
 #define MXF_COMPOUND_TYPE_DEF(id, name) \
-    CHK_ORET(itemType = mxf_register_compound_type(dataModel, name, id));
+    CHK_ORET((itemType = mxf_register_compound_type(dataModel, name, id)) != NULL);
 
 #define MXF_COMPOUND_TYPE_MEMBER(name, typeId) \
     CHK_ORET(mxf_register_compound_type_member(itemType, name, typeId));
@@ -530,11 +525,6 @@ int mxf_avid_load_extensions(MXFDataModel *dataModel)
 
     return 1;
 }
-
-#if defined(_MSC_VER)
-#pragma warning(pop)
-#endif
-
 
 int mxf_avid_read_filtered_header_metadata(MXFFile *mxfFile, int skipDataDefs, MXFHeaderMetadata *headerMetadata,
                                            uint64_t headerByteCount, const mxfKey *key, uint8_t llen, uint64_t len)

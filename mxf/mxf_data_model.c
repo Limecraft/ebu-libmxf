@@ -266,12 +266,6 @@ static int clone_item_def(MXFDataModel *fromDataModel, MXFItemDef *fromItemDef,
 
 
 
-#if defined(_MSC_VER)
-#pragma warning(push)
-#pragma warning(disable:4706)
-#endif
-
-
 #define MXF_BASIC_TYPE_DEF(id, name, size) \
     CHK_OFAIL(mxf_register_basic_type(newDataModel, name, id, size));
 
@@ -279,7 +273,7 @@ static int clone_item_def(MXFDataModel *fromDataModel, MXFItemDef *fromItemDef,
     CHK_OFAIL(mxf_register_array_type(newDataModel, name, id, elementTypeId, fixedSize));
 
 #define MXF_COMPOUND_TYPE_DEF(id, name) \
-    CHK_OFAIL(itemType = mxf_register_compound_type(newDataModel, name, id));
+    CHK_OFAIL((itemType = mxf_register_compound_type(newDataModel, name, id)) != NULL);
 
 #define MXF_COMPOUND_TYPE_MEMBER(name, typeId) \
     CHK_OFAIL(mxf_register_compound_type_member(itemType, name, typeId));
