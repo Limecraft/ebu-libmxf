@@ -264,7 +264,7 @@ static int archive_mxf_get_package_infax_data(MXFHeaderMetadata *headerMetadata,
 }
 
 static int archive_mxf_get_package_pse_failures(MXFHeaderMetadata *headerMetadata, MXFMetadataSet *packageSet,
-                                                PSEFailure **failures, long *numFailures)
+                                                PSEFailure **failures, size_t *numFailures)
 {
     MXFArrayItemIterator arrayIter;
     MXFArrayItemIterator arrayIter2;
@@ -278,7 +278,7 @@ static int archive_mxf_get_package_pse_failures(MXFHeaderMetadata *headerMetadat
     MXFMetadataSet *dmFrameworkSet;
     MXFListIterator setsIter;
     PSEFailure *newFailures = NULL;
-    long countedPSEFailures = 0;
+    size_t countedPSEFailures = 0;
     PSEFailure *tmp;
     int32_t i;
 
@@ -366,7 +366,7 @@ fail:
 }
 
 static int archive_mxf_get_package_vtr_errors(MXFHeaderMetadata *headerMetadata, MXFMetadataSet *packageSet,
-                                              VTRErrorAtPos **errors, long *numErrors)
+                                              VTRErrorAtPos **errors, size_t *numErrors)
 {
     MXFArrayItemIterator arrayIter;
     MXFArrayItemIterator arrayIter2;
@@ -380,7 +380,7 @@ static int archive_mxf_get_package_vtr_errors(MXFHeaderMetadata *headerMetadata,
     MXFMetadataSet *dmFrameworkSet;
     MXFListIterator setsIter;
     VTRErrorAtPos *newErrors = NULL;
-    long totalErrors = 0;
+    size_t totalErrors = 0;
     VTRErrorAtPos *tmp;
 
 
@@ -462,7 +462,7 @@ fail:
 }
 
 static int archive_mxf_get_package_digibeta_dropouts(MXFHeaderMetadata *headerMetadata, MXFMetadataSet *packageSet,
-                                                     DigiBetaDropout **digiBetaDropouts, long *numDigiBetaDropouts)
+                                                     DigiBetaDropout **digiBetaDropouts, size_t *numDigiBetaDropouts)
 {
     MXFArrayItemIterator arrayIter;
     MXFArrayItemIterator arrayIter2;
@@ -476,7 +476,7 @@ static int archive_mxf_get_package_digibeta_dropouts(MXFHeaderMetadata *headerMe
     MXFMetadataSet *dmFrameworkSet;
     MXFListIterator setsIter;
     DigiBetaDropout *newDigiBetaDropouts = NULL;
-    long totalDropouts = 0;
+    size_t totalDropouts = 0;
     DigiBetaDropout *tmp;
 
 
@@ -558,7 +558,7 @@ fail:
 }
 
 static int archive_mxf_get_package_timecode_breaks(MXFHeaderMetadata *headerMetadata, MXFMetadataSet *packageSet,
-                                                   TimecodeBreak **timecodeBreaks, long *numTimecodeBreaks)
+                                                   TimecodeBreak **timecodeBreaks, size_t *numTimecodeBreaks)
 {
     MXFArrayItemIterator arrayIter;
     MXFArrayItemIterator arrayIter2;
@@ -572,7 +572,7 @@ static int archive_mxf_get_package_timecode_breaks(MXFHeaderMetadata *headerMeta
     MXFMetadataSet *dmFrameworkSet;
     MXFListIterator setsIter;
     TimecodeBreak *newTimecodeBreaks = NULL;
-    long totalBreaks = 0;
+    size_t totalBreaks = 0;
     TimecodeBreak *tmp;
 
 
@@ -841,7 +841,7 @@ fail:
     return 0;
 }
 
-int mxf_app_get_pse_failures(MXFHeaderMetadata *headerMetadata, PSEFailure **failures, long *numFailures)
+int mxf_app_get_pse_failures(MXFHeaderMetadata *headerMetadata, PSEFailure **failures, size_t *numFailures)
 {
     MXFMetadataSet *materialPackageSet;
     MXFMetadataSet *fileSourcePackageSet;
@@ -855,7 +855,7 @@ int mxf_app_get_pse_failures(MXFHeaderMetadata *headerMetadata, PSEFailure **fai
     return archive_mxf_get_package_pse_failures(headerMetadata, fileSourcePackageSet, failures, numFailures);
 }
 
-int mxf_app_get_vtr_errors(MXFHeaderMetadata *headerMetadata, VTRErrorAtPos **errors, long *numErrors)
+int mxf_app_get_vtr_errors(MXFHeaderMetadata *headerMetadata, VTRErrorAtPos **errors, size_t *numErrors)
 {
     MXFMetadataSet *materialPackageSet;
     MXFMetadataSet *fileSourcePackageSet;
@@ -869,7 +869,7 @@ int mxf_app_get_vtr_errors(MXFHeaderMetadata *headerMetadata, VTRErrorAtPos **er
     return archive_mxf_get_package_vtr_errors(headerMetadata, fileSourcePackageSet, errors, numErrors);
 }
 
-int mxf_app_get_digibeta_dropouts(MXFHeaderMetadata *headerMetadata, DigiBetaDropout **digiBetaDropouts, long *numDigiBetaDropouts)
+int mxf_app_get_digibeta_dropouts(MXFHeaderMetadata *headerMetadata, DigiBetaDropout **digiBetaDropouts, size_t *numDigiBetaDropouts)
 {
     MXFMetadataSet *materialPackageSet;
     MXFMetadataSet *fileSourcePackageSet;
@@ -883,7 +883,7 @@ int mxf_app_get_digibeta_dropouts(MXFHeaderMetadata *headerMetadata, DigiBetaDro
     return archive_mxf_get_package_digibeta_dropouts(headerMetadata, fileSourcePackageSet, digiBetaDropouts, numDigiBetaDropouts);
 }
 
-int mxf_app_get_timecode_breaks(MXFHeaderMetadata *headerMetadata, TimecodeBreak **timecodeBreaks, long *numTimecodeBreaks)
+int mxf_app_get_timecode_breaks(MXFHeaderMetadata *headerMetadata, TimecodeBreak **timecodeBreaks, size_t *numTimecodeBreaks)
 {
     MXFMetadataSet *materialPackageSet;
     MXFMetadataSet *fileSourcePackageSet;
