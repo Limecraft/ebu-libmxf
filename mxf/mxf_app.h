@@ -70,9 +70,9 @@ int mxf_app_get_info(MXFHeaderMetadata *headerMetadata, ArchiveMXFInfo *info);
 int mxf_app_get_pse_failures(MXFHeaderMetadata *headerMetadata, PSEFailure **failures, long *numFailures);
 int mxf_app_get_vtr_errors(MXFHeaderMetadata *headerMetadata, VTRErrorAtPos **errors, long *numErrors);
 int mxf_app_get_digibeta_dropouts(MXFHeaderMetadata *headerMetadata, DigiBetaDropout **digibetaDropouts,
-                                      long *numDigiBetaDropouts);
+                                  long *numDigiBetaDropouts);
 int mxf_app_get_timecode_breaks(MXFHeaderMetadata *headerMetadata, TimecodeBreak **timecodeBreaks,
-                                    long *numTimecodeBreaks);
+                                long *numTimecodeBreaks);
 
 
 /* returns 1 if footer headermetadata was read, return 2 if none is present (*headerMetadata is NULL) */

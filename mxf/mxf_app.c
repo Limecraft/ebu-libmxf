@@ -45,47 +45,50 @@
 #include <mxf/mxf_macros.h>
 
 
-#define CHK_OFAIL_NOMSG(cmd) \
-    if (!(cmd)) \
-    { \
-        goto fail; \
-    }
+#define CHK_OFAIL_NOMSG(cmd)    \
+    do {                        \
+        if (!(cmd)) {           \
+            goto fail;          \
+        }                       \
+    } while (0)
 
 
-#define GET_STRING_ITEM(name, cName) \
-    if (mxf_have_item(dmFrameworkSet, &MXF_ITEM_K(APP_InfaxFramework, name))) \
-    { \
-        CHK_OFAIL(mxf_uu_get_utf16string_item(dmFrameworkSet, &MXF_ITEM_K(APP_InfaxFramework, name), &tempWString)); \
-        CHK_OFAIL(mxf_utf16_to_utf8(infaxData->cName, tempWString, sizeof(infaxData->cName)) != (size_t)(-1)); \
-        infaxData->cName[sizeof(infaxData->cName) - 1] = '\0'; \
-        SAFE_FREE(tempWString); \
-    }
-
-#define GET_DATE_ITEM(name, cName) \
-    if (mxf_have_item(dmFrameworkSet, &MXF_ITEM_K(APP_InfaxFramework, name))) \
-    { \
-        CHK_OFAIL(mxf_get_timestamp_item(dmFrameworkSet, &MXF_ITEM_K(APP_InfaxFramework, name), &infaxData->cName)); \
-        infaxData->cName.hour = 0; \
-        infaxData->cName.min = 0; \
-        infaxData->cName.sec = 0; \
-        infaxData->cName.qmsec = 0; \
-    }
-
-#define GET_INT64_ITEM(name, cName) \
-    if (mxf_have_item(dmFrameworkSet, &MXF_ITEM_K(APP_InfaxFramework, name))) \
-    { \
-        CHK_OFAIL(mxf_get_int64_item(dmFrameworkSet, &MXF_ITEM_K(APP_InfaxFramework, name), &infaxData->cName)); \
-    }
-
-#define GET_UINT32_ITEM(name, cName) \
-    if (mxf_have_item(dmFrameworkSet, &MXF_ITEM_K(APP_InfaxFramework, name))) \
-    { \
-        CHK_OFAIL(mxf_get_uint32_item(dmFrameworkSet, &MXF_ITEM_K(APP_InfaxFramework, name), &infaxData->cName)); \
-    }
 
 static int get_infax_data(MXFMetadataSet *dmFrameworkSet, InfaxData *infaxData)
 {
     mxfUTF16Char *tempWString = NULL;
+
+#define GET_STRING_ITEM(name, cName)                                                                                    \
+    if (mxf_have_item(dmFrameworkSet, &MXF_ITEM_K(APP_InfaxFramework, name)))                                           \
+    {                                                                                                                   \
+        CHK_OFAIL(mxf_uu_get_utf16string_item(dmFrameworkSet, &MXF_ITEM_K(APP_InfaxFramework, name), &tempWString));    \
+        CHK_OFAIL(mxf_utf16_to_utf8(infaxData->cName, tempWString, sizeof(infaxData->cName)) != (size_t)(-1));          \
+        infaxData->cName[sizeof(infaxData->cName) - 1] = '\0';                                                          \
+        SAFE_FREE(tempWString);                                                                                         \
+    }
+
+#define GET_DATE_ITEM(name, cName)                                                                                      \
+    if (mxf_have_item(dmFrameworkSet, &MXF_ITEM_K(APP_InfaxFramework, name)))                                           \
+    {                                                                                                                   \
+        CHK_OFAIL(mxf_get_timestamp_item(dmFrameworkSet, &MXF_ITEM_K(APP_InfaxFramework, name), &infaxData->cName));    \
+        infaxData->cName.hour = 0;                                                                                      \
+        infaxData->cName.min = 0;                                                                                       \
+        infaxData->cName.sec = 0;                                                                                       \
+        infaxData->cName.qmsec = 0;                                                                                     \
+    }
+
+#define GET_INT64_ITEM(name, cName)                                                                                 \
+    if (mxf_have_item(dmFrameworkSet, &MXF_ITEM_K(APP_InfaxFramework, name)))                                       \
+    {                                                                                                               \
+        CHK_OFAIL(mxf_get_int64_item(dmFrameworkSet, &MXF_ITEM_K(APP_InfaxFramework, name), &infaxData->cName));    \
+    }
+
+#define GET_UINT32_ITEM(name, cName)                                                                                \
+    if (mxf_have_item(dmFrameworkSet, &MXF_ITEM_K(APP_InfaxFramework, name)))                                       \
+    {                                                                                                               \
+        CHK_OFAIL(mxf_get_uint32_item(dmFrameworkSet, &MXF_ITEM_K(APP_InfaxFramework, name), &infaxData->cName));   \
+    }
+
 
     GET_STRING_ITEM(APP_Format, format);
     GET_STRING_ITEM(APP_ProgrammeTitle, progTitle);
