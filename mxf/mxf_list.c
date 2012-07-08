@@ -106,6 +106,9 @@ int mxf_append_list_element(MXFList *list, void *data)
 {
     MXFListElement *newElement;
 
+    if (list->len + 1 == MXF_LIST_NPOS)
+        return 0;
+
     CHK_MALLOC_ORET(newElement, MXFListElement);
     memset(newElement, 0, sizeof(MXFListElement));
     newElement->data = data;
@@ -128,6 +131,9 @@ int mxf_prepend_list_element(MXFList *list, void *data)
 {
     MXFListElement *newElement;
 
+    if (list->len + 1 == MXF_LIST_NPOS)
+        return 0;
+
     CHK_MALLOC_ORET(newElement, MXFListElement);
     memset(newElement, 0, sizeof(MXFListElement));
     newElement->data = data;
@@ -147,13 +153,15 @@ int mxf_prepend_list_element(MXFList *list, void *data)
     return 1;
 }
 
-int mxf_insert_list_element(MXFList *list, long index, int before, void *data)
+int mxf_insert_list_element(MXFList *list, size_t index, int before, void *data)
 {
     MXFListElement *newElement;
     MXFListElement *nextElement;
     MXFListElement *prevElement;
-    long currentIndex;
+    size_t currentIndex;
 
+    if (index == MXF_LIST_NPOS || list->len + 1 == MXF_LIST_NPOS)
+        return 0;
 
     /* create new element */
     CHK_MALLOC_ORET(newElement, MXFListElement);
@@ -224,7 +232,7 @@ fail:
     return 0;
 }
 
-long mxf_get_list_length(MXFList *list)
+size_t mxf_get_list_length(MXFList *list)
 {
     return list->len;
 }
@@ -286,14 +294,14 @@ void* mxf_remove_list_element(MXFList *list, void *info, eq_func_type eqFunc)
     return result;
 }
 
-void* mxf_remove_list_element_at_index(MXFList *list, long index)
+void* mxf_remove_list_element_at_index(MXFList *list, size_t index)
 {
-    long currentIndex = 0;
+    size_t currentIndex = 0;
     MXFListElement *element = list->elements;
     MXFListElement *prevElement = NULL;
     void *result;
 
-    if (index < 0 || index >= list->len)
+    if (index == MXF_LIST_NPOS || index >= list->len)
     {
         return NULL;
     }
@@ -329,12 +337,12 @@ void* mxf_remove_list_element_at_index(MXFList *list, long index)
     return result;
 }
 
-void* mxf_get_list_element(MXFList *list, long index)
+void* mxf_get_list_element(MXFList *list, size_t index)
 {
-    long currentIndex = 0;
+    size_t currentIndex = 0;
     MXFListElement *element = list->elements;
 
-    if (index < 0 || index >= list->len)
+    if (index == MXF_LIST_NPOS || index >= list->len)
     {
         return NULL;
     }
@@ -390,12 +398,12 @@ void mxf_initialise_list_iter(MXFListIterator *iter, const MXFList *list)
 {
     iter->nextElement = list->elements;
     iter->data = NULL;
-    iter->index = -1;
+    iter->index = MXF_LIST_NPOS;
 }
 
-void mxf_initialise_list_iter_at(MXFListIterator *iter, const MXFList *list, long index)
+void mxf_initialise_list_iter_at(MXFListIterator *iter, const MXFList *list, size_t index)
 {
-    if (index < 0)
+    if (index == MXF_LIST_NPOS)
     {
         mxf_initialise_list_iter(iter, list);
     }
@@ -431,7 +439,7 @@ int mxf_next_list_iter_element(MXFListIterator *iter)
     }
     else
     {
-        iter->index = -1;
+        iter->index = MXF_LIST_NPOS;
     }
 
     return iter->data != NULL;
@@ -442,7 +450,7 @@ void* mxf_get_iter_element(MXFListIterator *iter)
     return iter->data;
 }
 
-long mxf_get_list_iter_index(MXFListIterator *iter)
+size_t mxf_get_list_iter_index(MXFListIterator *iter)
 {
     return iter->index;
 }

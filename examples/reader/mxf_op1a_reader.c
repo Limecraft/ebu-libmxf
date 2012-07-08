@@ -1088,8 +1088,8 @@ int op1a_initialise_reader(MXFReader *reader, MXFPartition **headerPartition)
     MXFFile *mxfFile = reader->mxfFile;
     EssenceReader *essenceReader = reader->essenceReader;
     EssenceReaderData *data;
-    long i;
-    long numPartitions;
+    size_t i;
+    size_t numPartitions;
     MXFPartition *partition;
     mxfKey key;
     uint8_t llen;
@@ -1123,9 +1123,9 @@ int op1a_initialise_reader(MXFReader *reader, MXFPartition **headerPartition)
 
         /* process the last instance of header metadata */
         numPartitions = mxf_get_list_length(&data->partitions);
-        for (i = numPartitions - 1; i >= 0; i--)
+        for (i = numPartitions; i > 0; i--)
         {
-            partition = (MXFPartition*)mxf_get_list_element(&data->partitions, i);
+            partition = (MXFPartition*)mxf_get_list_element(&data->partitions, i - 1);
             if (partition->headerByteCount != 0)
             {
                 if (!mxf_partition_is_closed(&partition->key))
@@ -1150,7 +1150,7 @@ int op1a_initialise_reader(MXFReader *reader, MXFPartition **headerPartition)
                 break;
             }
         }
-        if (i < 0)
+        if (i == 0)
         {
             mxf_log_error("No partition with header metadata found" LOG_LOC_FORMAT, LOG_LOC_PARAMS);
             goto fail;

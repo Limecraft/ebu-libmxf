@@ -54,7 +54,7 @@ typedef struct
 {
     MXFListElement *elements;
     MXFListElement *lastElement;
-    long len;
+    size_t len;
     free_func_type freeFunc;
 } MXFList;
 
@@ -62,8 +62,11 @@ typedef struct
 {
     MXFListElement *nextElement;
     void *data;
-    long index;
+    size_t index;
 } MXFListIterator;
+
+
+static const size_t MXF_LIST_NPOS = (size_t)(-1);
 
 
 int mxf_create_list(MXFList **list, free_func_type freeFunc);
@@ -73,14 +76,14 @@ void mxf_clear_list(MXFList *list);
 
 int mxf_append_list_element(MXFList *list, void *data);
 int mxf_prepend_list_element(MXFList *list, void *data);
-int mxf_insert_list_element(MXFList *list, long index, int before, void *data);
-long mxf_get_list_length(MXFList *list);
+int mxf_insert_list_element(MXFList *list, size_t index, int before, void *data);
+size_t mxf_get_list_length(MXFList *list);
 
 void* mxf_find_list_element(const MXFList *list, void *info, eq_func_type eqFunc);
 void* mxf_remove_list_element(MXFList *list, void *info, eq_func_type eqFunc);
-void* mxf_remove_list_element_at_index(MXFList *list, long index);
+void* mxf_remove_list_element_at_index(MXFList *list, size_t index);
 
-void* mxf_get_list_element(MXFList *list, long index);
+void* mxf_get_list_element(MXFList *list, size_t index);
 
 void* mxf_get_first_list_element(MXFList *list);
 void* mxf_get_last_list_element(MXFList *list);
@@ -88,10 +91,10 @@ void* mxf_get_last_list_element(MXFList *list);
 void mxf_free_list_element_data(MXFList *list, void *data);
 
 void mxf_initialise_list_iter(MXFListIterator *iter, const MXFList *list);
-void mxf_initialise_list_iter_at(MXFListIterator *iter, const MXFList *list, long index);
+void mxf_initialise_list_iter_at(MXFListIterator *iter, const MXFList *list, size_t index);
 int mxf_next_list_iter_element(MXFListIterator *iter);
 void* mxf_get_iter_element(MXFListIterator *iter);
-long mxf_get_list_iter_index(MXFListIterator *iter);
+size_t mxf_get_list_iter_index(MXFListIterator *iter);
 
 
 #ifdef __cplusplus

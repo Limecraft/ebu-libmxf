@@ -976,7 +976,7 @@ int get_num_source_timecodes(MXFReader *reader)
 
 int get_source_timecode_type(MXFReader *reader, int index)
 {
-    void *element = mxf_get_list_element(&reader->sourceTimecodeIndexes, (long)index);
+    void *element = mxf_get_list_element(&reader->sourceTimecodeIndexes, (size_t)index);
     if (element == NULL)
     {
         return -1;
@@ -993,7 +993,7 @@ int get_source_timecode(MXFReader *reader, int index, MXFTimecode *timecode, int
     mxfPosition playoutFrameNumber;
     mxfPosition sourceFrameNumber;
 
-    CHK_ORET((element = mxf_get_list_element(&reader->sourceTimecodeIndexes, (long)index)) != NULL);
+    CHK_ORET((element = mxf_get_list_element(&reader->sourceTimecodeIndexes, (size_t)index)) != NULL);
     timecodeIndex = (TimecodeIndex*)element;
 
     if (timecodeIndex->type == FILE_SOURCE_PACKAGE_TIMECODE ||

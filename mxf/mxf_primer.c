@@ -271,7 +271,7 @@ fail:
 int mxf_write_primer_pack(MXFFile *mxfFile, MXFPrimerPack *primerPack)
 {
     MXFListIterator iter;
-    uint32_t numberOfItems = mxf_get_list_length(&primerPack->entries);
+    uint32_t numberOfItems = (uint32_t)mxf_get_list_length(&primerPack->entries);
 
     CHK_ORET(mxf_write_kl(mxfFile, &g_PrimerPack_key, 8 + 18 * numberOfItems));
 
@@ -292,7 +292,7 @@ int mxf_write_primer_pack(MXFFile *mxfFile, MXFPrimerPack *primerPack)
 /* Note: keep this in sync with mxf_write_primer_pack */
 void mxf_get_primer_pack_size(MXFFile *mxfFile, MXFPrimerPack *primerPack, uint64_t *size)
 {
-    uint32_t numberOfItems = mxf_get_list_length(&primerPack->entries);
+    uint32_t numberOfItems = (uint32_t)mxf_get_list_length(&primerPack->entries);
 
     *size = mxfKey_extlen + mxf_get_llen(mxfFile, 8 + 18 * numberOfItems) +
         8 + 18 * numberOfItems;

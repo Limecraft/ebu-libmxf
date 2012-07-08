@@ -583,7 +583,7 @@ int mxf_check_data_model(MXFDataModel *dataModel)
     MXFSetDef *setDef2;
     MXFItemDef *itemDef1;
     MXFItemDef *itemDef2;
-    long listIndex;
+    size_t listIndex;
 
 
     /* check that the set defs are unique */

@@ -317,7 +317,7 @@ fail:
 int is_null_timecode_index(TimecodeIndex *index)
 {
     TimecodeIndexArray *indexArray;
-    long listLen;
+    size_t listLen;
 
     /* index is null if the index is empty or has a duration > 1 with timecode frozen at 00:00:00:00 */
 
