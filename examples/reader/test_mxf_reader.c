@@ -51,7 +51,7 @@
 #define INVALID_TIMECODE_HOUR       99
 
 
-struct _MXFReaderListenerData
+struct MXFReaderListenerData
 {
     FILE *outFile;
 

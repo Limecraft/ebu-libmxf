@@ -81,7 +81,7 @@ typedef struct
     int audioNum;
 } EssWriteState;
 
-struct _ArchiveMXFWriter
+struct ArchiveMXFWriter
 {
     mxfRational frameRate;
     int numAudioTracks;

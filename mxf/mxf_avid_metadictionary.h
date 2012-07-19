@@ -41,7 +41,7 @@ extern "C"
 #endif
 
 
-typedef struct _AvidMetaDictionary AvidMetaDictionary;
+typedef struct AvidMetaDictionary AvidMetaDictionary;
 
 
 int mxf_avid_is_metadictionary(MXFDataModel *dataModel, const mxfKey *setKey);

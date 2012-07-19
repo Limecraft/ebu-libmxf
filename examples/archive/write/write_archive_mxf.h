@@ -46,7 +46,7 @@ extern "C"
 #define MAX_ARCHIVE_AUDIO_TRACKS        16
 
 
-typedef struct _ArchiveMXFWriter ArchiveMXFWriter;
+typedef struct ArchiveMXFWriter ArchiveMXFWriter;
 
 
 /* create a new Archive MXF file and prepare for writing the essence */

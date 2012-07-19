@@ -41,18 +41,18 @@ extern "C"
 #endif
 
 
-typedef struct _MXFDeltaEntry
+typedef struct MXFDeltaEntry
 {
-    struct _MXFDeltaEntry *next;
+    struct MXFDeltaEntry *next;
 
     int8_t posTableIndex;
     uint8_t slice;
     uint32_t elementData;
 } MXFDeltaEntry;
 
-typedef struct _MXFIndexEntry
+typedef struct MXFIndexEntry
 {
-    struct _MXFIndexEntry *next;
+    struct MXFIndexEntry *next;
 
     int8_t temporalOffset;
     int8_t keyFrameOffset;

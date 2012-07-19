@@ -48,19 +48,19 @@ typedef struct
     int isPersistent;
     uint16_t length;
     uint8_t *value;
-    struct _MXFMetadataSet *set;
+    struct MXFMetadataSet *set;
 } MXFMetadataItem;
 
-typedef struct _MXFMetadataSet
+typedef struct MXFMetadataSet
 {
     mxfKey key;
     mxfUUID instanceUID;
     MXFList items;
-    struct _MXFHeaderMetadata *headerMetadata;
+    struct MXFHeaderMetadata *headerMetadata;
     uint64_t fixedSpaceAllocation;
 } MXFMetadataSet;
 
-typedef struct _MXFHeaderMetadata
+typedef struct MXFHeaderMetadata
 {
     MXFDataModel *dataModel;
     MXFPrimerPack *primerPack;

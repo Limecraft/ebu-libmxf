@@ -85,7 +85,7 @@ typedef struct
 } NSFileIndex;
 
 
-struct _EssenceReaderData
+struct EssenceReaderData
 {
     MXFPartition *headerPartition;
     MXFHeaderMetadata *headerMetadata;

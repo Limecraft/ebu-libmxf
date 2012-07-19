@@ -57,7 +57,7 @@ typedef struct
     mxfUL targetIdentification;
 } WeakRefData;
 
-struct _AvidMetaDictionary
+struct AvidMetaDictionary
 {
     MXFHeaderMetadata *headerMetadata;
     MXFMetadataSet *metaDictSet;

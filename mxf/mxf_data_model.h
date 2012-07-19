@@ -107,13 +107,13 @@ typedef struct
     int isRequired;
 } MXFItemDef;
 
-typedef struct _MXFSetDef
+typedef struct MXFSetDef
 {
     char *name;
     mxfKey parentSetDefKey;
     mxfKey key;
     MXFList itemDefs;
-    struct _MXFSetDef *parentSetDef;
+    struct MXFSetDef *parentSetDef;
 } MXFSetDef;
 
 typedef struct

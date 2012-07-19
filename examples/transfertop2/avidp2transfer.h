@@ -84,7 +84,7 @@ private:
     std::string _message;
 };
 
-typedef struct _APTRational
+typedef struct APTRational
 {
     avtInt32 numerator;
     avtInt32 denominator;

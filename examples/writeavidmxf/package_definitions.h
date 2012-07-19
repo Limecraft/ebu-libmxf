@@ -162,7 +162,7 @@ typedef struct
 } Locator;
 
 
-typedef struct _PackageDefinitions
+typedef struct PackageDefinitions
 {
     Package *materialPackage;
     MXFList fileSourcePackages;

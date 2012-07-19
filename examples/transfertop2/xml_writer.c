@@ -53,7 +53,7 @@ typedef enum
     CHARACTER_DATA
 } PreviousWrite;
 
-struct _XMLWriter
+struct XMLWriter
 {
     FILE *file;
     int indent;

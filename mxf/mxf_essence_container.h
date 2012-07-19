@@ -41,7 +41,7 @@ extern "C"
 #endif
 
 
-typedef struct _MXFEssenceElement
+typedef struct MXFEssenceElement
 {
     mxfKey key;
     uint8_t llen;

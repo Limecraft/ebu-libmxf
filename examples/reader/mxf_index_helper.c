@@ -57,7 +57,7 @@ typedef struct
     mxfPosition startPosition; /* frame number corresponding to first content package */
 } PartitionIndexEntry;
 
-struct _FileIndex
+struct FileIndex
 {
     uint32_t indexSID;
     uint32_t bodySID;

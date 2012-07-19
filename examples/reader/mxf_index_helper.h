@@ -35,7 +35,7 @@
 #define MXF_INDEX_HELPER_H_
 
 
-typedef struct _FileIndex FileIndex;
+typedef struct FileIndex FileIndex;
 
 
 int create_index(MXFFile *mxfFile, MXFList *partitions, uint32_t indexSID, uint32_t bodySID, FileIndex **index);

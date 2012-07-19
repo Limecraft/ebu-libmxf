@@ -44,7 +44,7 @@ extern "C"
 #include "package_definitions.h"
 
 
-typedef struct _AvidClipWriter AvidClipWriter;
+typedef struct AvidClipWriter AvidClipWriter;
 
 typedef enum
 {

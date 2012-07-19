@@ -44,9 +44,9 @@ extern "C"
 typedef void (*free_func_type)(void *data);
 typedef int (*eq_func_type)(void *data, void *info);
 
-typedef struct _MXFListElement
+typedef struct MXFListElement
 {
-    struct _MXFListElement *next;
+    struct MXFListElement *next;
     void *data;
 } MXFListElement;
 

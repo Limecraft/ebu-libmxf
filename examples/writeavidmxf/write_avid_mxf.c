@@ -195,7 +195,7 @@ typedef struct
     MXFMetadataSet *descriptorSet;
 } TrackWriter;
 
-struct _AvidClipWriter
+struct AvidClipWriter
 {
     TrackWriter *tracks[MAX_TRACKS];
     int numTracks;

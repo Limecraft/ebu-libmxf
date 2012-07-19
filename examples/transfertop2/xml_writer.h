@@ -35,7 +35,7 @@
 #define XML_WRITER_H_
 
 
-typedef struct _XMLWriter XMLWriter;
+typedef struct XMLWriter XMLWriter;
 
 /* Note: XML writer uses DOS line endings */
 

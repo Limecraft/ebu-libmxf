@@ -50,7 +50,7 @@
 
 
 
-struct _EssenceReaderData
+struct EssenceReaderData
 {
     MXFPartition *headerPartition;
     MXFHeaderMetadata *headerMetadata;

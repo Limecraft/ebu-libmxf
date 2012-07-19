@@ -101,7 +101,7 @@ struct demux_sys_t
     mtime_t i_pcr;
 };
 
-struct _MXFReaderListenerData
+struct MXFReaderListenerData
 {
     demux_t *p_demux;
 };

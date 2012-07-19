@@ -62,9 +62,9 @@
 #include <mxf/mxf_macros.h>
 
 
-typedef struct _MXFAvidObjectReference
+typedef struct MXFAvidObjectReference
 {
-    struct _MXFAvidObjectReference *next;
+    struct MXFAvidObjectReference *next;
 
     mxfUUID instanceUID;
     uint64_t offset;
