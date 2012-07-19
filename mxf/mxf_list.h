@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_LIST_H__
-#define __MXF_LIST_H__
+#ifndef MXF_LIST_H_
+#define MXF_LIST_H_
 
 
 #ifdef __cplusplus

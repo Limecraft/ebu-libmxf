@@ -29,8 +29,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_WIN32_FILE_H__
-#define __MXF_WIN32_FILE_H__
+#ifndef MXF_WIN32_FILE_H_
+#define MXF_WIN32_FILE_H_
 
 
 #ifdef __cplusplus

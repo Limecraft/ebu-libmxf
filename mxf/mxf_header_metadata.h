@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_HEADER_METADATA_H__
-#define __MXF_HEADER_METADATA_H__
+#ifndef MXF_HEADER_METADATA_H_
+#define MXF_HEADER_METADATA_H_
 
 
 #ifdef __cplusplus

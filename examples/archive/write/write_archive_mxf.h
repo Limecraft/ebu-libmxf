@@ -29,8 +29,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __WRITE_ARCHIVE_MXF_H__
-#define __WRITE_ARCHIVE_MXF_H__
+#ifndef WRITE_ARCHIVE_MXF_H_
+#define WRITE_ARCHIVE_MXF_H_
 
 
 #ifdef __cplusplus

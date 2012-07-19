@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_AVID_H__
-#define __MXF_AVID_H__
+#ifndef MXF_AVID_H_
+#define MXF_AVID_H_
 
 
 #ifdef __cplusplus

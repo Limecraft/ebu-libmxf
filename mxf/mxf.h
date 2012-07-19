@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_MXF_H__
-#define __MXF_MXF_H__
+#ifndef MXF_MXF_H_
+#define MXF_MXF_H_
 
 #ifdef __cplusplus
 extern "C"

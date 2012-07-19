@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_INDEX_TABLE_H__
-#define __MXF_INDEX_TABLE_H__
+#ifndef MXF_INDEX_TABLE_H_
+#define MXF_INDEX_TABLE_H_
 
 
 #ifdef __cplusplus

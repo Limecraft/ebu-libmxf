@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_INDEX_HELPER_H__
-#define __MXF_INDEX_HELPER_H__
+#ifndef MXF_INDEX_HELPER_H_
+#define MXF_INDEX_HELPER_H_
 
 
 typedef struct _FileIndex FileIndex;

@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_FILE_H__
-#define __MXF_FILE_H__
+#ifndef MXF_FILE_H_
+#define MXF_FILE_H_
 
 
 #ifdef __cplusplus

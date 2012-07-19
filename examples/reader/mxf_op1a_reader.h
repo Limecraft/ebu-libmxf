@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_OP1A_READER_H__
-#define __MXF_OP1A_READER_H__
+#ifndef MXF_OP1A_READER_H_
+#define MXF_OP1A_READER_H_
 
 
 int op1a_is_supported(MXFPartition *headerPartition);

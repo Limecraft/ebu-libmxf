@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __PACKAGE_DEFINITIONS_H__
-#define __PACKAGE_DEFINITIONS_H__
+#ifndef PACKAGE_DEFINITIONS_H_
+#define PACKAGE_DEFINITIONS_H_
 
 
 #ifdef __cplusplus

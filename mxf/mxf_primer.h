@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_PRIMER_H__
-#define __MXF_PRIMER_H__
+#ifndef MXF_PRIMER_H_
+#define MXF_PRIMER_H_
 
 
 

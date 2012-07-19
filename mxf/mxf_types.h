@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_TYPES_H__
-#define __MXF_TYPES_H__
+#ifndef MXF_TYPES_H_
+#define MXF_TYPES_H_
 
 #include <wchar.h>
 #include <inttypes.h>

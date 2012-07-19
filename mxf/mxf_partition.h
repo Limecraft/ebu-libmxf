@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_PARTITION_H__
-#define __MXF_PARTITION_H__
+#ifndef MXF_PARTITION_H_
+#define MXF_PARTITION_H_
 
 
 #ifdef __cplusplus

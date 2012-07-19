@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_AVID_LABELS_AND_KEYS_H__
-#define __MXF_AVID_LABELS_AND_KEYS_H__
+#ifndef MXF_AVID_LABELS_AND_KEYS_H_
+#define MXF_AVID_LABELS_AND_KEYS_H_
 
 
 #ifdef __cplusplus

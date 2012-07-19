@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_UTILS_H__
-#define __MXF_UTILS_H__
+#ifndef MXF_UTILS_H_
+#define MXF_UTILS_H_
 
 
 #include <stdarg.h>

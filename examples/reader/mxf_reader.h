@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_READER_H__
-#define __MXF_READER_H__
+#ifndef MXF_READER_H_
+#define MXF_READER_H_
 
 
 #ifdef __cplusplus

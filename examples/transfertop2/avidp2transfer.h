@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __AVIDP2TRANSFER_H__
-#define __AVIDP2TRANSFER_H__
+#ifndef AVIDP2TRANSFER_H_
+#define AVIDP2TRANSFER_H_
 
 
 #include <vector>

@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_LABELS_AND_KEYS_H__
-#define __MXF_LABELS_AND_KEYS_H__
+#ifndef MXF_LABELS_AND_KEYS_H_
+#define MXF_LABELS_AND_KEYS_H_
 
 
 
