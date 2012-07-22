@@ -677,12 +677,9 @@ int mxf_read_header_pp_kl(MXFFile *mxfFile, mxfKey *key, uint8_t *llen, uint64_t
     uint8_t tllen;
     uint64_t tlen;
 
-    CHK_ORET(mxf_read_kl(mxfFile, &tkey, &tllen, &tlen));
-
-    if (!mxf_is_header_partition_pack(&tkey))
-    {
-        return 0;
-    }
+    CHK_ORET(mxf_read_k(mxfFile, &tkey));
+    CHK_ORET(mxf_is_header_partition_pack(&tkey));
+    CHK_ORET(mxf_read_l(mxfFile, &tllen, &tlen));
 
     *key = tkey;
     *llen = tllen;
@@ -701,10 +698,7 @@ int mxf_read_header_pp_kl_with_runin(MXFFile *mxfFile, mxfKey *key, uint8_t *lle
     /* try find first 11 bytes of partition pack */
     while (runinCheckCount < MAX_RUNIN_LEN + 11)
     {
-        if ((byte = mxf_file_getc(mxfFile)) == EOF)
-        {
-            return 0;
-        }
+        CHK_ORET((byte = mxf_file_getc(mxfFile)) != EOF);
 
         runinCheckCount++;
         if (byte == ((const uint8_t*)(&g_PartitionPackPrefix_key))[keyCompareByte])
@@ -717,37 +711,21 @@ int mxf_read_header_pp_kl_with_runin(MXFFile *mxfFile, mxfKey *key, uint8_t *lle
         }
         else
         {
-            if (runinCheckCount >= MAX_RUNIN_LEN)
-            {
-                return 0;
-            }
+            CHK_ORET(runinCheckCount < MAX_RUNIN_LEN);
             keyCompareByte = 0;
         }
     }
-    if (runinCheckCount >= MAX_RUNIN_LEN + 11)
-    {
-        return 0;
-    }
+    CHK_ORET(runinCheckCount < MAX_RUNIN_LEN + 11);
 
     /* read the remaing bytes of the key */
     for (; keyCompareByte < 16; keyCompareByte++)
     {
-        if ((byte = mxf_file_getc(mxfFile)) == EOF)
-        {
-            return 0;
-        }
+        CHK_ORET((byte = mxf_file_getc(mxfFile)) != EOF);
         keyPtr[keyCompareByte] = (uint8_t)byte;
     }
 
-    if (!mxf_is_header_partition_pack(&k))
-    {
-        return 0;
-    }
-
-    if (!mxf_read_l(mxfFile, llen, len))
-    {
-        return 0;
-    }
+    CHK_ORET(mxf_is_header_partition_pack(&k));
+    CHK_ORET(mxf_read_l(mxfFile, llen, len));
 
     mxf_set_runin_len(mxfFile, (uint16_t)(runinCheckCount - 11));
 
