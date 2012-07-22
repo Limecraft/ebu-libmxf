@@ -689,47 +689,36 @@ int mxf_read_header_pp_kl(MXFFile *mxfFile, mxfKey *key, uint8_t *llen, uint64_t
 
 int mxf_read_header_pp_kl_with_runin(MXFFile *mxfFile, mxfKey *key, uint8_t *llen, uint64_t *len)
 {
+    mxfKey tkey = MXF_PP_KEY(0x01, 0x00, 0x00);
+    uint8_t tllen;
+    uint64_t tlen;
     uint8_t keyCompareByte = 0;
     uint32_t runinCheckCount = 0;
-    mxfKey k;
-    uint8_t *keyPtr = (uint8_t*)&k;
     int byte;
 
-    /* try find first 11 bytes of partition pack */
-    while (runinCheckCount < MAX_RUNIN_LEN + 11)
-    {
+    /* the run-in shall not contain the first 11 bytes of the partition pack label and so
+       read until the first 11 bytes are found or max run-in exceeded */
+    while (runinCheckCount <= MAX_RUNIN_LEN && keyCompareByte < 11) {
         CHK_ORET((byte = mxf_file_getc(mxfFile)) != EOF);
 
-        runinCheckCount++;
-        if (byte == ((const uint8_t*)(&g_PartitionPackPrefix_key))[keyCompareByte])
-        {
-            keyPtr[keyCompareByte++] = (uint8_t)byte;
-            if (keyCompareByte == 11)
-            {
-                break;
-            }
-        }
-        else
-        {
-            CHK_ORET(runinCheckCount < MAX_RUNIN_LEN);
+        if (byte == ((uint8_t*)(&tkey))[keyCompareByte]) {
+            keyCompareByte++;
+        } else {
+            runinCheckCount += keyCompareByte + 1;
             keyCompareByte = 0;
         }
     }
-    CHK_ORET(runinCheckCount < MAX_RUNIN_LEN + 11);
+    CHK_ORET(runinCheckCount <= MAX_RUNIN_LEN);
 
-    /* read the remaing bytes of the key */
-    for (; keyCompareByte < 16; keyCompareByte++)
-    {
-        CHK_ORET((byte = mxf_file_getc(mxfFile)) != EOF);
-        keyPtr[keyCompareByte] = (uint8_t)byte;
-    }
+    CHK_ORET(mxf_file_read(mxfFile, &tkey.octet11, 5) == 5);
+    CHK_ORET(mxf_is_header_partition_pack(&tkey));
+    CHK_ORET(mxf_read_l(mxfFile, &tllen, &tlen));
 
-    CHK_ORET(mxf_is_header_partition_pack(&k));
-    CHK_ORET(mxf_read_l(mxfFile, llen, len));
+    mxf_set_runin_len(mxfFile, (uint16_t)runinCheckCount);
 
-    mxf_set_runin_len(mxfFile, (uint16_t)(runinCheckCount - 11));
-
-    *key = k;
+    *key = tkey;
+    *llen = tllen;
+    *len = tlen;
     return 1;
 }
 
