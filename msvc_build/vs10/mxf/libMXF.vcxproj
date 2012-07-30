@@ -1,0 +1,150 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{580F8E65-F910-46A6-8A9C-6A8E58D95E53}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Debug\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Release\</IntDir>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>../../..;..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <CompileAs>CompileAsC</CompileAs>
+      <PreprocessToFile>false</PreprocessToFile>
+    </ClCompile>
+    <Lib>
+      <OutputFile>$(OutDir)libMXF.lib</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>../../..;..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>CompileAsC</CompileAs>
+    </ClCompile>
+    <Lib>
+      <OutputFile>$(OutDir)libMXF.lib</OutputFile>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\mxf\mxf_avid.c" />
+    <ClCompile Include="..\..\..\mxf\mxf_avid_dictionary.c" />
+    <ClCompile Include="..\..\..\mxf\mxf_avid_metadictionary.c" />
+    <ClCompile Include="..\..\..\mxf\mxf_cache_file.c" />
+    <ClCompile Include="..\..\..\mxf\mxf_data_model.c" />
+    <ClCompile Include="..\..\..\mxf\mxf_essence_container.c" />
+    <ClCompile Include="..\..\..\mxf\mxf_file.c" />
+    <ClCompile Include="..\..\..\mxf\mxf_header_metadata.c" />
+    <ClCompile Include="..\..\..\mxf\mxf_index_table.c" />
+    <ClCompile Include="..\..\..\mxf\mxf_labels_and_keys.c" />
+    <ClCompile Include="..\..\..\mxf\mxf_list.c" />
+    <ClCompile Include="..\..\..\mxf\mxf_logging.c" />
+    <ClCompile Include="..\..\..\mxf\mxf_memory_file.c" />
+    <ClCompile Include="..\..\..\mxf\mxf_page_file.c" />
+    <ClCompile Include="..\..\..\mxf\mxf_partition.c" />
+    <ClCompile Include="..\..\..\mxf\mxf_primer.c" />
+    <ClCompile Include="..\..\..\mxf\mxf_rw_intl_file.c" />
+    <ClCompile Include="..\..\..\mxf\mxf_utils.c" />
+    <ClCompile Include="..\..\..\mxf\mxf_uu_metadata.c" />
+    <ClCompile Include="..\..\..\mxf\mxf_version.c" />
+    <ClCompile Include="..\..\..\mxf\mxf_win32_file.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\inttypes.h" />
+    <ClInclude Include="..\..\..\mxf_scm_version.h" />
+    <ClInclude Include="..\..\..\mxf\mxf.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_avid.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_avid_dictionary.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_avid_dictionary_data.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_avid_extensions_data_model.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_avid_labels_and_keys.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_avid_metadictionary.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_avid_metadictionary_data.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_baseline_data_model.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_cache_file.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_data_model.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_essence_container.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_file.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_header_metadata.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_index_table.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_labels_and_keys.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_list.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_logging.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_macros.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_memory_file.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_p2.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_page_file.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_partition.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_primer.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_rw_intl_file.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_types.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_utils.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_uu_metadata.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_version.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_win32_file.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
