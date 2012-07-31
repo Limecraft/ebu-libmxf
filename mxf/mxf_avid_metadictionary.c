@@ -236,12 +236,14 @@ static void free_avid_metadictionary(AvidMetaDictionary **metaDict)
 
 int mxf_avid_is_metadictionary(MXFDataModel *dataModel, const mxfKey *setKey)
 {
-    return mxf_is_subclass_of(dataModel, setKey, &MXF_SET_K(MetaDictionary));
+    (void)dataModel;
+    return mxf_equals_key(setKey, &MXF_SET_K(MetaDictionary));
 }
 
 int mxf_avid_is_metadef(MXFDataModel *dataModel, const mxfKey *setKey)
 {
-    return mxf_is_subclass_of(dataModel, setKey, &MXF_SET_K(MetaDefinition));
+    (void)dataModel;
+    return mxf_equals_key_prefix(setKey, &MXF_SET_K(MetaDefinition), 13);
 }
 
 

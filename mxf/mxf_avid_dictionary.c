@@ -65,8 +65,7 @@ static int dict_before_set_read(void *privateData, MXFHeaderMetadata *headerMeta
         *skip = 1;
     }
     else if (mxf_avid_is_def_object(headerMetadata->dataModel, key) &&
-             (filterData->skipDataDefs ||
-                 !mxf_is_subclass_of(headerMetadata->dataModel, key, &MXF_SET_K(DataDefinition))))
+             (filterData->skipDataDefs || !mxf_equals_key(key, &MXF_SET_K(DataDefinition))))
     {
         *skip = 1;
     }
@@ -109,12 +108,17 @@ static mxfUL* bounce_label(uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3, uint8
 
 int mxf_avid_is_dictionary(MXFDataModel *dataModel, const mxfKey *setKey)
 {
-    return mxf_is_subclass_of(dataModel, setKey, &MXF_SET_K(Dictionary));
+    (void)dataModel;
+    return mxf_equals_key(setKey, &MXF_SET_K(Dictionary));
 }
 
 int mxf_avid_is_def_object(MXFDataModel *dataModel, const mxfKey *setKey)
 {
-    return mxf_is_subclass_of(dataModel, setKey, &MXF_SET_K(DefinitionObject));
+    (void)dataModel;
+    return mxf_equals_key_prefix(setKey, &MXF_SET_K(DefinitionObject), 14) &&
+           ((setKey->octet14 >= 0x1a && setKey->octet14 <= 0x21) || /* DefinitionObject ... InterpolationDefinition */
+             setKey->octet14 == 0x4c ||                             /* TaggedValueDefinition */
+             setKey->octet14 == 0x4d);                              /* KLVDataDefinition */
 }
 
 
