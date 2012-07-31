@@ -88,6 +88,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\mxf\mxf_app.c" />
     <ClCompile Include="..\..\..\mxf\mxf_avid.c" />
     <ClCompile Include="..\..\..\mxf\mxf_avid_dictionary.c" />
     <ClCompile Include="..\..\..\mxf\mxf_avid_metadictionary.c" />
