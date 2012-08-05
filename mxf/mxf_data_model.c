@@ -171,6 +171,30 @@ static unsigned int get_type_id(MXFDataModel *dataModel)
     return typeId;
 }
 
+static MXFSetDef* register_set_def(MXFDataModel *dataModel, const char *name, const mxfKey *parentKey,
+                                   const mxfKey *key)
+{
+    MXFSetDef *newSetDef = NULL;
+
+    CHK_MALLOC_ORET(newSetDef, MXFSetDef);
+    memset(newSetDef, 0, sizeof(MXFSetDef));
+    if (name != NULL)
+    {
+        CHK_OFAIL((newSetDef->name = strdup(name)) != NULL);
+    }
+    newSetDef->parentSetDefKey = *parentKey;
+    newSetDef->key = *key;
+    mxf_initialise_list(&newSetDef->itemDefs, NULL);
+
+    CHK_OFAIL(mxf_tree_insert(&dataModel->setDefs, newSetDef));
+
+    return newSetDef;
+
+fail:
+    free_set_def(&newSetDef);
+    return NULL;
+}
+
 static MXFItemDef* register_item_def(MXFDataModel *dataModel, const char *name, const mxfKey *setKey,
                                      const mxfKey *key, mxfLocalTag tag, unsigned int typeId, int isRequired)
 {
@@ -270,30 +294,6 @@ static int clone_item_def(MXFDataModel *fromDataModel, MXFItemDef *fromItemDef,
 
     *toItemDef = clonedItemDef;
     return 1;
-}
-
-static MXFSetDef* register_set_def(MXFDataModel *dataModel, const char *name, const mxfKey *parentKey,
-                                   const mxfKey *key)
-{
-    MXFSetDef *newSetDef = NULL;
-
-    CHK_MALLOC_ORET(newSetDef, MXFSetDef);
-    memset(newSetDef, 0, sizeof(MXFSetDef));
-    if (name != NULL)
-    {
-        CHK_OFAIL((newSetDef->name = strdup(name)) != NULL);
-    }
-    newSetDef->parentSetDefKey = *parentKey;
-    newSetDef->key = *key;
-    mxf_initialise_list(&newSetDef->itemDefs, NULL);
-
-    CHK_OFAIL(mxf_tree_insert(&dataModel->setDefs, newSetDef));
-
-    return newSetDef;
-
-fail:
-    free_set_def(&newSetDef);
-    return NULL;
 }
 
 static int finalise_set_def(void *nodeData, void *processData)
