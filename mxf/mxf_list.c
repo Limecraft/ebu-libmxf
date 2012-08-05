@@ -99,8 +99,7 @@ int mxf_append_list_element(MXFList *list, void *data)
 {
     MXFListElement *newElement;
 
-    if (list->len + 1 == MXF_LIST_NPOS)
-        return 0;
+    CHK_ORET(list->len + 1 != MXF_LIST_NPOS);
 
     CHK_MALLOC_ORET(newElement, MXFListElement);
     memset(newElement, 0, sizeof(MXFListElement));
@@ -120,8 +119,7 @@ int mxf_prepend_list_element(MXFList *list, void *data)
 {
     MXFListElement *newElement;
 
-    if (list->len + 1 == MXF_LIST_NPOS)
-        return 0;
+    CHK_ORET(list->len + 1 != MXF_LIST_NPOS);
 
     CHK_MALLOC_ORET(newElement, MXFListElement);
     memset(newElement, 0, sizeof(MXFListElement));
@@ -146,7 +144,8 @@ int mxf_insert_list_element(MXFList *list, size_t index, int before, void *data)
     MXFListElement *prevElement;
     size_t currentIndex;
 
-    if (index == MXF_LIST_NPOS || list->len + 1 == MXF_LIST_NPOS)
+    CHK_ORET(list->len + 1 != MXF_LIST_NPOS);
+    if (index == MXF_LIST_NPOS)
         return 0;
 
     /* create new element */
