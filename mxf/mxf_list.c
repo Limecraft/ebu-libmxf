@@ -45,6 +45,28 @@
 
 
 
+static void* remove_list_element(MXFList *list, MXFListElement *element, MXFListElement *prevElement)
+{
+    void *data = element->data;
+
+    if (!prevElement) {
+        list->elements = element->next;
+        if (!list->elements)
+            list->lastElement = NULL;
+    } else {
+        prevElement->next = element->next;
+        if (!prevElement->next)
+            list->lastElement = prevElement;
+    }
+
+    SAFE_FREE(element); /* must free the wrapper element because we only return the data */
+    list->len--;
+
+    return data;
+}
+
+
+
 int mxf_create_list(MXFList **list, free_func_type freeFunc)
 {
     MXFList *newList;
@@ -208,48 +230,27 @@ size_t mxf_get_list_length(MXFList *list)
 
 void* mxf_find_list_element(const MXFList *list, void *info, eq_func_type eqFunc)
 {
-    void *result = NULL;
     MXFListElement *element = list->elements;
 
-    while (element) {
-        if (eqFunc(element->data, info)) {
-            result = element->data;
-            break;
-        }
+    while (element && !eqFunc(element->data, info))
         element = element->next;
-    }
 
-    return result;
+    return (element ? element->data : NULL);
 }
 
 void* mxf_remove_list_element(MXFList *list, void *info, eq_func_type eqFunc)
 {
-    void *result = NULL;
     MXFListElement *element = list->elements;
     MXFListElement *prevElement = NULL;
 
-    while (element) {
-        if (eqFunc(element->data, info)) {
-            result = element->data;
-            if (!prevElement) {
-                list->elements = element->next;
-                if (!list->elements)
-                    list->lastElement = list->elements;
-            } else {
-                prevElement->next = element->next;
-                if (!prevElement->next)
-                    list->lastElement = prevElement;
-            }
-            SAFE_FREE(element); /* must free the wrapper element because we only return the data */
-            list->len--;
-            break;
-        }
+    while (element && !eqFunc(element->data, info)) {
         prevElement = element;
         element = element->next;
     }
+    if (!element)
+        return NULL;
 
-
-    return result;
+    return remove_list_element(list, element, prevElement);
 }
 
 void* mxf_remove_list_element_at_index(MXFList *list, size_t index)
@@ -257,7 +258,6 @@ void* mxf_remove_list_element_at_index(MXFList *list, size_t index)
     size_t currentIndex = 0;
     MXFListElement *element = list->elements;
     MXFListElement *prevElement = NULL;
-    void *result;
 
     if (index == MXF_LIST_NPOS || index >= list->len)
         return NULL;
@@ -269,20 +269,7 @@ void* mxf_remove_list_element_at_index(MXFList *list, size_t index)
         assert(element);
     }
 
-    result = element->data;
-    if (!prevElement) {
-        list->elements = element->next;
-        if (!list->elements)
-            list->lastElement = list->elements;
-    } else {
-        prevElement->next = element->next;
-        if (!prevElement->next)
-            list->lastElement = prevElement;
-    }
-    SAFE_FREE(element); /* must free the wrapper element because we only return the data */
-    list->len--;
-
-    return result;
+    return remove_list_element(list, element, prevElement);
 }
 
 void* mxf_get_list_element(MXFList *list, size_t index)
