@@ -129,20 +129,6 @@ static int item_def_eq(void *data, void *info)
     return mxf_equals_key((mxfKey*)info, &((MXFItemDef*)data)->key);
 }
 
-static int add_set_def(MXFDataModel *dataModel, MXFSetDef *setDef)
-{
-    CHK_ORET(mxf_tree_insert(&dataModel->setDefs, (void*)setDef));
-
-    return 1;
-}
-
-static int add_item_def(MXFDataModel *dataModel, MXFItemDef *itemDef)
-{
-    CHK_ORET(mxf_append_list_element(&dataModel->itemDefs, (void*)itemDef));
-
-    return 1;
-}
-
 static unsigned int get_type_id(MXFDataModel *dataModel)
 {
     size_t i;
@@ -274,7 +260,7 @@ static MXFSetDef* register_set_def(MXFDataModel *dataModel, const char *name, co
     newSetDef->key = *key;
     mxf_initialise_list(&newSetDef->itemDefs, NULL);
 
-    CHK_OFAIL(add_set_def(dataModel, newSetDef));
+    CHK_OFAIL(mxf_tree_insert(&dataModel->setDefs, newSetDef));
 
     return newSetDef;
 
@@ -389,7 +375,7 @@ int mxf_register_item_def(MXFDataModel *dataModel, const char *name, const mxfKe
     newItemDef->typeId = typeId;
     newItemDef->isRequired = isRequired;
 
-    CHK_OFAIL(add_item_def(dataModel, newItemDef));
+    CHK_OFAIL(mxf_append_list_element(&dataModel->itemDefs, newItemDef));
 
     return 1;
 
