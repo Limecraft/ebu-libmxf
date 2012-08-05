@@ -198,6 +198,37 @@ fail:
     return NULL;
 }
 
+static MXFItemType* register_type(MXFDataModel *dataModel, const char *name, unsigned int typeId,
+                                  MXFItemTypeCategory category)
+{
+    MXFItemType *type = NULL;
+    unsigned int actualTypeId = typeId;
+
+    if (category == MXF_BASIC_TYPE_CAT) {
+        /* basic types can only be built-in */
+        CHK_ORET(actualTypeId < MXF_EXTENSION_TYPE);
+    } else if (actualTypeId <= 0) {
+        actualTypeId = get_new_type_id(dataModel);
+    }
+
+    /* check the type id is valid and free to use */
+    CHK_ORET(actualTypeId > 0 &&
+             actualTypeId < ARRAY_SIZE(dataModel->types) &&
+             dataModel->types[actualTypeId].typeId == 0);
+
+    type = &dataModel->types[actualTypeId];
+    type->typeId = actualTypeId; /* set first to indicate type is present */
+    type->category = category;
+    if (name)
+        CHK_OFAIL((type->name = strdup(name)) != NULL);
+
+    return type;
+
+fail:
+    clear_type(type);
+    return NULL;
+}
+
 static int clone_item_type(MXFDataModel *fromDataModel, unsigned int fromItemTypeId,
                            MXFDataModel *toDataModel, MXFItemType **toItemType)
 {
@@ -364,85 +395,37 @@ int mxf_register_item_def(MXFDataModel *dataModel, const char *name, const mxfKe
 
 MXFItemType* mxf_register_basic_type(MXFDataModel *dataModel, const char *name, unsigned int typeId, unsigned int size)
 {
-    MXFItemType *type;
+    MXFItemType *type = register_type(dataModel, name, typeId, MXF_BASIC_TYPE_CAT);
+    if (!type)
+        return NULL;
 
-    /* basic types can only be built-in */
-    CHK_ORET(typeId > 0 && typeId < MXF_EXTENSION_TYPE);
-
-    /* check the type id is valid and free */
-    CHK_ORET(typeId < ARRAY_SIZE(dataModel->types) &&
-             dataModel->types[typeId].typeId == 0);
-
-    type = &dataModel->types[typeId];
-    type->typeId = typeId; /* set first to indicate type is present */
-    type->category = MXF_BASIC_TYPE_CAT;
-    if (name)
-        CHK_OFAIL((type->name = strdup(name)) != NULL);
     type->info.basic.size = size;
 
     return type;
-
-fail:
-    clear_type(type);
-    return NULL;
 }
 
 MXFItemType* mxf_register_array_type(MXFDataModel *dataModel, const char *name, unsigned int typeId,
                                      unsigned int elementTypeId, unsigned int fixedSize)
 {
-    unsigned int actualTypeId;
-    MXFItemType *type;
+    MXFItemType *type = register_type(dataModel, name, typeId, MXF_ARRAY_TYPE_CAT);
+    if (!type)
+        return NULL;
 
-    if (typeId <= 0) {
-        actualTypeId = get_new_type_id(dataModel);
-    } else {
-        /* check the type id is valid and free */
-        CHK_ORET(typeId < ARRAY_SIZE(dataModel->types) &&
-                 dataModel->types[typeId].typeId == 0);
-        actualTypeId = typeId;
-    }
-
-    type = &dataModel->types[actualTypeId];
-    type->typeId = actualTypeId; /* set first to indicate type is present */
-    type->category = MXF_ARRAY_TYPE_CAT;
-    if (name)
-        CHK_OFAIL((type->name = strdup(name)) != NULL);
     type->info.array.elementTypeId = elementTypeId;
     type->info.array.fixedSize = fixedSize;
 
     return type;
-
-fail:
-    clear_type(type);
-    return NULL;
 }
 
 MXFItemType* mxf_register_compound_type(MXFDataModel *dataModel, const char *name, unsigned int typeId)
 {
-    unsigned int actualTypeId;
-    MXFItemType *type = NULL;
+    MXFItemType *type = register_type(dataModel, name, typeId, MXF_COMPOUND_TYPE_CAT);
+    if (!type)
+        return NULL;
 
-    if (typeId == 0) {
-        actualTypeId = get_new_type_id(dataModel);
-    } else {
-        /* check the type id is valid and free */
-        CHK_ORET(typeId < ARRAY_SIZE(dataModel->types) &&
-                 dataModel->types[typeId].typeId == 0);
-        actualTypeId = typeId;
-    }
-
-    type = &dataModel->types[actualTypeId];
-    type->typeId = actualTypeId; /* set first to indicate type is present */
-    type->category = MXF_COMPOUND_TYPE_CAT;
-    if (name)
-        CHK_OFAIL((type->name = strdup(name)) != NULL);
     memset(type->info.compound.members, 0, sizeof(type->info.compound.members));
 
     return type;
-
-fail:
-    clear_type(type);
-    return NULL;
 }
 
 int mxf_register_compound_type_member(MXFItemType *type, const char *memberName, unsigned int memberTypeId)
@@ -472,31 +455,14 @@ int mxf_register_compound_type_member(MXFItemType *type, const char *memberName,
 MXFItemType* mxf_register_interpret_type(MXFDataModel *dataModel, const char *name, unsigned int typeId,
                                          unsigned int interpretedTypeId, unsigned int fixedArraySize)
 {
-    unsigned int actualTypeId;
-    MXFItemType *type;
+    MXFItemType *type = register_type(dataModel, name, typeId, MXF_INTERPRET_TYPE_CAT);
+    if (!type)
+        return NULL;
 
-    if (typeId == 0) {
-        actualTypeId = get_new_type_id(dataModel);
-    } else {
-        /* check the type id is valid and free */
-        CHK_ORET(typeId < ARRAY_SIZE(dataModel->types) &&
-                 dataModel->types[typeId].typeId == 0);
-        actualTypeId = typeId;
-    }
-
-    type = &dataModel->types[actualTypeId];
-    type->typeId = actualTypeId; /* set first to indicate type is present */
-    type->category = MXF_INTERPRET_TYPE_CAT;
-    if (name)
-        CHK_OFAIL((type->name = strdup(name)) != NULL);
     type->info.interpret.typeId = interpretedTypeId;
     type->info.interpret.fixedArraySize = fixedArraySize;
 
     return type;
-
-fail:
-    clear_type(type);
-    return NULL;
 }
 
 int mxf_finalise_data_model(MXFDataModel *dataModel)
