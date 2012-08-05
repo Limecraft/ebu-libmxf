@@ -59,9 +59,7 @@ int mxf_create_list(MXFList **list, free_func_type freeFunc)
 void mxf_free_list(MXFList **list)
 {
     if (!(*list))
-    {
         return;
-    }
 
     mxf_clear_list(*list);
     SAFE_FREE(*list);
@@ -79,19 +77,14 @@ void mxf_clear_list(MXFList *list)
     MXFListElement *nextElement;
 
     if (!list)
-    {
         return;
-    }
 
     element = list->elements;
-    while (element)
-    {
+    while (element) {
         nextElement = element->next;
 
         if (list->freeFunc)
-        {
             list->freeFunc(element->data);
-        }
         SAFE_FREE(element);
 
         element = nextElement;
@@ -114,13 +107,9 @@ int mxf_append_list_element(MXFList *list, void *data)
     newElement->data = data;
 
     if (!list->elements)
-    {
         list->elements = newElement;
-    }
     else
-    {
         list->lastElement->next = newElement;
-    }
     list->lastElement = newElement;
 
     list->len++;
@@ -138,13 +127,10 @@ int mxf_prepend_list_element(MXFList *list, void *data)
     memset(newElement, 0, sizeof(MXFListElement));
     newElement->data = data;
 
-    if (!list->elements)
-    {
+    if (!list->elements) {
         list->elements = newElement;
         list->lastElement = newElement;
-    }
-    else
-    {
+    } else {
         newElement->next = list->elements;
         list->elements = newElement;
     }
@@ -169,8 +155,7 @@ int mxf_insert_list_element(MXFList *list, size_t index, int before, void *data)
     newElement->data = data;
 
     /* special case when list is empty */
-    if (!list->elements)
-    {
+    if (!list->elements) {
         list->elements = newElement;
         list->lastElement = newElement;
         list->len++;
@@ -180,49 +165,34 @@ int mxf_insert_list_element(MXFList *list, size_t index, int before, void *data)
     nextElement = list->elements;
     prevElement = NULL;
     currentIndex = 0;
-    if (before)
-    {
+    if (before) {
         /* move to index position */
-        while (currentIndex < index && nextElement)
-        {
+        while (currentIndex < index && nextElement) {
             prevElement = nextElement;
             nextElement = nextElement->next;
             currentIndex++;
         }
         if (currentIndex != index)
-        {
             goto fail;
-        }
-    }
-    else
-    {
+    } else {
         /* move to after index position */
-        while (currentIndex <= index && nextElement)
-        {
+        while (currentIndex <= index && nextElement) {
             prevElement = nextElement;
             nextElement = nextElement->next;
             currentIndex++;
         }
         if (currentIndex != index + 1)
-        {
             goto fail;
-        }
     }
 
     /* insert element */
     if (!prevElement)
-    {
         list->elements = newElement;
-    }
     else
-    {
         prevElement->next = newElement;
-    }
     newElement->next = nextElement;
     if (!newElement->next)
-    {
         list->lastElement = newElement;
-    }
 
     list->len++;
     return 1;
@@ -242,10 +212,8 @@ void* mxf_find_list_element(const MXFList *list, void *info, eq_func_type eqFunc
     void *result = NULL;
     MXFListElement *element = list->elements;
 
-    while (element)
-    {
-        if (eqFunc(element->data, info))
-        {
+    while (element) {
+        if (eqFunc(element->data, info)) {
             result = element->data;
             break;
         }
@@ -261,26 +229,17 @@ void* mxf_remove_list_element(MXFList *list, void *info, eq_func_type eqFunc)
     MXFListElement *element = list->elements;
     MXFListElement *prevElement = NULL;
 
-    while (element)
-    {
-        if (eqFunc(element->data, info))
-        {
+    while (element) {
+        if (eqFunc(element->data, info)) {
             result = element->data;
-            if (!prevElement)
-            {
+            if (!prevElement) {
                 list->elements = element->next;
                 if (!list->elements)
-                {
                     list->lastElement = list->elements;
-                }
-            }
-            else
-            {
+            } else {
                 prevElement->next = element->next;
                 if (!prevElement->next)
-                {
                     list->lastElement = prevElement;
-                }
             }
             SAFE_FREE(element); /* must free the wrapper element because we only return the data */
             list->len--;
@@ -302,12 +261,9 @@ void* mxf_remove_list_element_at_index(MXFList *list, size_t index)
     void *result;
 
     if (index == MXF_LIST_NPOS || index >= list->len)
-    {
         return NULL;
-    }
 
-    while (currentIndex != index)
-    {
+    while (currentIndex != index) {
         currentIndex++;
         prevElement = element;
         element = element->next;
@@ -315,21 +271,14 @@ void* mxf_remove_list_element_at_index(MXFList *list, size_t index)
     }
 
     result = element->data;
-    if (!prevElement)
-    {
+    if (!prevElement) {
         list->elements = element->next;
         if (!list->elements)
-        {
             list->lastElement = list->elements;
-        }
-    }
-    else
-    {
+    } else {
         prevElement->next = element->next;
         if (!prevElement->next)
-        {
             list->lastElement = prevElement;
-        }
     }
     SAFE_FREE(element); /* must free the wrapper element because we only return the data */
     list->len--;
@@ -343,23 +292,18 @@ void* mxf_get_list_element(MXFList *list, size_t index)
     MXFListElement *element = list->elements;
 
     if (index == MXF_LIST_NPOS || index >= list->len)
-    {
         return NULL;
-    }
 
-    if (index == 0)
-    {
+    if (index == 0) {
         assert(list->elements);
         return list->elements->data;
     }
-    if (index == list->len - 1)
-    {
+    if (index == list->len - 1) {
         assert(list->lastElement);
         return list->lastElement->data;
     }
 
-    while (currentIndex != index)
-    {
+    while (currentIndex != index) {
         currentIndex++;
         element = element->next;
         assert(element);
@@ -371,27 +315,21 @@ void* mxf_get_list_element(MXFList *list, size_t index)
 void* mxf_get_first_list_element(MXFList *list)
 {
     if (!list->elements)
-    {
         return NULL;
-    }
     return list->elements->data;
 }
 
 void* mxf_get_last_list_element(MXFList *list)
 {
     if (!list->lastElement)
-    {
         return NULL;
-    }
     return list->lastElement->data;
 }
 
 void mxf_free_list_element_data(MXFList *list, void *data)
 {
     if (list->freeFunc)
-    {
         list->freeFunc(data);
-    }
 }
 
 void mxf_initialise_list_iter(MXFListIterator *iter, const MXFList *list)
@@ -403,18 +341,14 @@ void mxf_initialise_list_iter(MXFListIterator *iter, const MXFList *list)
 
 void mxf_initialise_list_iter_at(MXFListIterator *iter, const MXFList *list, size_t index)
 {
-    if (index == MXF_LIST_NPOS)
-    {
+    if (index == MXF_LIST_NPOS) {
         mxf_initialise_list_iter(iter, list);
-    }
-    else
-    {
+    } else {
         iter->nextElement = list->elements;
         iter->data = NULL;
         iter->index = 0;
 
-        while (iter->index != index && iter->nextElement)
-        {
+        while (iter->index != index && iter->nextElement) {
             iter->index++;
             iter->nextElement = iter->nextElement->next;
         }
@@ -423,24 +357,17 @@ void mxf_initialise_list_iter_at(MXFListIterator *iter, const MXFList *list, siz
 
 int mxf_next_list_iter_element(MXFListIterator *iter)
 {
-    if (iter->nextElement)
-    {
+    if (iter->nextElement) {
         iter->data = iter->nextElement->data;
         iter->nextElement = iter->nextElement->next;
-    }
-    else
-    {
+    } else {
         iter->data = NULL;
     }
 
     if (iter->data)
-    {
         iter->index++;
-    }
     else
-    {
         iter->index = MXF_LIST_NPOS;
-    }
 
     return iter->data != NULL;
 }
