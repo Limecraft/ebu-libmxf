@@ -48,20 +48,14 @@ static void clear_type(MXFItemType *type)
 {
     size_t i;
 
-    if (type == NULL)
-    {
+    if (!type)
         return;
-    }
 
-    if (type->typeId != 0)
-    {
+    if (type->typeId != 0) {
         SAFE_FREE(type->name);
-        if (type->category == MXF_COMPOUND_TYPE_CAT)
-        {
+        if (type->category == MXF_COMPOUND_TYPE_CAT) {
             for (i = 0; i < ARRAY_SIZE(type->info.compound.members); i++)
-            {
                 SAFE_FREE(type->info.compound.members[i].name);
-            }
         }
     }
     memset(type, 0, sizeof(MXFItemType));
@@ -69,37 +63,43 @@ static void clear_type(MXFItemType *type)
 
 static void free_item_def(MXFItemDef **itemDef)
 {
-    if (*itemDef == NULL)
-    {
+    if (!(*itemDef))
         return;
-    }
 
     SAFE_FREE((*itemDef)->name);
     SAFE_FREE(*itemDef);
-}
-
-static void free_set_def(MXFSetDef **setDef)
-{
-    if (*setDef == NULL)
-    {
-        return;
-    }
-
-    SAFE_FREE((*setDef)->name);
-    SAFE_FREE(*setDef);
 }
 
 static void free_item_def_in_list(void *data)
 {
     MXFItemDef *itemDef;
 
-    if (data == NULL)
-    {
+    if (!data)
         return;
-    }
 
     itemDef = (MXFItemDef*)data;
     free_item_def(&itemDef);
+}
+
+static void free_set_def(MXFSetDef **setDef)
+{
+    if (!(*setDef))
+        return;
+
+    SAFE_FREE((*setDef)->name);
+    SAFE_FREE(*setDef);
+}
+
+static void free_set_def_in_tree(void *data)
+{
+    MXFSetDef *setDef;
+
+    if (!data)
+        return;
+
+    setDef = (MXFSetDef*)data;
+    mxf_clear_list(&setDef->itemDefs);
+    free_set_def(&setDef);
 }
 
 static int compare_set_def_in_tree(void *left_in, void *right_in)
@@ -110,26 +110,12 @@ static int compare_set_def_in_tree(void *left_in, void *right_in)
     return memcmp(&left->key, &right->key, sizeof(left->key));
 }
 
-static void free_set_def_in_tree(void *data)
-{
-    MXFSetDef *setDef;
-
-    if (data == NULL)
-    {
-        return;
-    }
-
-    setDef = (MXFSetDef*)data;
-    mxf_clear_list(&setDef->itemDefs);
-    free_set_def(&setDef);
-}
-
 static int item_def_eq(void *data, void *info)
 {
     return mxf_equals_key((mxfKey*)info, &((MXFItemDef*)data)->key);
 }
 
-static unsigned int get_type_id(MXFDataModel *dataModel)
+static unsigned int get_new_type_id(MXFDataModel *dataModel)
 {
     size_t i;
     unsigned int lastTypeId;
@@ -146,22 +132,17 @@ static unsigned int get_type_id(MXFDataModel *dataModel)
     }
 
     /* try from the last type id to the end of the list */
-    for (i = lastTypeId; i < ARRAY_SIZE(dataModel->types); i++)
-    {
-        if (dataModel->types[i].typeId == 0)
-        {
+    for (i = lastTypeId; i < ARRAY_SIZE(dataModel->types); i++) {
+        if (dataModel->types[i].typeId == 0) {
             typeId = (unsigned int)i;
             break;
         }
     }
 
-    if (typeId == 0 && lastTypeId > MXF_EXTENSION_TYPE)
-    {
+    if (typeId == 0 && lastTypeId > MXF_EXTENSION_TYPE) {
         /* try from MXF_EXTENSION_TYPE to lastTypeId */
-        for (i = MXF_EXTENSION_TYPE; i < lastTypeId; i++)
-        {
-            if (dataModel->types[i].typeId == 0)
-            {
+        for (i = MXF_EXTENSION_TYPE; i < lastTypeId; i++) {
+            if (dataModel->types[i].typeId == 0) {
                 typeId = (unsigned int)i;
                 break;
             }
@@ -178,10 +159,8 @@ static MXFSetDef* register_set_def(MXFDataModel *dataModel, const char *name, co
 
     CHK_MALLOC_ORET(newSetDef, MXFSetDef);
     memset(newSetDef, 0, sizeof(MXFSetDef));
-    if (name != NULL)
-    {
+    if (name)
         CHK_OFAIL((newSetDef->name = strdup(name)) != NULL);
-    }
     newSetDef->parentSetDefKey = *parentKey;
     newSetDef->key = *key;
     mxf_initialise_list(&newSetDef->itemDefs, NULL);
@@ -202,10 +181,8 @@ static MXFItemDef* register_item_def(MXFDataModel *dataModel, const char *name, 
 
     CHK_MALLOC_ORET(newItemDef, MXFItemDef);
     memset(newItemDef, 0, sizeof(MXFItemDef));
-    if (name != NULL)
-    {
+    if (name)
         CHK_OFAIL((newItemDef->name = strdup(name)) != NULL);
-    }
     newItemDef->setDefKey = *setKey;
     newItemDef->key = *key;
     newItemDef->localTag = tag;
@@ -230,8 +207,7 @@ static int clone_item_type(MXFDataModel *fromDataModel, unsigned int fromItemTyp
     int i;
 
     clonedItemType = mxf_get_item_def_type(toDataModel, fromItemTypeId);
-    if (clonedItemType)
-    {
+    if (clonedItemType) {
         *toItemType = clonedItemType;
         return 1;
     }
@@ -257,8 +233,7 @@ static int clone_item_type(MXFDataModel *fromDataModel, unsigned int fromItemTyp
             CHK_ORET(clonedItemType);
 
             i = 0;
-            while (fromItemType->info.compound.members[i].typeId)
-            {
+            while (fromItemType->info.compound.members[i].typeId) {
                 CHK_ORET(clone_item_type(fromDataModel, fromItemType->info.compound.members[i].typeId,
                                          toDataModel, &toRefItemType));
                 CHK_ORET(mxf_register_compound_type_member(clonedItemType, fromItemType->info.compound.members[i].name,
@@ -364,18 +339,14 @@ void mxf_free_data_model(MXFDataModel **dataModel)
 {
     size_t i;
 
-    if (*dataModel == NULL)
-    {
+    if (!(*dataModel))
         return;
-    }
 
     mxf_tree_clear(&(*dataModel)->setDefs);
     mxf_clear_list(&(*dataModel)->itemDefs);
 
     for (i = 0; i < ARRAY_SIZE((*dataModel)->types); i++)
-    {
         clear_type(&(*dataModel)->types[i]);
-    }
 
     SAFE_FREE(*dataModel);
 }
@@ -391,7 +362,6 @@ int mxf_register_item_def(MXFDataModel *dataModel, const char *name, const mxfKe
     return register_item_def(dataModel, name, setKey, key, tag, typeId, isRequired) != NULL;
 }
 
-
 MXFItemType* mxf_register_basic_type(MXFDataModel *dataModel, const char *name, unsigned int typeId, unsigned int size)
 {
     MXFItemType *type;
@@ -406,10 +376,8 @@ MXFItemType* mxf_register_basic_type(MXFDataModel *dataModel, const char *name, 
     type = &dataModel->types[typeId];
     type->typeId = typeId; /* set first to indicate type is present */
     type->category = MXF_BASIC_TYPE_CAT;
-    if (name != NULL)
-    {
+    if (name)
         CHK_OFAIL((type->name = strdup(name)) != NULL);
-    }
     type->info.basic.size = size;
 
     return type;
@@ -425,12 +393,9 @@ MXFItemType* mxf_register_array_type(MXFDataModel *dataModel, const char *name, 
     unsigned int actualTypeId;
     MXFItemType *type;
 
-    if (typeId <= 0)
-    {
-        actualTypeId = get_type_id(dataModel);
-    }
-    else
-    {
+    if (typeId <= 0) {
+        actualTypeId = get_new_type_id(dataModel);
+    } else {
         /* check the type id is valid and free */
         CHK_ORET(typeId < ARRAY_SIZE(dataModel->types) &&
                  dataModel->types[typeId].typeId == 0);
@@ -440,10 +405,8 @@ MXFItemType* mxf_register_array_type(MXFDataModel *dataModel, const char *name, 
     type = &dataModel->types[actualTypeId];
     type->typeId = actualTypeId; /* set first to indicate type is present */
     type->category = MXF_ARRAY_TYPE_CAT;
-    if (name != NULL)
-    {
+    if (name)
         CHK_OFAIL((type->name = strdup(name)) != NULL);
-    }
     type->info.array.elementTypeId = elementTypeId;
     type->info.array.fixedSize = fixedSize;
 
@@ -459,12 +422,9 @@ MXFItemType* mxf_register_compound_type(MXFDataModel *dataModel, const char *nam
     unsigned int actualTypeId;
     MXFItemType *type = NULL;
 
-    if (typeId == 0)
-    {
-        actualTypeId = get_type_id(dataModel);
-    }
-    else
-    {
+    if (typeId == 0) {
+        actualTypeId = get_new_type_id(dataModel);
+    } else {
         /* check the type id is valid and free */
         CHK_ORET(typeId < ARRAY_SIZE(dataModel->types) &&
                  dataModel->types[typeId].typeId == 0);
@@ -474,10 +434,8 @@ MXFItemType* mxf_register_compound_type(MXFDataModel *dataModel, const char *nam
     type = &dataModel->types[actualTypeId];
     type->typeId = actualTypeId; /* set first to indicate type is present */
     type->category = MXF_COMPOUND_TYPE_CAT;
-    if (name != NULL)
-    {
+    if (name)
         CHK_OFAIL((type->name = strdup(name)) != NULL);
-    }
     memset(type->info.compound.members, 0, sizeof(type->info.compound.members));
 
     return type;
@@ -493,15 +451,11 @@ int mxf_register_compound_type_member(MXFItemType *type, const char *memberName,
     size_t maxMembers = ARRAY_SIZE(type->info.compound.members) - 1;
 
     /* find null terminator (eg. typeId == 0) */
-    for (memberIndex = 0; memberIndex < maxMembers; memberIndex++)
-    {
+    for (memberIndex = 0; memberIndex < maxMembers; memberIndex++) {
         if (type->info.compound.members[memberIndex].typeId == 0)
-        {
             break;
-        }
     }
-    if (memberIndex == maxMembers)
-    {
+    if (memberIndex == maxMembers) {
         mxf_log_error("Number of compound item type members exceeds hardcoded maximum %d"
                       LOG_LOC_FORMAT, maxMembers, LOG_LOC_PARAMS);
         return 0;
@@ -521,12 +475,9 @@ MXFItemType* mxf_register_interpret_type(MXFDataModel *dataModel, const char *na
     unsigned int actualTypeId;
     MXFItemType *type;
 
-    if (typeId == 0)
-    {
-        actualTypeId = get_type_id(dataModel);
-    }
-    else
-    {
+    if (typeId == 0) {
+        actualTypeId = get_new_type_id(dataModel);
+    } else {
         /* check the type id is valid and free */
         CHK_ORET(typeId < ARRAY_SIZE(dataModel->types) &&
                  dataModel->types[typeId].typeId == 0);
@@ -536,10 +487,8 @@ MXFItemType* mxf_register_interpret_type(MXFDataModel *dataModel, const char *na
     type = &dataModel->types[actualTypeId];
     type->typeId = actualTypeId; /* set first to indicate type is present */
     type->category = MXF_INTERPRET_TYPE_CAT;
-    if (name != NULL)
-    {
+    if (name)
         CHK_OFAIL((type->name = strdup(name)) != NULL);
-    }
     type->info.interpret.typeId = interpretedTypeId;
     type->info.interpret.fixedArraySize = fixedArraySize;
 
@@ -561,8 +510,7 @@ int mxf_finalise_data_model(MXFDataModel *dataModel)
 
     /* add item defs to owner set def */
     mxf_initialise_list_iter(&iter, &dataModel->itemDefs);
-    while (mxf_next_list_iter_element(&iter))
-    {
+    while (mxf_next_list_iter_element(&iter)) {
         itemDef = (MXFItemDef*)mxf_get_iter_element(&iter);
         CHK_ORET(mxf_find_set_def(dataModel, &itemDef->setDefKey, &setDef));
         CHK_ORET(mxf_append_list_element(&setDef->itemDefs, (void*)itemDef));
@@ -584,13 +532,11 @@ int mxf_check_data_model(MXFDataModel *dataModel)
        and the item type is known */
     listIndex = 0;
     mxf_initialise_list_iter(&iter1, &dataModel->itemDefs);
-    while (mxf_next_list_iter_element(&iter1))
-    {
+    while (mxf_next_list_iter_element(&iter1)) {
         itemDef1 = (MXFItemDef*)mxf_get_iter_element(&iter1);
 
         /* check item def is contained in a set def */
-        if (mxf_equals_key(&itemDef1->setDefKey, &g_Null_Key))
-        {
+        if (mxf_equals_key(&itemDef1->setDefKey, &g_Null_Key)) {
             char keyStr[KEY_STR_SIZE];
             mxf_sprint_key(keyStr, &itemDef1->key);
             mxf_log_warn("Found item def not contained in any set def. Key = %s"
@@ -600,19 +546,16 @@ int mxf_check_data_model(MXFDataModel *dataModel)
 
         /* check with item defs with higher index in list */
         mxf_initialise_list_iter_at(&iter2, &dataModel->itemDefs, listIndex + 1);
-        while (mxf_next_list_iter_element(&iter2))
-        {
+        while (mxf_next_list_iter_element(&iter2)) {
             itemDef2 = (MXFItemDef*)mxf_get_iter_element(&iter2);
-            if (mxf_equals_key(&itemDef1->key, &itemDef2->key))
-            {
+            if (mxf_equals_key(&itemDef1->key, &itemDef2->key)) {
                 char keyStr[KEY_STR_SIZE];
                 mxf_sprint_key(keyStr, &itemDef1->key);
                 mxf_log_warn("Duplicate item def found. Key = %s"
                              LOG_LOC_FORMAT, keyStr, LOG_LOC_PARAMS);
                 return 0;
             }
-            if (itemDef1->localTag != 0 && itemDef1->localTag == itemDef2->localTag)
-            {
+            if (itemDef1->localTag != 0 && itemDef1->localTag == itemDef2->localTag) {
                 char keyStr[KEY_STR_SIZE];
                 mxf_sprint_key(keyStr, &itemDef1->key);
                 mxf_log_warn("Duplicate item def local tag found. LocalTag = 0x%04x, Key = %s"
@@ -622,8 +565,7 @@ int mxf_check_data_model(MXFDataModel *dataModel)
         }
 
         /* check item type is valid and known */
-        if (mxf_get_item_def_type(dataModel, itemDef1->typeId) == NULL)
-        {
+        if (!mxf_get_item_def_type(dataModel, itemDef1->typeId)) {
             char keyStr[KEY_STR_SIZE];
             mxf_sprint_key(keyStr, &itemDef1->key);
             mxf_log_warn("Item def has unknown type (%d). LocalTag = 0x%04x, Key = %s"
@@ -653,65 +595,44 @@ int mxf_find_set_def(MXFDataModel *dataModel, const mxfKey *key, MXFSetDef **set
 
 int mxf_find_item_def(MXFDataModel *dataModel, const mxfKey *key, MXFItemDef **itemDef)
 {
-    void *result;
+    void *result = mxf_find_list_element(&dataModel->itemDefs, (void*)key, item_def_eq);
+    if (!result)
+        return 0;
 
-    if ((result = mxf_find_list_element(&dataModel->itemDefs, (void*)key, item_def_eq)) != NULL)
-    {
-        *itemDef = (MXFItemDef*)result;
-        return 1;
-    }
-
-    return 0;
+    *itemDef = (MXFItemDef*)result;
+    return 1;
 }
 
 int mxf_find_item_def_in_set_def(const mxfKey *key, const MXFSetDef *setDef, MXFItemDef **itemDef)
 {
-    void *result;
-
-    if ((result = mxf_find_list_element(&setDef->itemDefs, (void*)key, item_def_eq)) != NULL)
-    {
-        *itemDef = (MXFItemDef*)result;
-        return 1;
+    void *result = mxf_find_list_element(&setDef->itemDefs, (void*)key, item_def_eq);
+    if (!result) {
+        if (setDef->parentSetDef)
+            return mxf_find_item_def_in_set_def(key, setDef->parentSetDef, itemDef);
+        return 0;
     }
 
-    if (setDef->parentSetDef != NULL)
-    {
-        return mxf_find_item_def_in_set_def(key, setDef->parentSetDef, itemDef);
-    }
-
-    return 0;
+    *itemDef = (MXFItemDef*)result;
+    return 1;
 }
-
 
 MXFItemType* mxf_get_item_def_type(MXFDataModel *dataModel, unsigned int typeId)
 {
-    if (typeId == 0 || typeId >= ARRAY_SIZE(dataModel->types))
-    {
+    if (typeId == 0 || typeId >= ARRAY_SIZE(dataModel->types) || dataModel->types[typeId].typeId == MXF_UNKNOWN_TYPE)
         return NULL;
-    }
-    if (dataModel->types[typeId].typeId == MXF_UNKNOWN_TYPE)
-    {
-        return NULL;
-    }
 
     return &dataModel->types[typeId];
 }
-
-
 
 int mxf_is_subclass_of(MXFDataModel *dataModel, const mxfKey *setKey, const mxfKey *parentSetKey)
 {
     MXFSetDef *setDef;
 
     if (mxf_equals_key(setKey, parentSetKey))
-    {
         return 1;
-    }
 
     if (!mxf_find_set_def(dataModel, setKey, &setDef))
-    {
         return 0;
-    }
 
     return mxf_is_subclass_of_2(dataModel, setDef, parentSetKey);
 }
@@ -719,19 +640,13 @@ int mxf_is_subclass_of(MXFDataModel *dataModel, const mxfKey *setKey, const mxfK
 int mxf_is_subclass_of_2(MXFDataModel *dataModel, MXFSetDef *setDef, const mxfKey *parentSetKey)
 {
     if (mxf_equals_key(&setDef->key, parentSetKey))
-    {
         return 1;
-    }
 
-    if (setDef->parentSetDef == NULL ||
-        mxf_equals_key(&setDef->key, &setDef->parentSetDefKey))
-    {
+    if (!setDef->parentSetDef || mxf_equals_key(&setDef->key, &setDef->parentSetDefKey))
         return 0;
-    }
 
     return mxf_is_subclass_of_2(dataModel, setDef->parentSetDef, parentSetKey);
 }
-
 
 int mxf_clone_set_def(MXFDataModel *fromDataModel, MXFSetDef *fromSetDef,
                       MXFDataModel *toDataModel, MXFSetDef **toSetDef)
@@ -742,12 +657,9 @@ int mxf_clone_set_def(MXFDataModel *fromDataModel, MXFSetDef *fromSetDef,
     MXFItemDef *fromItemDef;
     MXFItemDef *toItemDef = NULL;
 
-    if (!mxf_find_set_def(toDataModel, &fromSetDef->key, &clonedSetDef))
-    {
+    if (!mxf_find_set_def(toDataModel, &fromSetDef->key, &clonedSetDef)) {
         if (fromSetDef->parentSetDef)
-        {
             CHK_ORET(mxf_clone_set_def(fromDataModel, fromSetDef->parentSetDef, toDataModel, &toParentSetDef));
-        }
 
         clonedSetDef = register_set_def(toDataModel, fromSetDef->name, &fromSetDef->parentSetDefKey, &fromSetDef->key);
         CHK_ORET(clonedSetDef);
@@ -755,14 +667,11 @@ int mxf_clone_set_def(MXFDataModel *fromDataModel, MXFSetDef *fromSetDef,
     }
 
     mxf_initialise_list_iter(&iter, &fromSetDef->itemDefs);
-    while (mxf_next_list_iter_element(&iter))
-    {
+    while (mxf_next_list_iter_element(&iter)) {
         fromItemDef = (MXFItemDef*)mxf_get_iter_element(&iter);
 
         if (mxf_find_item_def_in_set_def(&fromItemDef->key, clonedSetDef, &toItemDef))
-        {
             continue;
-        }
 
         CHK_ORET(clone_item_def(fromDataModel, fromItemDef, toDataModel, &toItemDef));
         CHK_ORET(mxf_append_list_element(&clonedSetDef->itemDefs, (void*)toItemDef));
