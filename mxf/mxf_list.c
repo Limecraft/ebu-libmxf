@@ -35,7 +35,6 @@
 #include "config.h"
 #endif
 
-#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -265,7 +264,6 @@ void* mxf_remove_list_element_at_index(MXFList *list, size_t index)
         currentIndex++;
         prevElement = element;
         element = element->next;
-        assert(element);
     }
 
     return remove_list_element(list, element, prevElement);
@@ -279,19 +277,14 @@ void* mxf_get_list_element(MXFList *list, size_t index)
     if (index == MXF_LIST_NPOS || index >= list->len)
         return NULL;
 
-    if (index == 0) {
-        assert(list->elements);
+    if (index == 0)
         return list->elements->data;
-    }
-    if (index == list->len - 1) {
-        assert(list->lastElement);
+    if (index == list->len - 1)
         return list->lastElement->data;
-    }
 
     while (currentIndex != index) {
         currentIndex++;
         element = element->next;
-        assert(element);
     }
 
     return element->data;
