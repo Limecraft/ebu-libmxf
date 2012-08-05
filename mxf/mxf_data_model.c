@@ -35,7 +35,6 @@
 #include "config.h"
 #endif
 
-#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -127,15 +126,11 @@ static void free_set_def_in_tree(void *data)
 
 static int item_def_eq(void *data, void *info)
 {
-    assert(data != NULL && info != NULL);
-
     return mxf_equals_key((mxfKey*)info, &((MXFItemDef*)data)->key);
 }
 
 static int add_set_def(MXFDataModel *dataModel, MXFSetDef *setDef)
 {
-    assert(setDef != NULL);
-
     CHK_ORET(mxf_tree_insert(&dataModel->setDefs, (void*)setDef));
 
     return 1;
@@ -143,8 +138,6 @@ static int add_set_def(MXFDataModel *dataModel, MXFSetDef *setDef)
 
 static int add_item_def(MXFDataModel *dataModel, MXFItemDef *itemDef)
 {
-    assert(itemDef != NULL);
-
     CHK_ORET(mxf_append_list_element(&dataModel->itemDefs, (void*)itemDef));
 
     return 1;
