@@ -1,7 +1,7 @@
 /*
- * libMXF header files
+ * Implements an AVL binary search tree
  *
- * Copyright (C) 2006, British Broadcasting Corporation
+ * Copyright (C) 2012, British Broadcasting Corporation
  * All Rights Reserved.
  *
  * Author: Philip de Nier
@@ -31,8 +31,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef MXF_MXF_H_
-#define MXF_MXF_H_
+#ifndef MXF_TREE_H_
+#define MXF_TREE_H_
+
 
 #ifdef __cplusplus
 extern "C"
@@ -40,20 +41,40 @@ extern "C"
 #endif
 
 
-#include <mxf/mxf_types.h>
-#include <mxf/mxf_version.h>
-#include <mxf/mxf_labels_and_keys.h>
-#include <mxf/mxf_list.h>
-#include <mxf/mxf_tree.h>
-#include <mxf/mxf_logging.h>
-#include <mxf/mxf_file.h>
-#include <mxf/mxf_utils.h>
-#include <mxf/mxf_partition.h>
-#include <mxf/mxf_primer.h>
-#include <mxf/mxf_index_table.h>
-#include <mxf/mxf_essence_container.h>
-#include <mxf/mxf_data_model.h>
-#include <mxf/mxf_header_metadata.h>
+typedef void (*mxf_tree_free_node_f)(void *node_data);
+typedef int (*mxf_tree_compare_node_f)(void *left, void *right);
+typedef int (*mxf_tree_process_node_f)(void *node_data, void *process_data);
+
+typedef struct MXFTreeNode
+{
+    struct MXFTreeNode *left;
+    struct MXFTreeNode *right;
+    int height;
+    void *data;
+} MXFTreeNode;
+
+typedef struct
+{
+    MXFTreeNode *root;
+    int allow_duplicates;
+    mxf_tree_compare_node_f compare_f;
+    mxf_tree_free_node_f free_f;
+} MXFTree;
+
+
+
+int mxf_tree_create(MXFTree **tree, int allow_duplicates, mxf_tree_compare_node_f compare_f,
+                    mxf_tree_free_node_f free_f);
+void mxf_tree_free(MXFTree **tree);
+void mxf_tree_init(MXFTree *tree, int allow_duplicates, mxf_tree_compare_node_f compare_f,
+                   mxf_tree_free_node_f free_f);
+void mxf_tree_clear(MXFTree *tree);
+
+int mxf_tree_insert(MXFTree *tree, void *data);
+int mxf_tree_remove(MXFTree *tree, void *key);
+void* mxf_tree_find(MXFTree *tree, void *key);
+int mxf_tree_traverse(MXFTree *tree, mxf_tree_process_node_f process_f, void *process_data);
+
 
 
 #ifdef __cplusplus

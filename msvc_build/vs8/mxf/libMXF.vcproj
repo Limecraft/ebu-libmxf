@@ -229,6 +229,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\mxf\mxf_tree.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\mxf\mxf_utils.c"
 				>
 			</File>
@@ -368,6 +372,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\mxf\mxf_rw_intl_file.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\mxf\mxf_tree.h"
 				>
 			</File>
 			<File

@@ -119,7 +119,7 @@ typedef struct MXFSetDef
 typedef struct
 {
     MXFList itemDefs;
-    MXFList setDefs;
+    MXFTree setDefs;
     MXFItemType types[128]; /* index 0 is not used */
     unsigned int lastTypeId;
 } MXFDataModel;

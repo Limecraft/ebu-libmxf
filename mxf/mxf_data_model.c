@@ -103,7 +103,15 @@ static void free_item_def_in_list(void *data)
     free_item_def(&itemDef);
 }
 
-static void free_set_def_in_list(void *data)
+static int compare_set_def_in_tree(void *left_in, void *right_in)
+{
+    MXFSetDef *left = (MXFSetDef*)left_in;
+    MXFSetDef *right = (MXFSetDef*)right_in;
+
+    return memcmp(&left->key, &right->key, sizeof(left->key));
+}
+
+static void free_set_def_in_tree(void *data)
 {
     MXFSetDef *setDef;
 
@@ -117,13 +125,6 @@ static void free_set_def_in_list(void *data)
     free_set_def(&setDef);
 }
 
-static int set_def_eq(void *data, void *info)
-{
-    assert(data != NULL && info != NULL);
-
-    return mxf_equals_key((mxfKey*)info, &((MXFSetDef*)data)->key);
-}
-
 static int item_def_eq(void *data, void *info)
 {
     assert(data != NULL && info != NULL);
@@ -135,7 +136,7 @@ static int add_set_def(MXFDataModel *dataModel, MXFSetDef *setDef)
 {
     assert(setDef != NULL);
 
-    CHK_ORET(mxf_append_list_element(&dataModel->setDefs, (void*)setDef));
+    CHK_ORET(mxf_tree_insert(&dataModel->setDefs, (void*)setDef));
 
     return 1;
 }
@@ -261,6 +262,45 @@ static int clone_item_def(MXFDataModel *fromDataModel, MXFItemDef *fromItemDef,
                                    fromItemDef->localTag, fromItemDef->typeId, fromItemDef->isRequired));
 
     *toItemDef = (MXFItemDef*)mxf_get_last_list_element(&toDataModel->itemDefs);
+
+    return 1;
+}
+
+static MXFSetDef* register_set_def(MXFDataModel *dataModel, const char *name, const mxfKey *parentKey,
+                                   const mxfKey *key)
+{
+    MXFSetDef *newSetDef = NULL;
+
+    CHK_MALLOC_ORET(newSetDef, MXFSetDef);
+    memset(newSetDef, 0, sizeof(MXFSetDef));
+    if (name != NULL)
+    {
+        CHK_OFAIL((newSetDef->name = strdup(name)) != NULL);
+    }
+    newSetDef->parentSetDefKey = *parentKey;
+    newSetDef->key = *key;
+    mxf_initialise_list(&newSetDef->itemDefs, NULL);
+
+    CHK_OFAIL(add_set_def(dataModel, newSetDef));
+
+    return newSetDef;
+
+fail:
+    free_set_def(&newSetDef);
+    return NULL;
+}
+
+static int finalise_set_def(void *nodeData, void *processData)
+{
+    MXFSetDef *setDef = (MXFSetDef*)nodeData;
+    MXFDataModel *dataModel = (MXFDataModel*)processData;
+
+    mxf_clear_list(&setDef->itemDefs);
+    setDef->parentSetDef = NULL;
+
+    if (!mxf_equals_key(&setDef->parentSetDefKey, &g_Null_Key))
+        CHK_ORET(mxf_find_set_def(dataModel, &setDef->parentSetDefKey, &setDef->parentSetDef));
+
     return 1;
 }
 
@@ -298,7 +338,7 @@ int mxf_load_data_model(MXFDataModel **dataModel)
     CHK_MALLOC_ORET(newDataModel, MXFDataModel);
     memset(newDataModel, 0, sizeof(MXFDataModel));
     mxf_initialise_list(&newDataModel->itemDefs, free_item_def_in_list);
-    mxf_initialise_list(&newDataModel->setDefs, free_set_def_in_list);
+    mxf_tree_init(&newDataModel->setDefs, 0, compare_set_def_in_tree, free_set_def_in_tree);
 
 #define KEEP_DATA_MODEL_DEFS 1
 #include <mxf/mxf_baseline_data_model.h>
@@ -323,7 +363,7 @@ void mxf_free_data_model(MXFDataModel **dataModel)
         return;
     }
 
-    mxf_clear_list(&(*dataModel)->setDefs);
+    mxf_tree_clear(&(*dataModel)->setDefs);
     mxf_clear_list(&(*dataModel)->itemDefs);
 
     for (i = 0; i < ARRAY_SIZE((*dataModel)->types); i++)
@@ -336,25 +376,7 @@ void mxf_free_data_model(MXFDataModel **dataModel)
 
 int mxf_register_set_def(MXFDataModel *dataModel, const char *name, const mxfKey *parentKey, const mxfKey *key)
 {
-    MXFSetDef *newSetDef = NULL;
-
-    CHK_MALLOC_ORET(newSetDef, MXFSetDef);
-    memset(newSetDef, 0, sizeof(MXFSetDef));
-    if (name != NULL)
-    {
-        CHK_OFAIL((newSetDef->name = strdup(name)) != NULL);
-    }
-    newSetDef->parentSetDefKey = *parentKey;
-    newSetDef->key = *key;
-    mxf_initialise_list(&newSetDef->itemDefs, NULL);
-
-    CHK_OFAIL(add_set_def(dataModel, newSetDef));
-
-    return 1;
-
-fail:
-    free_set_def(&newSetDef);
-    return 0;
+    return register_set_def(dataModel, name, parentKey, key) != NULL;
 }
 
 int mxf_register_item_def(MXFDataModel *dataModel, const char *name, const mxfKey *setKey, const mxfKey *key,
@@ -542,7 +564,6 @@ fail:
     return NULL;
 }
 
-
 int mxf_finalise_data_model(MXFDataModel *dataModel)
 {
     MXFListIterator iter;
@@ -550,18 +571,7 @@ int mxf_finalise_data_model(MXFDataModel *dataModel)
     MXFSetDef *setDef;
 
     /* reset set defs and set the parent set def if the parent set def key != g_Null_Key */
-    mxf_initialise_list_iter(&iter, &dataModel->setDefs);
-    while (mxf_next_list_iter_element(&iter))
-    {
-        setDef = (MXFSetDef*)mxf_get_iter_element(&iter);
-        mxf_clear_list(&setDef->itemDefs);
-        setDef->parentSetDef = NULL;
-
-        if (!mxf_equals_key(&setDef->parentSetDefKey, &g_Null_Key))
-        {
-            CHK_ORET(mxf_find_set_def(dataModel, &setDef->parentSetDefKey, &setDef->parentSetDef));
-        }
-    }
+    CHK_ORET(mxf_tree_traverse(&dataModel->setDefs, finalise_set_def, dataModel));
 
     /* add item defs to owner set def */
     mxf_initialise_list_iter(&iter, &dataModel->itemDefs);
@@ -579,35 +589,9 @@ int mxf_check_data_model(MXFDataModel *dataModel)
 {
     MXFListIterator iter1;
     MXFListIterator iter2;
-    MXFSetDef *setDef1;
-    MXFSetDef *setDef2;
     MXFItemDef *itemDef1;
     MXFItemDef *itemDef2;
     size_t listIndex;
-
-
-    /* check that the set defs are unique */
-    listIndex = 0;
-    mxf_initialise_list_iter(&iter1, &dataModel->setDefs);
-    while (mxf_next_list_iter_element(&iter1))
-    {
-        setDef1 = (MXFSetDef*)mxf_get_iter_element(&iter1);
-
-        /* check with set defs with higher index in list */
-        mxf_initialise_list_iter_at(&iter2, &dataModel->setDefs, listIndex + 1);
-        while (mxf_next_list_iter_element(&iter2))
-        {
-            setDef2 = (MXFSetDef*)mxf_get_iter_element(&iter2);
-            if (mxf_equals_key(&setDef1->key, &setDef2->key))
-            {
-                char keyStr[KEY_STR_SIZE];
-                mxf_sprint_key(keyStr, &setDef1->key);
-                mxf_log_warn("Duplicate set def found. Key = %s" LOG_LOC_FORMAT, keyStr, LOG_LOC_PARAMS);
-                return 0;
-            }
-        }
-        listIndex++;
-    }
 
     /* check that the item defs are unique (both key and static local tag),
        that the item def is contained in a set def
@@ -669,15 +653,16 @@ int mxf_check_data_model(MXFDataModel *dataModel)
 
 int mxf_find_set_def(MXFDataModel *dataModel, const mxfKey *key, MXFSetDef **setDef)
 {
-    void *result;
+    MXFSetDef *result;
+    MXFSetDef setDefKey;
 
-    if ((result = mxf_find_list_element(&dataModel->setDefs, (void*)key, set_def_eq)) != NULL)
-    {
-        *setDef = (MXFSetDef*)result;
-        return 1;
-    }
+    setDefKey.key = *key;
+    result = mxf_tree_find(&dataModel->setDefs, &setDefKey);
+    if (!result)
+        return 0;
 
-    return 0;
+    *setDef = (MXFSetDef*)result;
+    return 1;
 }
 
 int mxf_find_item_def(MXFDataModel *dataModel, const mxfKey *key, MXFItemDef **itemDef)
@@ -778,8 +763,8 @@ int mxf_clone_set_def(MXFDataModel *fromDataModel, MXFSetDef *fromSetDef,
             CHK_ORET(mxf_clone_set_def(fromDataModel, fromSetDef->parentSetDef, toDataModel, &toParentSetDef));
         }
 
-        CHK_ORET(mxf_register_set_def(toDataModel, fromSetDef->name, &fromSetDef->parentSetDefKey, &fromSetDef->key));
-        clonedSetDef = (MXFSetDef*)mxf_get_last_list_element(&toDataModel->setDefs);
+        clonedSetDef = register_set_def(toDataModel, fromSetDef->name, &fromSetDef->parentSetDefKey, &fromSetDef->key);
+        CHK_ORET(clonedSetDef);
         clonedSetDef->parentSetDef = toParentSetDef;
     }
 
