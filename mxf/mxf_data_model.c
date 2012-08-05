@@ -171,6 +171,32 @@ static unsigned int get_type_id(MXFDataModel *dataModel)
     return typeId;
 }
 
+static MXFItemDef* register_item_def(MXFDataModel *dataModel, const char *name, const mxfKey *setKey,
+                                     const mxfKey *key, mxfLocalTag tag, unsigned int typeId, int isRequired)
+{
+    MXFItemDef *newItemDef = NULL;
+
+    CHK_MALLOC_ORET(newItemDef, MXFItemDef);
+    memset(newItemDef, 0, sizeof(MXFItemDef));
+    if (name != NULL)
+    {
+        CHK_OFAIL((newItemDef->name = strdup(name)) != NULL);
+    }
+    newItemDef->setDefKey = *setKey;
+    newItemDef->key = *key;
+    newItemDef->localTag = tag;
+    newItemDef->typeId = typeId;
+    newItemDef->isRequired = isRequired;
+
+    CHK_OFAIL(mxf_append_list_element(&dataModel->itemDefs, newItemDef));
+
+    return newItemDef;
+
+fail:
+    free_item_def(&newItemDef);
+    return NULL;
+}
+
 static int clone_item_type(MXFDataModel *fromDataModel, unsigned int fromItemTypeId,
                            MXFDataModel *toDataModel, MXFItemType **toItemType)
 {
@@ -234,14 +260,15 @@ static int clone_item_def(MXFDataModel *fromDataModel, MXFItemDef *fromItemDef,
                           MXFDataModel *toDataModel, MXFItemDef **toItemDef)
 {
     MXFItemType *toItemType;
+    MXFItemDef *clonedItemDef;
 
     CHK_ORET(clone_item_type(fromDataModel, fromItemDef->typeId, toDataModel, &toItemType));
 
-    CHK_ORET(mxf_register_item_def(toDataModel, fromItemDef->name, &fromItemDef->setDefKey, &fromItemDef->key,
-                                   fromItemDef->localTag, fromItemDef->typeId, fromItemDef->isRequired));
+    clonedItemDef = register_item_def(toDataModel, fromItemDef->name, &fromItemDef->setDefKey, &fromItemDef->key,
+                                      fromItemDef->localTag, fromItemDef->typeId, fromItemDef->isRequired);
+    CHK_ORET(clonedItemDef);
 
-    *toItemDef = (MXFItemDef*)mxf_get_last_list_element(&toDataModel->itemDefs);
-
+    *toItemDef = clonedItemDef;
     return 1;
 }
 
@@ -361,27 +388,7 @@ int mxf_register_set_def(MXFDataModel *dataModel, const char *name, const mxfKey
 int mxf_register_item_def(MXFDataModel *dataModel, const char *name, const mxfKey *setKey, const mxfKey *key,
                           mxfLocalTag tag, unsigned int typeId, int isRequired)
 {
-    MXFItemDef *newItemDef = NULL;
-
-    CHK_MALLOC_ORET(newItemDef, MXFItemDef);
-    memset(newItemDef, 0, sizeof(MXFItemDef));
-    if (name != NULL)
-    {
-        CHK_OFAIL((newItemDef->name = strdup(name)) != NULL);
-    }
-    newItemDef->setDefKey = *setKey;
-    newItemDef->key = *key;
-    newItemDef->localTag = tag;
-    newItemDef->typeId = typeId;
-    newItemDef->isRequired = isRequired;
-
-    CHK_OFAIL(mxf_append_list_element(&dataModel->itemDefs, newItemDef));
-
-    return 1;
-
-fail:
-    free_item_def(&newItemDef);
-    return 0;
+    return register_item_def(dataModel, name, setKey, key, tag, typeId, isRequired) != NULL;
 }
 
 
