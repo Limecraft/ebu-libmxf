@@ -1143,6 +1143,13 @@ void mxf_get_int64(const uint8_t *value, int64_t *result)
     mxf_get_uint64(value, (uint64_t*)result);
 }
 
+void mxf_get_float(const uint8_t *value, float *result)
+{
+	uint32_t t;
+	mxf_get_uint32(value, &t);
+    *result = (float)t;
+}
+
 void mxf_get_version_type(const uint8_t *value, mxfVersionType *result)
 {
     mxf_get_uint16(value, result);
@@ -1432,6 +1439,11 @@ void mxf_set_int64(int64_t value, uint8_t *result)
     mxf_set_uint64(*(uint64_t*)&value, result);
 }
 
+void mxf_set_float(float value, uint8_t *result)
+{
+    mxf_set_uint32(*(uint32_t*)&value, result);
+}
+
 void mxf_set_version_type(mxfVersionType value, uint8_t *result)
 {
     mxf_set_uint16(value, result);
@@ -1656,6 +1668,11 @@ int mxf_set_int32_item(MXFMetadataSet *set, const mxfKey *itemKey, int32_t value
 int mxf_set_int64_item(MXFMetadataSet *set, const mxfKey *itemKey, int64_t value)
 {
     SET_VALUE(8, mxf_set_int64);
+}
+
+int mxf_set_float_item(MXFMetadataSet *set, const mxfKey *itemKey, float value)
+{
+    SET_VALUE(4, mxf_set_float);
 }
 
 int mxf_set_version_type_item(MXFMetadataSet *set, const mxfKey *itemKey, mxfVersionType value)
@@ -1956,6 +1973,11 @@ int mxf_get_int32_item(MXFMetadataSet *set, const mxfKey *itemKey, int32_t *valu
 int mxf_get_int64_item(MXFMetadataSet *set, const mxfKey *itemKey, int64_t *value)
 {
     GET_VALUE(8, mxf_get_int64);
+}
+
+int mxf_get_float_item(MXFMetadataSet *set, const mxfKey *itemKey, float *value)
+{
+    GET_VALUE(4, mxf_get_float);
 }
 
 int mxf_get_version_type_item(MXFMetadataSet *set, const mxfKey *itemKey, mxfVersionType *value)
