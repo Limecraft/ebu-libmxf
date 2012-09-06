@@ -159,8 +159,10 @@ MXF_INTERPRETED_TYPE_DEF(MXF_WEAKREF_TYPE,              "WeakRef",          MXF_
 MXF_INTERPRETED_TYPE_DEF(MXF_ORIENTATION_TYPE,          "Orientation",      MXF_UINT8_TYPE, 0);
 MXF_INTERPRETED_TYPE_DEF(MXF_CODED_CONTENT_TYPE_TYPE,   "CodedContentType", MXF_UINT8_TYPE, 0);
 
-
-
+/* IEEE-754 singple precision float types */
+MXF_BASIC_TYPE_DEF(MXF_FLOAT_TYPE, "Float", 3);
+MXF_ARRAY_TYPE_DEF(MXF_FLOATARRAY_TYPE,         "FloatArray",       MXF_FLOAT_TYPE, 0);
+MXF_ARRAY_TYPE_DEF(MXF_FLOATBATCH_TYPE,         "FloatBatch",       MXF_FLOAT_TYPE, 0);
 
 /* Set and Item Definitions */
 
