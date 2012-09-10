@@ -205,6 +205,7 @@ typedef enum
 	/* IEEE-754 singple precision float types */
 	MXF_FLOAT_TYPE,
 	MXF_FLOATARRAY_TYPE,
+    MXF_FLOATBATCH_TYPE,
 
     MXF_EXTENSION_TYPE /* extension types must have integer value >= this */
 
