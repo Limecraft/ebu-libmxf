@@ -462,6 +462,7 @@ int main(int argv, const char *argc[])
     const char *mxf_filename = NULL;
     FILE *dv50File = NULL;
     MXFFile *mxfFile = NULL;
+    char errorBuf[128];
     int result;
 
     if (argv != 3)
@@ -490,7 +491,8 @@ int main(int argv, const char *argc[])
         dv50File = fopen(dv50_filename, "rb");
         if (!dv50File)
         {
-            fprintf(stderr, "Failed to open %s for reading: %s\n", dv50_filename, strerror(errno));
+            fprintf(stderr, "Failed to open %s for reading: %s\n",
+                    dv50_filename, mxf_strerror(errno, errorBuf, sizeof(errorBuf)));
             return 1;
         }
     }

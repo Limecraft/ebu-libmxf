@@ -64,6 +64,8 @@ typedef void (*mxf_generate_key_func)(mxfKey *key);
 void mxf_snprintf(char *str, size_t size, const char *format, ...);
 void mxf_vsnprintf(char *str, size_t size, const char *format, va_list ap);
 
+char* mxf_strerror(int errnum, char *buf, size_t size);
+
 
 void mxf_print_key(const mxfKey *key);
 void mxf_sprint_key(char *str, const mxfKey *key);

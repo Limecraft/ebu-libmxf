@@ -35,6 +35,9 @@
 #include "config.h"
 #endif
 
+// ensure strerror_r is the XSI compliant version and not the GNU version
+#undef _GNU_SOURCE
+
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
@@ -281,6 +284,21 @@ void mxf_vsnprintf(char *str, size_t size, const char *format, va_list ap)
     if (vsnprintf(str, size, format, ap) < 0 && str && size > 0)
         str[0] = 0;
 #endif
+}
+
+char* mxf_strerror(int errnum, char *buf, size_t size)
+{
+#ifdef HAVE_STRERROR_R
+    if (strerror_r(errnum, buf, size) != 0)
+        snprintf(buf, size, "unknown error code %d", errnum);
+#elif defined(_MSC_VER)
+    if (strerror_s(buf, size, errnum) != 0)
+        snprintf(buf, size, "unknown error code %d", errnum);
+#else
+    snprintf(buf, size, "error code %d", errnum);
+#endif
+
+    return buf;
 }
 
 void mxf_print_key(const mxfKey *key)
@@ -664,6 +682,7 @@ uint32_t mxf_get_system_page_size()
     SYSTEM_INFO systemInfo;
 #else
     long psResult;
+    char errorBuf[128];
 #endif
 
 #if defined (_WIN32)
@@ -674,7 +693,7 @@ uint32_t mxf_get_system_page_size()
     if (psResult < 0) {
         pageSize = 8192;
         mxf_log_warn("Failed to get system page size using sysconf(__SC_PAGESIZE): %s. Defaulting to %u\n",
-                     strerror(errno), pageSize);
+                     mxf_strerror(errno, errorBuf, sizeof(errorBuf)), pageSize);
     } else {
         pageSize = (uint32_t)psResult;
     }

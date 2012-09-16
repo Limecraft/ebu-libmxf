@@ -206,7 +206,7 @@ AC_SYS_LARGEFILE
 AC_FUNC_FSEEKO
 
 
-AC_CHECK_FUNCS([gettimeofday memmove memset sqrt strerror strncasecmp])
+AC_CHECK_FUNCS([gettimeofday memmove memset sqrt strerror strncasecmp strerror_r])
 AC_CHECK_FUNC([strdup],,
 			  AC_ERROR(require implementation for missing strdup function))
 

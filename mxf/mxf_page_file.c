@@ -128,17 +128,19 @@ static void disk_file_close(FileDescriptor *fileDesc)
 
 static uint32_t disk_file_read(FileDescriptor *fileDesc, uint8_t *data, uint32_t count)
 {
+    char errorBuf[128];
     uint32_t result = (uint32_t)fread(data, 1, count, fileDesc->file);
     if (result != count && ferror(fileDesc->file))
-        mxf_log_error("fread failed: %s\n", strerror(errno));
+        mxf_log_error("fread failed: %s\n", mxf_strerror(errno, errorBuf, sizeof(errorBuf)));
     return result;
 }
 
 static uint32_t disk_file_write(FileDescriptor *fileDesc, const uint8_t *data, uint32_t count)
 {
+    char errorBuf[128];
     uint32_t result = (uint32_t)fwrite(data, 1, count, fileDesc->file);
     if (result != count)
-        mxf_log_error("fwrite failed: %s\n", strerror(errno));
+        mxf_log_error("fwrite failed: %s\n", mxf_strerror(errno, errorBuf, sizeof(errorBuf)));
     return result;
 }
 
@@ -174,6 +176,7 @@ static int open_file(MXFFileSysData *sysData, Page *page)
     FILE *newFile = NULL;
     char filename[4096];
     FileDescriptor *newFileDescriptor = NULL;
+    char errorBuf[128];
 
     if (page->wasRemoved)
     {
@@ -274,7 +277,8 @@ static int open_file(MXFFileSysData *sysData, Page *page)
     }
     if (newFile == NULL)
     {
-        mxf_log_error("Failed to open paged mxf file '%s': %s\n", filename, strerror(errno));
+        mxf_log_error("Failed to open paged mxf file '%s': %s\n",
+                      filename, mxf_strerror(errno, errorBuf, sizeof(errorBuf)));
         return 0;
     }
 
@@ -678,6 +682,7 @@ int mxf_page_file_open_read(const char *filenameTemplate, MXFPageFile **mxfPageF
     char filename[4096];
     FILE *file;
     struct stat st;
+    char errorBuf[128];
 
 
     if (strstr(filenameTemplate, "%d") == NULL)
@@ -735,7 +740,7 @@ int mxf_page_file_open_read(const char *filenameTemplate, MXFPageFile **mxfPageF
     mxf_snprintf(filename, sizeof(filename), filenameTemplate, 0);
     if (stat(filename, &st) != 0)
     {
-        mxf_log_error("Failed to stat file '%s': %s\n", filename, strerror(errno));
+        mxf_log_error("Failed to stat file '%s': %s\n", filename, mxf_strerror(errno, errorBuf, sizeof(errorBuf)));
         goto fail;
     }
     newMXFFile->sysData->pageSize = st.st_size;
@@ -756,7 +761,7 @@ int mxf_page_file_open_read(const char *filenameTemplate, MXFPageFile **mxfPageF
     mxf_snprintf(filename, sizeof(filename), filenameTemplate, newMXFFile->sysData->numPages - 1);
     if (stat(filename, &st) != 0)
     {
-        mxf_log_error("Failed to stat file '%s': %s\n", filename, strerror(errno));
+        mxf_log_error("Failed to stat file '%s': %s\n", filename, mxf_strerror(errno, errorBuf, sizeof(errorBuf)));
         goto fail;
     }
     newMXFFile->sysData->pages[newMXFFile->sysData->numPages - 1].size = st.st_size;
@@ -781,6 +786,7 @@ int mxf_page_file_open_modify(const char *filenameTemplate, int64_t pageSize, MX
     char filename[4096];
     FILE *file;
     int64_t fileSize;
+    char errorBuf[128];
 
 
     if (strstr(filenameTemplate, "%d") == NULL)
@@ -815,7 +821,7 @@ int mxf_page_file_open_modify(const char *filenameTemplate, int64_t pageSize, MX
         fileSize = disk_file_size(filename);
         if (fileSize < 0)
         {
-            mxf_log_error("Failed to stat file '%s': %s\n", filename, strerror(errno));
+            mxf_log_error("Failed to stat file '%s': %s\n", filename, mxf_strerror(errno, errorBuf, sizeof(errorBuf)));
             return 0;
         }
         if (pageSize != fileSize)
@@ -868,7 +874,7 @@ int mxf_page_file_open_modify(const char *filenameTemplate, int64_t pageSize, MX
     fileSize = disk_file_size(filename);
     if (fileSize < 0)
     {
-        mxf_log_error("Failed to stat file '%s': %s\n", filename, strerror(errno));
+        mxf_log_error("Failed to stat file '%s': %s\n", filename, mxf_strerror(errno, errorBuf, sizeof(errorBuf)));
         goto fail;
     }
     newMXFFile->sysData->pages[newMXFFile->sysData->numPages - 1].size = fileSize;
@@ -909,6 +915,7 @@ int mxf_page_file_forward_truncate(MXFPageFile *mxfPageFile)
 #if defined(_WIN32)
     int fileid;
 #endif
+    char errorBuf[128];
 
     if (sysData->mode == READ_MODE)
     {
@@ -960,7 +967,8 @@ int mxf_page_file_forward_truncate(MXFPageFile *mxfPageFile)
         if (truncate(filename, 0) != 0)
 #endif
         {
-            mxf_log_warn("Failed to truncate '%s' to zero length: %s\n", filename, strerror(errno));
+            mxf_log_warn("Failed to truncate '%s' to zero length: %s\n", filename,
+                         mxf_strerror(errno, errorBuf, sizeof(errorBuf)));
         }
         sysData->pages[i].wasRemoved = 1;
     }
