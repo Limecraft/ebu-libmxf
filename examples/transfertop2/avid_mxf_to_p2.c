@@ -1114,7 +1114,8 @@ static int write_clip_document(AvidMXFToP2Transfer *transfer)
     globalClipIDString[0] = 0;
     for (i = 0; i < 32; i++)
     {
-        sprintf(&globalClipIDString[i*2], "%02x", ((uint8_t*)&transfer->globalClipID)[i]);
+        mxf_snprintf(&globalClipIDString[i*2], sizeof(globalClipIDString) - i * 2, "%02x",
+                     ((uint8_t*)&transfer->globalClipID)[i]);
     }
 
     mxf_snprintf(timestampString, sizeof(timestampString), "%04d-%02u-%02uT%02u:%02u:%02u+00:00",
