@@ -35,9 +35,6 @@
 #include "config.h"
 #endif
 
-// ensure strerror_r is the XSI compliant version and not the GNU version
-#undef _GNU_SOURCE
-
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
@@ -289,8 +286,16 @@ void mxf_vsnprintf(char *str, size_t size, const char *format, va_list ap)
 char* mxf_strerror(int errnum, char *buf, size_t size)
 {
 #ifdef HAVE_STRERROR_R
+
+#ifdef _GNU_SOURCE
+    const char *err_str = strerror_r(errnum, buf, size);
+    if (err_str != buf)
+        mxf_snprintf(buf, size, err_str);
+#else
     if (strerror_r(errnum, buf, size) != 0)
         snprintf(buf, size, "unknown error code %d", errnum);
+#endif
+
 #elif defined(_MSC_VER)
     if (strerror_s(buf, size, errnum) != 0)
         snprintf(buf, size, "unknown error code %d", errnum);
