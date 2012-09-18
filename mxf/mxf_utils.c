@@ -290,7 +290,7 @@ char* mxf_strerror(int errnum, char *buf, size_t size)
 #ifdef _GNU_SOURCE
     const char *err_str = strerror_r(errnum, buf, size);
     if (err_str != buf)
-        mxf_snprintf(buf, size, err_str);
+        mxf_snprintf(buf, size, "%s", err_str);
 #else
     if (strerror_r(errnum, buf, size) != 0)
         snprintf(buf, size, "unknown error code %d", errnum);
