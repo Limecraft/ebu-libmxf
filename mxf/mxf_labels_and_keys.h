@@ -407,7 +407,7 @@ static const mxfUL MXF_EC_L(ALawCustomWrapped) = MXF_ALAW_EC_L(0x03);
 static const mxfUL MXF_EC_L(AVCIFrameWrapped) = MXF_GENERIC_CONTAINER_LABEL(0x0a, 0x10, 0x60, 0x01);
 static const mxfUL MXF_EC_L(AVCIClipWrapped)  = MXF_GENERIC_CONTAINER_LABEL(0x0a, 0x10, 0x60, 0x02);
 
-int mxf_is_mpeg_video_ec(const mxfUL *label, int frame_wrapped);
+int mxf_is_avc_ec(const mxfUL *label, int frame_wrapped);
 
 
 /* MPEG ES VideoStream-0 SID */
@@ -415,7 +415,7 @@ int mxf_is_mpeg_video_ec(const mxfUL *label, int frame_wrapped);
 static const mxfUL MXF_EC_L(MPEGES0FrameWrapped) = MXF_GENERIC_CONTAINER_LABEL(0x02, 0x04, 0x60, 0x01);
 static const mxfUL MXF_EC_L(MPEGES0ClipWrapped)  = MXF_GENERIC_CONTAINER_LABEL(0x02, 0x04, 0x60, 0x02);
 
-int mxf_is_avc_ec(const mxfUL *label, int frame_wrapped);
+int mxf_is_mpeg_video_ec(const mxfUL *label, int frame_wrapped);
 
 
 /* VC-3 */

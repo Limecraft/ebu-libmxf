@@ -111,15 +111,6 @@ int mxf_is_generic_container_label(const mxfUL *label)
 
 
 
-int mxf_is_mpeg_video_ec(const mxfUL *label, int frame_wrapped)
-{
-    return mxf_is_generic_container_label(label) &&
-           label->octet13 == 0x04 &&                         /* MPEG elementary stream */
-           (label->octet14 & 0xf0) == 0x60 &&                /* video stream */
-           ((frame_wrapped && label->octet15 == 0x01) ||     /* frame wrapped or */
-               (!frame_wrapped && label->octet15 == 0x02));  /*   clip wrapped */
-}
-
 int mxf_is_avc_ec(const mxfUL *label, int frame_wrapped)
 {
     return mxf_is_generic_container_label(label) &&
@@ -129,6 +120,14 @@ int mxf_is_avc_ec(const mxfUL *label, int frame_wrapped)
                (!frame_wrapped && label->octet15 == 0x02));  /*   clip wrapped */
 }
 
+int mxf_is_mpeg_video_ec(const mxfUL *label, int frame_wrapped)
+{
+    return mxf_is_generic_container_label(label) &&
+           label->octet13 == 0x04 &&                         /* MPEG elementary stream */
+           (label->octet14 & 0xf0) == 0x60 &&                /* video stream */
+           ((frame_wrapped && label->octet15 == 0x01) ||     /* frame wrapped or */
+               (!frame_wrapped && label->octet15 == 0x02));  /*   clip wrapped */
+}
 
 
 
