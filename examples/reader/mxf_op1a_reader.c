@@ -161,7 +161,7 @@ static int ns_position_at_first_frame(MXFReader *reader)
         {
             mxf_free_partition(&partition);
         }
-        CHK_OFAIL(mxf_read_partition(mxfFile, &key, &partition));
+        CHK_OFAIL(mxf_read_partition(mxfFile, &key, len, &partition));
     }
 
     /* move to start of essence data in partition */
@@ -269,7 +269,7 @@ static int ns_pos_at_next_frame(MXFReader *reader)
         while (!atEOF)
         {
             /* read partition pack and check if it contains essence */
-            CHK_OFAIL(mxf_read_partition(mxfFile, &key, &partition));
+            CHK_OFAIL(mxf_read_partition(mxfFile, &key, len, &partition));
             if (data->bodySID == partition->bodySID)
             {
                 CHK_OFAIL(ns_position_at_first_frame(reader));
@@ -602,7 +602,7 @@ static int get_file_partitions(MXFFile *mxfFile, MXFPartition *headerPartition, 
                 SEEK_SET));
             CHK_OFAIL(mxf_read_kl(mxfFile, &key, &llen, &len));
             CHK_OFAIL(mxf_is_partition_pack(&key));
-            CHK_OFAIL(mxf_read_partition(mxfFile, &key, &partition));
+            CHK_OFAIL(mxf_read_partition(mxfFile, &key, len, &partition));
             CHK_OFAIL(mxf_append_list_element(partitions, partition));
             partition = NULL; /* owned by list */
         }
@@ -624,7 +624,7 @@ static int get_file_partitions(MXFFile *mxfFile, MXFPartition *headerPartition, 
             CHK_OFAIL(mxf_file_seek(mxfFile, mxf_get_runin_len(mxfFile) + thisPartition, SEEK_SET));
             CHK_OFAIL(mxf_read_kl(mxfFile, &key, &llen, &len));
             CHK_OFAIL(mxf_is_partition_pack(&key));
-            CHK_OFAIL(mxf_read_partition(mxfFile, &key, &partition));
+            CHK_OFAIL(mxf_read_partition(mxfFile, &key, len, &partition));
             CHK_OFAIL(mxf_prepend_list_element(partitions, partition));
             partitionRef = partition;
             partition = NULL; /* owned by list */

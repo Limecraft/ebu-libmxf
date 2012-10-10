@@ -645,7 +645,7 @@ static int get_info(Reader *reader, int showPSEFailures, int showVTRErrors, int 
     {
         mxf_log_warn("Header partition is incomplete" LOG_LOC_FORMAT, LOG_LOC_PARAMS);
     }
-    CHK_ORET(mxf_read_partition(reader->mxfFile, &key, &reader->headerPartition));
+    CHK_ORET(mxf_read_partition(reader->mxfFile, &key, len, &reader->headerPartition));
 
 
     /* check the operational pattern is OP 1A */
@@ -692,7 +692,7 @@ static int get_info(Reader *reader, int showPSEFailures, int showVTRErrors, int 
             CHK_ORET(mxf_file_seek(reader->mxfFile, reader->headerPartition->footerPartition, SEEK_SET));
             CHK_ORET(mxf_read_next_nonfiller_kl(reader->mxfFile, &key, &llen, &len));
             CHK_ORET(mxf_is_footer_partition_pack(&key));
-            CHK_ORET(mxf_read_partition(reader->mxfFile, &key, &reader->footerPartition));
+            CHK_ORET(mxf_read_partition(reader->mxfFile, &key, len, &reader->footerPartition));
             headerByteCount = reader->footerPartition->headerByteCount;
 
             if (!mxf_partition_is_closed(&key))

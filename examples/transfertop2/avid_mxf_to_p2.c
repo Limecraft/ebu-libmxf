@@ -305,7 +305,7 @@ static int preprocess_avid_input(AvidMXFToP2Transfer *transfer, int inputFileInd
         mxf_log_error("Could not find header partition pack key" LOG_LOC_FORMAT, LOG_LOC_PARAMS);
         return 0;
     }
-    CHK_ORET(mxf_read_partition(input->mxfFile, &key, &input->headerPartition));
+    CHK_ORET(mxf_read_partition(input->mxfFile, &key, len, &input->headerPartition));
 
 
     /* check the operational pattern is OP Atom */

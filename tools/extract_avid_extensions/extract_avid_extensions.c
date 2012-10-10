@@ -754,7 +754,7 @@ int main(int argc, const char **argv)
     /* read header partition pack */
 
     CHECK(mxf_read_header_pp_kl(mxfFile, &key, &llen, &len));
-    CHECK(mxf_read_partition(mxfFile, &key, &headerPartition));
+    CHECK(mxf_read_partition(mxfFile, &key, len, &headerPartition));
 
 
     /* skip to the header metadata */

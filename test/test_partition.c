@@ -105,7 +105,7 @@ int test_read(const char *filename)
 
     /* read header pp, allowing for runin */
     CHK_OFAIL(mxf_read_header_pp_kl_with_runin(mxfFile, &key, &llen, &len));
-    CHK_OFAIL(mxf_read_partition(mxfFile, &key, &headerPartition));
+    CHK_OFAIL(mxf_read_partition(mxfFile, &key, len, &headerPartition));
     CHK_OFAIL(mxf_append_partition(&partitions, headerPartition));
     CHK_OFAIL(headerPartition->indexSID == 1);
     CHK_OFAIL(headerPartition->bodySID == 0);
@@ -129,7 +129,7 @@ int test_read(const char *filename)
     /* skip filler and read body pp 1 */
     CHK_OFAIL(mxf_read_next_nonfiller_kl(mxfFile, &key, &llen, &len));
     CHK_OFAIL(mxf_is_partition_pack(&key));
-    CHK_OFAIL(mxf_read_partition(mxfFile, &key, &bodyPartition1));
+    CHK_OFAIL(mxf_read_partition(mxfFile, &key, len, &bodyPartition1));
     CHK_OFAIL(bodyPartition1->indexSID == 0);
     CHK_OFAIL(bodyPartition1->bodySID == 2);
     CHK_OFAIL(mxf_append_partition(&partitions, bodyPartition1));
@@ -137,7 +137,7 @@ int test_read(const char *filename)
     /* skip filler and read body pp 2 */
     CHK_OFAIL(mxf_read_next_nonfiller_kl(mxfFile, &key, &llen, &len));
     CHK_OFAIL(mxf_is_partition_pack(&key));
-    CHK_OFAIL(mxf_read_partition(mxfFile, &key, &bodyPartition2));
+    CHK_OFAIL(mxf_read_partition(mxfFile, &key, len, &bodyPartition2));
     CHK_OFAIL(bodyPartition2->indexSID == 0);
     CHK_OFAIL(bodyPartition2->bodySID == 3);
     CHK_OFAIL(mxf_append_partition(&partitions, bodyPartition2));
@@ -145,7 +145,7 @@ int test_read(const char *filename)
     /* skip filler and read footer pp */
     CHK_OFAIL(mxf_read_next_nonfiller_kl(mxfFile, &key, &llen, &len));
     CHK_OFAIL(mxf_is_partition_pack(&key));
-    CHK_OFAIL(mxf_read_partition(mxfFile, &key, &footerPartition));
+    CHK_OFAIL(mxf_read_partition(mxfFile, &key, len, &footerPartition));
     CHK_OFAIL(footerPartition->bodySID == 0);
     CHK_OFAIL(footerPartition->indexSID == 1);
     CHK_OFAIL(mxf_append_partition(&partitions, footerPartition));

@@ -273,7 +273,7 @@ int test_read(const char *filename)
     /* read header pp */
 
     CHK_OFAIL(mxf_read_header_pp_kl(mxfFile, &key, &llen, &len));
-    CHK_OFAIL(mxf_read_partition(mxfFile, &key, &headerPartition));
+    CHK_OFAIL(mxf_read_partition(mxfFile, &key, len, &headerPartition));
     CHK_OFAIL(mxf_append_partition(&partitions, headerPartition));
 
     CHK_OFAIL((headerMetadataFilePos = mxf_file_tell(mxfFile)) >= 0);
@@ -438,7 +438,7 @@ int test_read(const char *filename)
     /* skip filler and read footer pp */
     CHK_OFAIL(mxf_read_next_nonfiller_kl(mxfFile, &key, &llen, &len));
     CHK_OFAIL(mxf_is_partition_pack(&key));
-    CHK_OFAIL(mxf_read_partition(mxfFile, &key, &footerPartition));
+    CHK_OFAIL(mxf_read_partition(mxfFile, &key, len, &footerPartition));
     CHK_OFAIL(mxf_append_partition(&partitions, footerPartition));
 
 

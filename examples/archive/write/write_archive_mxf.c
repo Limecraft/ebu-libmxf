@@ -2203,7 +2203,7 @@ int update_archive_mxf_file_2(MXFFile **mxfFileIn, const char *newFilename, cons
         mxf_log_error("Could not find header partition pack key" LOG_LOC_FORMAT, LOG_LOC_PARAMS);
         return 0;
     }
-    CHK_OFAIL(mxf_read_partition(mxfFile, &key, &headerPartition));
+    CHK_OFAIL(mxf_read_partition(mxfFile, &key, len, &headerPartition));
 
     CHK_OFAIL(update_header_metadata(mxfFile, headerPartition->headerByteCount, ltoInfaxData, newFilename));
 
@@ -2219,7 +2219,7 @@ int update_archive_mxf_file_2(MXFFile **mxfFileIn, const char *newFilename, cons
         mxf_log_error("Could not find footer partition pack key" LOG_LOC_FORMAT, LOG_LOC_PARAMS);
         return 0;
     }
-    CHK_OFAIL(mxf_read_partition(mxfFile, &key, &footerPartition));
+    CHK_OFAIL(mxf_read_partition(mxfFile, &key, len, &footerPartition));
 
     CHK_OFAIL(update_header_metadata(mxfFile, footerPartition->headerByteCount, ltoInfaxData, newFilename));
 

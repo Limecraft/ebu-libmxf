@@ -414,13 +414,16 @@ int mxf_update_partitions(MXFFile *mxfFile, MXFFilePartitions *partitions)
     return 1;
 }
 
-int mxf_read_partition(MXFFile *mxfFile, const mxfKey *key, MXFPartition **partition)
+int mxf_read_partition(MXFFile *mxfFile, const mxfKey *key, uint64_t len, MXFPartition **partition)
 {
     MXFPartition *newPartition;
-    uint32_t len;
-    uint32_t eleLen;
+    uint32_t numLabels;
+    uint32_t labelLen;
     mxfUL label;
+    uint64_t expectedLen;
     uint32_t i;
+
+    CHK_ORET(len >= 88 && len <= INT64_MAX);
 
     CHK_ORET(mxf_create_partition(&newPartition));
     newPartition->key = *key;
@@ -438,11 +441,20 @@ int mxf_read_partition(MXFFile *mxfFile, const mxfKey *key, MXFPartition **parti
     CHK_OFAIL(mxf_read_uint32(mxfFile, &newPartition->bodySID));
     CHK_OFAIL(mxf_read_ul(mxfFile, &newPartition->operationalPattern));
 
-    CHK_OFAIL(mxf_read_batch_header(mxfFile, &len, &eleLen));
-    for (i = 0; i < len; i++)
+    CHK_OFAIL(mxf_read_batch_header(mxfFile, &numLabels, &labelLen));
+    CHK_OFAIL(numLabels == 0 || labelLen == 16);
+    expectedLen = 88 + (uint64_t)numLabels * labelLen;
+    CHK_OFAIL(len >= expectedLen);
+    for (i = 0; i < numLabels; i++)
     {
         CHK_OFAIL(mxf_read_ul(mxfFile, &label));
         CHK_OFAIL(mxf_append_partition_esscont_label(newPartition, &label));
+    }
+
+    if (len > expectedLen) {
+        mxf_log_warn("Partition pack len %"PRIu64" is larger than expected len %"PRIu64"\n",
+                     len, expectedLen);
+        CHK_OFAIL(mxf_file_seek(mxfFile, (int64_t)(len - expectedLen), SEEK_CUR));
     }
 
     *partition = newPartition;

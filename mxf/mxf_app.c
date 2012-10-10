@@ -950,7 +950,7 @@ int mxf_app_read_footer_metadata(const char *filename, MXFDataModel *dataModel, 
     *headerMetadata = NULL;
 
     CHK_OFAIL_NOMSG(mxf_is_footer_partition_pack(&key));
-    CHK_OFAIL_NOMSG(mxf_read_partition(mxfFile, &key, &footerPartition));
+    CHK_OFAIL_NOMSG(mxf_read_partition(mxfFile, &key, len, &footerPartition));
 
     /* read the header metadata */
     CHK_OFAIL_NOMSG(mxf_read_next_nonfiller_kl(mxfFile, &key, &llen, &len));
@@ -999,7 +999,7 @@ int mxf_app_is_metadata_only(const char *filename)
 
     /* read header partition pack */
     if (!mxf_read_header_pp_kl_with_runin(mxfFile, &key, &llen, &len) ||
-        !mxf_read_partition(mxfFile, &key, &headerPartition))
+        !mxf_read_partition(mxfFile, &key, len, &headerPartition))
     {
         return 0;
     }

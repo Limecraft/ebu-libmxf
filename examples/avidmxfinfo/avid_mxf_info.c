@@ -822,7 +822,7 @@ int ami_read_info(const char *filename, AvidMXFInfo *info, int printDebugError)
     /* read header partition pack */
 
     CHECK(mxf_read_header_pp_kl(mxfFile, &key, &llen, &len), -3);
-    CHECK(mxf_read_partition(mxfFile, &key, &headerPartition), -3);
+    CHECK(mxf_read_partition(mxfFile, &key, len, &headerPartition), -3);
 
 
     /* check is OP-Atom */

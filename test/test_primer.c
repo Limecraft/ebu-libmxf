@@ -66,7 +66,7 @@ int test_read(const char *filename)
 
     /* read header pp */
     CHK_OFAIL(mxf_read_header_pp_kl(mxfFile, &key, &llen, &len));
-    CHK_OFAIL(mxf_read_partition(mxfFile, &key, &headerPartition));
+    CHK_OFAIL(mxf_read_partition(mxfFile, &key, len, &headerPartition));
 
 
     /* TEST */

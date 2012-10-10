@@ -151,7 +151,7 @@ fail:
     return 0;
 }
 
-static int add_partition_index_entry(MXFFile *mxfFile, FileIndex *index, const mxfKey *key,
+static int add_partition_index_entry(MXFFile *mxfFile, FileIndex *index, const mxfKey *key, uint64_t len,
     int append, PartitionIndexEntry **entry)
 {
     MXFPartition *partition = NULL;
@@ -164,7 +164,7 @@ static int add_partition_index_entry(MXFFile *mxfFile, FileIndex *index, const m
 
     /* read the partition pack */
     CHK_ORET(mxf_is_partition_pack(key));
-    CHK_ORET(mxf_read_partition(mxfFile, key, &partition));
+    CHK_ORET(mxf_read_partition(mxfFile, key, len, &partition));
 
     /* create entry */
     CHK_OFAIL(create_partition_index_entry(mxfFile, &partition, 1, &newEntry));
@@ -329,7 +329,7 @@ static int move_to_next_partition_with_essence(MXFFile *mxfFile, FileIndex *inde
         /* else index this new partition */
         else
         {
-            CHK_ORET(add_partition_index_entry(mxfFile, index, &index->nextKey, 1, &entry));
+            CHK_ORET(add_partition_index_entry(mxfFile, index, &index->nextKey, index->nextLen, 1, &entry));
             index->currentPartition++;
         }
 
@@ -355,7 +355,7 @@ static int move_to_next_partition_with_essence(MXFFile *mxfFile, FileIndex *inde
             }
 
             /* create partition index entry */
-            CHK_ORET(add_partition_index_entry(mxfFile, index, &key, 1, &entry));
+            CHK_ORET(add_partition_index_entry(mxfFile, index, &key, len, 1, &entry));
             index->currentPartition++;
         }
 
