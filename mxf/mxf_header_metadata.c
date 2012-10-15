@@ -1147,7 +1147,7 @@ void mxf_get_float(const uint8_t *value, float *result)
 {
 	uint32_t t;
 	mxf_get_uint32(value, &t);
-    *result = (float)t;
+    *result = *(float*)&t;
 }
 
 void mxf_get_version_type(const uint8_t *value, mxfVersionType *result)
