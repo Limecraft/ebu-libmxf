@@ -793,7 +793,7 @@ int mxf_read_filtered_header_metadata(MXFFile *mxfFile, MXFReadFilter *filter,
 
                 if (!skip)
                 {
-                    CHK_ORET((result = mxf_read_and_return_set(mxfFile, &key, len, headerMetadata, 0, &newSet)) > 0);
+                    CHK_ORET((result = mxf_read_filtered_and_return_set(mxfFile, filter, &key, len, headerMetadata, 0, &newSet)) > 0);
 
                     if (result == 1) /* set was read and returned in "set" parameter */
                     {
@@ -843,6 +843,11 @@ int mxf_read_set(MXFFile *mxfFile, const mxfKey *key, uint64_t len,
 }
 
 int mxf_read_and_return_set(MXFFile *mxfFile, const mxfKey *key, uint64_t len,
+                            MXFHeaderMetadata *headerMetadata, int addToHeaderMetadata, MXFMetadataSet **set) {
+	return mxf_read_filtered_and_return_set(mxfFile, NULL, key, len, headerMetadata, addToHeaderMetadata, set);
+}
+
+int mxf_read_filtered_and_return_set(MXFFile *mxfFile, MXFReadFilter *filter, const mxfKey *key, uint64_t len,
                             MXFHeaderMetadata *headerMetadata, int addToHeaderMetadata, MXFMetadataSet **set)
 {
     MXFMetadataSet *newSet = NULL;
@@ -854,6 +859,7 @@ int mxf_read_and_return_set(MXFFile *mxfFile, const mxfKey *key, uint64_t len,
     mxfKey itemKey;
     MXFItemDef *itemDef = NULL;
     MXFMetadataItem *newItem;
+	int skip = 0;
 
     assert(headerMetadata->primerPack != NULL);
 
@@ -870,23 +876,35 @@ int mxf_read_and_return_set(MXFFile *mxfFile, const mxfKey *key, uint64_t len,
             /* check the item tag is registered in the primer */
             if (mxf_get_item_key(headerMetadata->primerPack, itemTag, &itemKey))
             {
-                /* only read items with known definition */
-                if (mxf_find_item_def_in_set_def(&itemKey, setDef, &itemDef))
-                {
-                    CHK_OFAIL(mxf_create_item(newSet, &itemKey, itemTag, &newItem));
-                    newItem->isPersistent = 1;
-                    CHK_OFAIL(mxf_read_item(mxfFile, newItem, itemLen));
-                    if (mxf_equals_key(&MXF_ITEM_K(InterchangeObject, InstanceUID), &itemKey))
-                    {
-                        mxf_get_uuid(newItem->value, &newSet->instanceUID);
-                        haveInstanceUID = 1;
-                    }
-                }
-                /* skip items with unknown definition */
-                else
-                {
-                    CHK_OFAIL(mxf_skip(mxfFile, (int64_t)itemLen));
-                }
+				skip = 0;
+				if (filter != NULL && filter->before_item_read != NULL) {
+					/* signal before read */
+					CHK_ORET(filter->before_item_read(filter->privateData, headerMetadata, &itemKey, itemLen, &skip));
+				}
+
+				if (!skip) {
+					/* only read items with known definition */
+					if (mxf_find_item_def_in_set_def(&itemKey, setDef, &itemDef))
+					{
+						CHK_OFAIL(mxf_create_item(newSet, &itemKey, itemTag, &newItem));
+						newItem->isPersistent = 1;
+						CHK_OFAIL(mxf_read_item(mxfFile, newItem, itemLen));
+						if (mxf_equals_key(&MXF_ITEM_K(InterchangeObject, InstanceUID), &itemKey))
+						{
+							mxf_get_uuid(newItem->value, &newSet->instanceUID);
+							haveInstanceUID = 1;
+						}
+
+						if (filter != NULL && filter->after_item_read != NULL) {
+							CHK_OFAIL(filter->after_item_read(filter->privateData, headerMetadata, newItem));
+						}
+					}
+					/* skip items with unknown definition */
+					else
+					{
+						CHK_OFAIL(mxf_skip(mxfFile, (int64_t)itemLen));
+					}
+				}
             }
             /* skip items not registered in the primer. Log warning because the file is invalid */
             else

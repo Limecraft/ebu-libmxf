@@ -82,6 +82,9 @@ typedef struct
                             const mxfKey *key, uint8_t llen, uint64_t len, int *skip);
     int (*after_set_read) (void *privateData, MXFHeaderMetadata *headerMetadata, MXFMetadataSet *set, int *skip);
     void *privateData;
+    int (*before_item_read) (void *privateData, MXFHeaderMetadata *headerMetadata,
+                            const mxfKey *key, uint64_t len, int *skip);
+	int (*after_item_read) (void *privateData, MXFHeaderMetadata *headerMetadata, MXFMetadataItem *item);
 } MXFReadFilter;
 
 
@@ -126,6 +129,8 @@ int mxf_read_set(MXFFile *mxfFile, const mxfKey *key, uint64_t len,
                  MXFHeaderMetadata *headerMetadata, int addToHeaderMetadata);
 /* returns 1 on success, 0 for failure, 2 if it is an unknown set and "set" parameter is set to NULL */
 int mxf_read_and_return_set(MXFFile *mxfFile, const mxfKey *key, uint64_t len,
+                            MXFHeaderMetadata *headerMetadata, int addToHeaderMetadata, MXFMetadataSet **set);
+int mxf_read_filtered_and_return_set(MXFFile *mxfFile, MXFReadFilter *filter, const mxfKey *key, uint64_t len,
                             MXFHeaderMetadata *headerMetadata, int addToHeaderMetadata, MXFMetadataSet **set);
 int mxf_read_item_tl(MXFFile *mxfFile, mxfLocalTag *itemTag, uint16_t *itemLen);
 int mxf_read_item(MXFFile *mxfFile, MXFMetadataItem *item, uint16_t len);
