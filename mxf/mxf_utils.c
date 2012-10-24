@@ -293,14 +293,14 @@ char* mxf_strerror(int errnum, char *buf, size_t size)
         mxf_snprintf(buf, size, "%s", err_str);
 #else
     if (strerror_r(errnum, buf, size) != 0)
-        snprintf(buf, size, "unknown error code %d", errnum);
+        mxf_snprintf(buf, size, "unknown error code %d", errnum);
 #endif
 
 #elif defined(_MSC_VER)
     if (strerror_s(buf, size, errnum) != 0)
-        snprintf(buf, size, "unknown error code %d", errnum);
+        mxf_snprintf(buf, size, "unknown error code %d", errnum);
 #else
-    snprintf(buf, size, "error code %d", errnum);
+    mxf_snprintf(buf, size, "error code %d", errnum);
 #endif
 
     return buf;
