@@ -1,4 +1,4 @@
-SUBDIRS = mxf examples test tools msvc_build
+SUBDIRS = mxf test examples tools msvc_build
 
 
 ACLOCAL_AMFLAGS = -I m4
