@@ -41,7 +41,7 @@
 #include <mxf/mxf_cache_file.h>
 
 
-#define DATA_SIZE   65536
+#define DATA_SIZE   10000
 #define PAGE_SIZE   8192
 
 
