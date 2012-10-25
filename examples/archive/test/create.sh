@@ -1,13 +1,6 @@
 #!/bin/sh
 
-if command -v md5sum >/dev/null 2>&1; then
-  MD5TOOL=md5sum
-elif command -v md5 >/dev/null 2>&1; then
-  MD5TOOL=md5
-else
-  echo "ERROR: require md5/md5sum tool"
-  exit 1
-fi
+MD5TOOL=../../../test/file_md5
 
 
 MD5_FILE=$1
@@ -21,7 +14,7 @@ then
 fi
 
 
-$MD5TOOL < /tmp/libmxf_test.mxf | sed 's/\([a-f0-9]\)$/\1\ \ -/g' > ${MD5_FILE}
+$MD5TOOL < /tmp/libmxf_test.mxf > ${MD5_FILE}
 
 rm -f /tmp/libmxf_test.mxf /tmp/libmxf_test.mxf.md5
 
