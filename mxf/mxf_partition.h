@@ -124,6 +124,7 @@ int mxf_write_fill(MXFFile *mxfFile, uint32_t size);
 int mxf_read_next_nonfiller_kl(MXFFile *mxfFile, mxfKey *key, uint8_t *llen, uint64_t *len);
 
 int mxf_read_rip(MXFFile *mxfFile, MXFRIP *rip);
+int mxf_read_rip_and_size(MXFFile *mxfFile, MXFRIP *rip, uint32_t* size);
 int mxf_write_rip(MXFFile *mxfFile, MXFFilePartitions *partitions);
 
 int mxf_read_header_pp_kl_with_runin(MXFFile *mxfFile, mxfKey *key, uint8_t *llen, uint64_t *len);

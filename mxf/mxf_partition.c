@@ -587,10 +587,15 @@ int mxf_read_next_nonfiller_kl(MXFFile *mxfFile, mxfKey *key, uint8_t *llen, uin
     return 1;
 }
 
-
 int mxf_read_rip(MXFFile *mxfFile, MXFRIP *rip)
 {
-    uint32_t size;
+	uint32_t size;
+	return mxf_read_rip_and_size(mxfFile, rip, &size);
+}
+
+int mxf_read_rip_and_size(MXFFile *mxfFile, MXFRIP *rip, uint32_t* size)
+{
+	uint32_t rip_size;
     mxfKey key;
     uint8_t llen;
     uint64_t len;
@@ -603,14 +608,14 @@ int mxf_read_rip(MXFFile *mxfFile, MXFRIP *rip)
 
     /* read RIP size (min is 16 + 1 + (4 + 8) * 1 + 4) at end of file */
     if (!mxf_file_seek(mxfFile, -4, SEEK_END) ||
-        !mxf_read_uint32(mxfFile, &size) ||
-        size < 33)
+        !mxf_read_uint32(mxfFile, &rip_size) ||
+        rip_size < 33)
     {
         return 0;
     }
 
     /* seek, read and check RIP key */
-    if (!mxf_file_seek(mxfFile, (int64_t)0 - size, SEEK_CUR) ||
+    if (!mxf_file_seek(mxfFile, (int64_t)0 - rip_size, SEEK_CUR) ||
         !mxf_read_k(mxfFile, &key) ||
         !mxf_equals_key(&key, &g_RandomIndexPack_key) ||
         !mxf_read_l(mxfFile, &llen, &len))
@@ -633,6 +638,7 @@ int mxf_read_rip(MXFFile *mxfFile, MXFRIP *rip)
         CHK_OFAIL(mxf_read_uint64(mxfFile, &entry->thisPartition));
     }
 
+	*size = rip_size;
     return 1;
 
 fail:
