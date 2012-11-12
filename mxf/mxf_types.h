@@ -204,7 +204,6 @@ typedef int64_t mxfLength;
 
 typedef uint8_t mxfBoolean;
 
-
 typedef struct
 {
     uint16_t major;
@@ -214,7 +213,6 @@ typedef struct
     uint16_t release;
 } mxfProductVersion;
 
-
 typedef struct
 {
     struct
@@ -223,6 +221,11 @@ typedef struct
         uint8_t depth;
     } components[8];
 } mxfRGBALayout;
+
+typedef struct
+{
+    unsigned char bytes[24];
+} mxfAES3FixedData;
 
 
 
@@ -243,6 +246,7 @@ typedef struct
 #define mxfBoolean_extlen               1
 #define mxfProductVersion_extlen        10
 #define mxfRGBALayout_extlen            16
+#define mxfAES3FixedData_extlen         24
 
 
 static const mxfUUID g_Null_UUID =

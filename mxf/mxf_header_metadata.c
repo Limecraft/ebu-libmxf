@@ -1218,6 +1218,11 @@ void mxf_get_rgba_layout(const uint8_t *value, mxfRGBALayout *result)
     }
 }
 
+void mxf_get_aes3_fixed_data(const uint8_t *value, mxfAES3FixedData *result)
+{
+    memcpy(result->bytes, value, mxfAES3FixedData_extlen);
+}
+
 void mxf_get_array_header(const uint8_t *value, uint32_t *arrayLen, uint32_t *arrayItemLen)
 {
     mxf_get_uint32(value, arrayLen);
@@ -1551,6 +1556,11 @@ void mxf_set_rgba_layout(const mxfRGBALayout *value, uint8_t *result)
         result[2 * i    ] = value->components[i].code;
         result[2 * i + 1] = value->components[i].depth;
     }
+}
+
+void mxf_set_aes3_fixed_data(const mxfAES3FixedData *value, uint8_t *result)
+{
+    memcpy(result, value->bytes, mxfAES3FixedData_extlen);
 }
 
 void mxf_set_array_header(uint32_t arrayLen, uint32_t arrayElementLen, uint8_t *result)

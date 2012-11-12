@@ -159,6 +159,7 @@ void mxf_get_position(const uint8_t *value, mxfPosition *result);
 void mxf_get_boolean(const uint8_t *value, mxfBoolean *result);
 void mxf_get_product_version(const uint8_t *value, mxfProductVersion *result);
 void mxf_get_rgba_layout(const uint8_t *value, mxfRGBALayout *result);
+void mxf_get_aes3_fixed_data(const uint8_t *value, mxfAES3FixedData *result);
 void mxf_get_array_header(const uint8_t *value, uint32_t *arrayLen, uint32_t *arrayItemLen);
 uint16_t mxf_get_utf16string_size(const uint8_t *value, uint16_t valueLen);
 void mxf_get_utf16string(const uint8_t *value, uint16_t valueLen, mxfUTF16Char *result);
@@ -201,6 +202,7 @@ void mxf_set_length(mxfLength value, uint8_t *result);
 void mxf_set_boolean(mxfBoolean value, uint8_t *result);
 void mxf_set_product_version(const mxfProductVersion *value, uint8_t *result);
 void mxf_set_rgba_layout(const mxfRGBALayout *value, uint8_t *result);
+void mxf_set_aes3_fixed_data(const mxfAES3FixedData *value, uint8_t *result);
 void mxf_set_array_header(uint32_t arrayLen, uint32_t arrayElementLen, uint8_t *result);
 
 

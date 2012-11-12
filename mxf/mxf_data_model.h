@@ -171,6 +171,7 @@ typedef enum
     MXF_WEAKREFBATCH_TYPE,
     MXF_RATIONALARRAY_TYPE,
     MXF_RGBALAYOUT_TYPE,
+    MXF_AES3_FIXED_DATA_ARRAY_TYPE,
 
     /* compound */
     MXF_RATIONAL_TYPE,
@@ -201,6 +202,7 @@ typedef enum
     MXF_WEAKREF_TYPE,
     MXF_ORIENTATION_TYPE,
     MXF_CODED_CONTENT_TYPE_TYPE,
+    MXF_AES3_FIXED_DATA_TYPE,
 
     MXF_EXTENSION_TYPE /* extension types must have integer value >= this */
 
