@@ -168,6 +168,7 @@ void mxf_get_rgba_layout(const uint8_t *value, mxfRGBALayout *result);
 void mxf_get_array_header(const uint8_t *value, uint32_t *arrayLen, uint32_t *arrayItemLen);
 uint16_t mxf_get_utf16string_size(const uint8_t *value, uint16_t valueLen);
 void mxf_get_utf16string(const uint8_t *value, uint16_t valueLen, mxfUTF16Char *result);
+void mxf_get_fixed_item_length_utf16string(const uint8_t *value, uint16_t valueLen, uint16_t *result);
 
 int mxf_get_strongref(MXFHeaderMetadata *headerMetadata, const uint8_t *value, MXFMetadataSet **set);
 int mxf_get_weakref(MXFHeaderMetadata *headerMetadata, const uint8_t *value, MXFMetadataSet **set);

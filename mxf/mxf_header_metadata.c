@@ -1302,6 +1302,33 @@ void mxf_get_utf16string(const uint8_t *value, uint16_t valueLen, mxfUTF16Char *
     }
 }
 
+
+/* Note: returns a null-terminated UTF16 string, using fixed 2-byte length characters*/
+void mxf_get_fixed_item_length_utf16string(const uint8_t *value, uint16_t valueLen, uint16_t *result)
+{
+    uint16_t i;
+    int haveNullTerminator = 0;
+    uint16_t c;
+
+    /* get characters until end of value or null terminator */
+    for (i = 0; i < valueLen / 2; i++)
+    {
+        mxf_get_uint16(&value[2 * i], &c);
+        result[i] = c;
+        if (result[i] == 0)
+        {
+            haveNullTerminator = 1;
+            break;
+        }
+    }
+
+    /* add null terminator if none is present */
+    if (!haveNullTerminator)
+    {
+        result[i] = 0;
+    }
+}
+
 int mxf_get_strongref(MXFHeaderMetadata *headerMetadata, const uint8_t *value, MXFMetadataSet **set)
 {
     mxfUUID uuid;
