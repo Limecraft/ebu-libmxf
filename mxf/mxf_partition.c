@@ -367,6 +367,12 @@ int mxf_write_partition(MXFFile *mxfFile, MXFPartition *partition)
 /* Note: positions file pointer at end of file */
 int mxf_update_partitions(MXFFile *mxfFile, MXFFilePartitions *partitions)
 {
+    mxf_update_partitions_in_memory(partitions);
+    return mxf_rewrite_partitions(mxfFile, partitions);
+}
+
+void mxf_update_partitions_in_memory(MXFFilePartitions *partitions)
+{
     MXFPartition *previousPartition;
     MXFPartition *lastPartition;
     MXFListIterator iter;
@@ -375,7 +381,7 @@ int mxf_update_partitions(MXFFile *mxfFile, MXFFilePartitions *partitions)
     /* check if anything there to update */
     if (mxf_get_list_length(partitions) == 0)
     {
-        return 1;
+        return;
     }
 
     /* update partition packs with previousPartition and footerPartition (if present) offsets */
@@ -398,8 +404,13 @@ int mxf_update_partitions(MXFFile *mxfFile, MXFFilePartitions *partitions)
 
         previousPartition = partition;
     }
+}
 
-    /* re-write the partition packs */
+/* Note: positions file pointer at end of file */
+int mxf_rewrite_partitions(MXFFile *mxfFile, MXFFilePartitions *partitions)
+{
+    MXFListIterator iter;
+
     mxf_initialise_list_iter(&iter, partitions);
     while (mxf_next_list_iter_element(&iter))
     {

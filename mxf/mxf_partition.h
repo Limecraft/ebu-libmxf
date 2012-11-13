@@ -113,6 +113,8 @@ int mxf_append_partition_esscont_label(MXFPartition *partition, const mxfUL *lab
 
 int mxf_write_partition(MXFFile *mxfFile, MXFPartition *partition);
 int mxf_update_partitions(MXFFile *mxfFile, MXFFilePartitions *partitions);
+void mxf_update_partitions_in_memory(MXFFilePartitions *partitions);
+int mxf_rewrite_partitions(MXFFile *mxfFile, MXFFilePartitions *partitions);
 int mxf_read_partition(MXFFile *mxfFile, const mxfKey *key, uint64_t len, MXFPartition **partition);
 
 int mxf_is_filler(const mxfKey *key);
