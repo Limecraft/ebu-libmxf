@@ -1077,6 +1077,7 @@ static int write_icon_bmp(AvidMXFToP2Transfer *transfer)
 {
     FILE *iconFile;
     char filename[FILENAME_MAX];
+    size_t numWrite;
 
     mxf_snprintf(filename, sizeof(filename), "%s%s%s%s%s%s%s.BMP",
         transfer->p2path, g_fileSeparator,
@@ -1091,14 +1092,14 @@ static int write_icon_bmp(AvidMXFToP2Transfer *transfer)
         return 0;
     }
 	/* write the hard-coded "Avid->P2" icon */
-    if ((fwrite(icon_avid_to_p2, 1, sizeof(icon_avid_to_p2), iconFile)) != sizeof(icon_avid_to_p2))
+    numWrite = fwrite(icon_avid_to_p2, 1, sizeof(icon_avid_to_p2), iconFile);
+    if (numWrite != sizeof(icon_avid_to_p2))
     {
         mxf_log_error("Failed to write BMP data for '%s'" LOG_LOC_FORMAT, filename, LOG_LOC_PARAMS);
-        return 0;
     }
     fclose(iconFile);
 
-    return 1;
+    return (numWrite == sizeof(icon_avid_to_p2));
 }
 
 static int write_clip_document(AvidMXFToP2Transfer *transfer)
