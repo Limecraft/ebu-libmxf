@@ -2,9 +2,9 @@
 
 temp=/tmp/libmxf_test.mxf
 
-./test_file $temp && ./test_file stdin <$temp
+./test_file $temp && ./test_file stdin <$temp && ./test_file stdout >$temp
 res=$?
 
-rm $temp
+rm -f $temp
 
 exit $res

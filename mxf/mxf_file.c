@@ -298,6 +298,11 @@ int mxf_stdin_wrap_read(MXFFile **mxfFile)
     return disk_file_open(stdin, READ_MODE, mxfFile);
 }
 
+int mxf_stdout_wrap_write(MXFFile **mxfFile)
+{
+    return disk_file_open(stdout, NEW_MODE, mxfFile);
+}
+
 
 void mxf_file_close(MXFFile **mxfFile)
 {
