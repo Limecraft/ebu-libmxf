@@ -79,10 +79,21 @@ int test_read(const char *filename)
     uint32_t ablen;
     uint32_t abelen;
 
-    if (!mxf_disk_file_open_read(filename, &mxfFile))
+    if (filename == NULL)
     {
-        mxf_log_error("Failed to open '%s'" LOG_LOC_FORMAT, filename, LOG_LOC_PARAMS);
-        return 0;
+        if (!mxf_stdin_wrap_read(&mxfFile))
+        {
+            mxf_log_error("Failed to open stdin" LOG_LOC_FORMAT, LOG_LOC_PARAMS);
+            return 0;
+        }
+    }
+    else
+    {
+        if (!mxf_disk_file_open_read(filename, &mxfFile))
+        {
+            mxf_log_error("Failed to open '%s'" LOG_LOC_FORMAT, filename, LOG_LOC_PARAMS);
+            return 0;
+        }
     }
 
     /* TEST */
@@ -162,8 +173,6 @@ fail:
 
 int do_write(MXFFile *mxfFile)
 {
-    memset(data, 0xaa, 256);
-
     CHK_ORET(mxf_file_write(mxfFile, NULL, 0) == 0);
     CHK_ORET(mxf_file_write(mxfFile, data, 0) == 0);
     CHK_ORET(mxf_file_write(mxfFile, data, 100) == 100);
@@ -263,19 +272,24 @@ int main(int argc, const char *argv[])
         return 1;
     }
 
-    if (!test_write(argv[1]))
-    {
-        return 1;
-    }
+    memset(data, 0xaa, 256);
 
-    if (!test_read(argv[1]))
+    if (strcmp(argv[1], "stdin") == 0)
     {
-        return 1;
+        if (!test_read(NULL))
+        {
+            return 1;
+        }
     }
-
-    if (!test_modify(argv[1]))
+    else
     {
-        return 1;
+        if (!test_write(argv[1]) ||
+            !test_read(argv[1]) ||
+            !test_modify(argv[1]) ||
+            !test_write(argv[1])) /* reset for next run of test_read(NULL) */
+        {
+            return 1;
+        }
     }
 
     return 0;

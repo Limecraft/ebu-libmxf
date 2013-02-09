@@ -1,7 +1,10 @@
 #!/bin/sh
 
-RESULT=`./test_file /tmp/libmxf_test.mxf`
+temp=/tmp/libmxf_test.mxf
 
-rm /tmp/libmxf_test.mxf
+./test_file $temp && ./test_file stdin <$temp
+res=$?
 
-exit $RESULT
+rm $temp
+
+exit $res

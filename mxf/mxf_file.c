@@ -43,6 +43,7 @@
 #include <errno.h>
 
 #include <mxf/mxf.h>
+#include <mxf/mxf_stream_file.h>
 #include <mxf/mxf_macros.h>
 
 
@@ -70,27 +71,35 @@ struct MXFFileSysData
 {
     FILE *file;
     OpenMode mode;
-
     int isSeekable;
-    int haveTestedIsSeekable;
-    int isStream;
-    int64_t streamPosition;
 };
 
 
-static int check_file_is_stream(int fileId)
+static int check_file_is_seekable(FILE *file, int *isSeekable)
 {
+    int fileId;
     struct stat buf;
+    char errorBuf[128];
+
+#if defined(_WIN32)
+    fileId = _fileno(file);
+#else
+    fileId = fileno(file);
+#endif
     if (fstat(fileId, &buf) != 0)
     {
+        mxf_log_error("unexpected fstat error when checking seek support: %s\n",
+                      mxf_strerror(errno, errorBuf, sizeof(errorBuf)));
         return 0;
     }
 
-#if defined(_MSC_VER)
-    return ((buf.st_mode & _S_IFMT) == _S_IFIFO);
+#if defined(_WIN32)
+    *isSeekable = ((buf.st_mode & S_IFMT) == S_IFREG);
 #else
-    return S_ISFIFO(buf.st_mode);
+    *isSeekable = S_ISREG(buf.st_mode);
 #endif
+
+    return 1;
 }
 
 
@@ -110,7 +119,6 @@ static uint32_t disk_file_read(MXFFileSysData *sysData, uint8_t *data, uint32_t 
     uint32_t result = (uint32_t)fread(data, 1, count, sysData->file);
     if (result != count && ferror(sysData->file))
         mxf_log_error("fread failed: %s\n", mxf_strerror(errno, errorBuf, sizeof(errorBuf)));
-    sysData->streamPosition += result;
     return result;
 }
 
@@ -120,28 +128,17 @@ static uint32_t disk_file_write(MXFFileSysData *sysData, const uint8_t *data, ui
     uint32_t result = (uint32_t)fwrite(data, 1, count, sysData->file);
     if (result != count)
         mxf_log_error("fwrite failed: %s\n", mxf_strerror(errno, errorBuf, sizeof(errorBuf)));
-    sysData->streamPosition += result;
     return result;
 }
 
 static int disk_file_getchar(MXFFileSysData *sysData)
 {
-    int result = fgetc(sysData->file);
-    if (result != EOF)
-    {
-        sysData->streamPosition++;
-    }
-    return result;
+    return fgetc(sysData->file);
 }
 
 static int disk_file_putchar(MXFFileSysData *sysData, int c)
 {
-    int result = fputc(c, sysData->file);
-    if (result != EOF)
-    {
-        sysData->streamPosition++;
-    }
-    return result;
+    return fputc(c, sysData->file);
 }
 
 static int disk_file_eof(MXFFileSysData *sysData)
@@ -151,12 +148,6 @@ static int disk_file_eof(MXFFileSysData *sysData)
 
 static int disk_file_seek(MXFFileSysData *sysData, int64_t offset, int whence)
 {
-    if (sysData->isStream)
-    {
-        return (whence == SEEK_CUR && offset == 0) ||
-               (whence == SEEK_SET && offset == sysData->streamPosition);
-    }
-
 #if defined(_WIN32)
     return _fseeki64(sysData->file, offset, whence) == 0;
 #else
@@ -166,11 +157,6 @@ static int disk_file_seek(MXFFileSysData *sysData, int64_t offset, int whence)
 
 static int64_t disk_file_tell(MXFFileSysData *sysData)
 {
-    if (sysData->isStream)
-    {
-        return sysData->streamPosition;
-    }
-
 #if defined(_WIN32)
     return _ftelli64(sysData->file);
 #else
@@ -180,12 +166,6 @@ static int64_t disk_file_tell(MXFFileSysData *sysData)
 
 static int disk_file_is_seekable(MXFFileSysData *sysData)
 {
-    if (!sysData->haveTestedIsSeekable)
-    {
-        sysData->isSeekable = (fseek(sysData->file, 0, SEEK_CUR) == 0);
-        sysData->haveTestedIsSeekable = 1;
-    }
-
     return sysData->isSeekable;
 }
 
@@ -219,61 +199,60 @@ static void free_disk_file(MXFFileSysData *sysData)
 }
 
 
-static void assign_file_struct(MXFFile *mxfFile, MXFFileSysData *sysData)
-{
-    mxfFile->close         = disk_file_close;
-    mxfFile->read          = disk_file_read;
-    mxfFile->write         = disk_file_write;
-    mxfFile->get_char      = disk_file_getchar;
-    mxfFile->put_char      = disk_file_putchar;
-    mxfFile->eof           = disk_file_eof;
-    mxfFile->seek          = disk_file_seek;
-    mxfFile->tell          = disk_file_tell;
-    mxfFile->is_seekable   = disk_file_is_seekable;
-    mxfFile->size          = disk_file_size;
-
-    mxfFile->free_sys_data = free_disk_file;
-    mxfFile->sysData       = sysData;
-}
-
-static int disk_file_open(const char *filename, OpenMode mode, MXFFile **mxfFile)
+static int disk_file_open(FILE *file, OpenMode mode, MXFFile **mxfFile)
 {
     MXFFile *newMXFFile = NULL;
     MXFFileSysData *newDiskFile = NULL;
+    int isSeekable = 0;
 
-    CHK_MALLOC_ORET(newMXFFile, MXFFile);
+    if (!check_file_is_seekable(file, &isSeekable))
+    {
+        return 0;
+    }
+
+    CHK_MALLOC_OFAIL(newMXFFile, MXFFile);
     memset(newMXFFile, 0, sizeof(MXFFile));
     CHK_MALLOC_OFAIL(newDiskFile, MXFFileSysData);
     memset(newDiskFile, 0, sizeof(MXFFileSysData));
 
-    switch (mode)
+    newDiskFile->file       = file;
+    newDiskFile->isSeekable = isSeekable;
+    newDiskFile->mode       = mode;
+
+    newMXFFile->close         = disk_file_close;
+    newMXFFile->read          = disk_file_read;
+    newMXFFile->write         = disk_file_write;
+    newMXFFile->get_char      = disk_file_getchar;
+    newMXFFile->put_char      = disk_file_putchar;
+    newMXFFile->eof           = disk_file_eof;
+    newMXFFile->seek          = disk_file_seek;
+    newMXFFile->tell          = disk_file_tell;
+    newMXFFile->is_seekable   = disk_file_is_seekable;
+    newMXFFile->size          = disk_file_size;
+    newMXFFile->free_sys_data = free_disk_file;
+    newMXFFile->sysData       = newDiskFile;
+
+    if (!isSeekable)
     {
-        case NEW_MODE:
-            newDiskFile->file = fopen(filename, "w+b");
-            break;
-        case READ_MODE:
-            newDiskFile->file = fopen(filename, "rb");
-            break;
-        case MODIFY_MODE:
-            newDiskFile->file = fopen(filename, "r+b");
-            break;
-
+        MXFFile *newStreamMXFFile = NULL;
+        if (!mxf_stream_file_wrap(newMXFFile, mode == READ_MODE, &newStreamMXFFile))
+        {
+            goto fail;
+        }
+        *mxfFile = newStreamMXFFile;
     }
-    if (!newDiskFile->file)
-        goto fail;
+    else
+    {
+        *mxfFile = newMXFFile;
+    }
 
-#if defined(_WIN32)
-    newDiskFile->isStream = check_file_is_stream(_fileno(newDiskFile->file));
-#else
-    newDiskFile->isStream = check_file_is_stream(fileno(newDiskFile->file));
-#endif
-    newDiskFile->mode = mode;
-    assign_file_struct(newMXFFile, newDiskFile);
-
-    *mxfFile = newMXFFile;
     return 1;
 
 fail:
+    if (file != stdin && file != stdout && file != stderr)
+    {
+        fclose(file);
+    }
     SAFE_FREE(newMXFFile);
     SAFE_FREE(newDiskFile);
     return 0;
@@ -282,43 +261,42 @@ fail:
 
 int mxf_disk_file_open_new(const char *filename, MXFFile **mxfFile)
 {
-    return disk_file_open(filename, NEW_MODE, mxfFile);
+    FILE *file = fopen(filename, "w+b");
+    if (file == NULL)
+    {
+        return 0;
+    }
+
+    return disk_file_open(file, NEW_MODE, mxfFile);
 }
 
 int mxf_disk_file_open_read(const char *filename, MXFFile **mxfFile)
 {
-    return disk_file_open(filename, READ_MODE, mxfFile);
+    FILE *file = fopen(filename, "rb");
+    if (file == NULL)
+    {
+        return 0;
+    }
+
+    return disk_file_open(file, READ_MODE, mxfFile);
 }
 
 int mxf_disk_file_open_modify(const char *filename, MXFFile **mxfFile)
 {
-    return disk_file_open(filename, MODIFY_MODE, mxfFile);
+    FILE *file = fopen(filename, "r+b");
+    if (file == NULL)
+    {
+        return 0;
+    }
+
+    return disk_file_open(file, MODIFY_MODE, mxfFile);
 }
 
 
 int mxf_stdin_wrap_read(MXFFile **mxfFile)
 {
-    MXFFile *newMXFFile = NULL;
-    MXFFileSysData *newStdInFile = NULL;
-
-    CHK_MALLOC_ORET(newMXFFile, MXFFile);
-    memset(newMXFFile, 0, sizeof(MXFFile));
-    CHK_MALLOC_OFAIL(newStdInFile, MXFFileSysData);
-    memset(newStdInFile, 0, sizeof(MXFFileSysData));
-
-    newStdInFile->file     = stdin;
-    newStdInFile->isStream = 1;
-    assign_file_struct(newMXFFile, newStdInFile);
-
-    *mxfFile = newMXFFile;
-    return 1;
-
-fail:
-    SAFE_FREE(newMXFFile);
-    SAFE_FREE(newStdInFile);
-    return 0;
+    return disk_file_open(stdin, READ_MODE, mxfFile);
 }
-
 
 
 void mxf_file_close(MXFFile **mxfFile)
