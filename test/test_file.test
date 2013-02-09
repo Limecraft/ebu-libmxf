@@ -4,7 +4,9 @@ temp=/tmp/libmxf_test.mxf
 
 ./test_file $temp && \
     ./test_file stdin <$temp && \
-    ./test_file stdout >$temp
+    cat $temp | ./test_file stdin && \
+    ./test_file stdout >$temp && \
+    ./test_file stdout | ./test_file stdin
 res=$?
 
 rm -f $temp
