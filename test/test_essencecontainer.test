@@ -1,25 +1,12 @@
 #!/bin/sh
 
-MD5TOOL=./file_md5
+temp=/tmp/libmxf_test.mxf
 
+./test_essencecontainer $temp && \
+    ./file_md5 < $temp > $temp.md5 && \
+    diff $temp.md5 ${srcdir}/test_essencecontainer.md5
+res=$?
 
-if ! ./test_essencecontainer /tmp/libmxf_test.mxf
-then
-  rm -f /tmp/libmxf_test.mxf
-  exit 1
-fi
+rm -f $temp $temp.md5
 
-
-$MD5TOOL < /tmp/libmxf_test.mxf > /tmp/libmxf_test.mxf.md5
-if diff /tmp/libmxf_test.mxf.md5 ${srcdir}/test_essencecontainer.md5
-then
-	RESULT=0
-else
-	RESULT=1
-fi
-
-
-rm -f /tmp/libmxf_test.mxf /tmp/libmxf_test.mxf.md5
-
-
-exit $RESULT
+exit $res
