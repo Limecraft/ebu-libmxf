@@ -731,7 +731,7 @@ uint8_t mxf_get_llen(MXFFile *mxfFile, uint64_t len)
             llen = 2;
     }
 
-    if (mxfFile && mxfFile->minLLen > 0 && llen < mxfFile->minLLen)
+    if (mxfFile && llen < mxfFile->minLLen)
         llen = mxfFile->minLLen;
 
     return llen;
