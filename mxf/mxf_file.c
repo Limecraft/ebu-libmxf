@@ -86,8 +86,7 @@ static int check_file_is_seekable(FILE *file, int *isSeekable)
 #else
     fileId = fileno(file);
 #endif
-    if (fstat(fileId, &buf) != 0)
-    {
+    if (fstat(fileId, &buf) != 0) {
         mxf_log_error("unexpected fstat error when checking seek support: %s\n",
                       mxf_strerror(errno, errorBuf, sizeof(errorBuf)));
         return 0;
@@ -105,7 +104,7 @@ static int check_file_is_seekable(FILE *file, int *isSeekable)
 
 static void disk_file_close(MXFFileSysData *sysData)
 {
-    if (sysData->file != NULL &&
+    if (sysData->file &&
         sysData->file != stdin && sysData->file != stdout && sysData->file != stderr)
     {
         fclose(sysData->file);
@@ -206,9 +205,7 @@ static int disk_file_open(FILE *file, OpenMode mode, MXFFile **mxfFile)
     int isSeekable = 0;
 
     if (!check_file_is_seekable(file, &isSeekable))
-    {
         return 0;
-    }
 
     CHK_MALLOC_OFAIL(newMXFFile, MXFFile);
     memset(newMXFFile, 0, sizeof(MXFFile));
@@ -232,17 +229,12 @@ static int disk_file_open(FILE *file, OpenMode mode, MXFFile **mxfFile)
     newMXFFile->free_sys_data = free_disk_file;
     newMXFFile->sysData       = newDiskFile;
 
-    if (!isSeekable)
-    {
+    if (!isSeekable) {
         MXFFile *newStreamMXFFile = NULL;
         if (!mxf_stream_file_wrap(newMXFFile, mode == READ_MODE, &newStreamMXFFile))
-        {
             goto fail;
-        }
         *mxfFile = newStreamMXFFile;
-    }
-    else
-    {
+    } else {
         *mxfFile = newMXFFile;
     }
 
@@ -250,9 +242,7 @@ static int disk_file_open(FILE *file, OpenMode mode, MXFFile **mxfFile)
 
 fail:
     if (file != stdin && file != stdout && file != stderr)
-    {
         fclose(file);
-    }
     SAFE_FREE(newMXFFile);
     SAFE_FREE(newDiskFile);
     return 0;
@@ -262,10 +252,8 @@ fail:
 int mxf_disk_file_open_new(const char *filename, MXFFile **mxfFile)
 {
     FILE *file = fopen(filename, "w+b");
-    if (file == NULL)
-    {
+    if (!file)
         return 0;
-    }
 
     return disk_file_open(file, NEW_MODE, mxfFile);
 }
@@ -273,10 +261,8 @@ int mxf_disk_file_open_new(const char *filename, MXFFile **mxfFile)
 int mxf_disk_file_open_read(const char *filename, MXFFile **mxfFile)
 {
     FILE *file = fopen(filename, "rb");
-    if (file == NULL)
-    {
+    if (!file)
         return 0;
-    }
 
     return disk_file_open(file, READ_MODE, mxfFile);
 }
@@ -284,10 +270,8 @@ int mxf_disk_file_open_read(const char *filename, MXFFile **mxfFile)
 int mxf_disk_file_open_modify(const char *filename, MXFFile **mxfFile)
 {
     FILE *file = fopen(filename, "r+b");
-    if (file == NULL)
-    {
+    if (!file)
         return 0;
-    }
 
     return disk_file_open(file, MODIFY_MODE, mxfFile);
 }
@@ -380,9 +364,8 @@ void mxf_file_set_min_llen(MXFFile *mxfFile, uint8_t llen)
 uint8_t mxf_get_min_llen(MXFFile *mxfFile)
 {
     if (mxfFile->minLLen != 0)
-    {
         return mxfFile->minLLen;
-    }
+
     return 1;
 }
 
@@ -402,7 +385,7 @@ int mxf_read_uint16(MXFFile *mxfFile, uint16_t *value)
     uint8_t buffer[2];
     CHK_ORET(mxf_file_read(mxfFile, buffer, 2) == 2);
 
-    *value = (buffer[0]<<8) |
+    *value = (buffer[0] << 8) |
               buffer[1];
 
     return 1;
@@ -550,16 +533,12 @@ int mxf_read_l(MXFFile *mxfFile, uint8_t *llen, uint64_t *len)
 
     length = 0;
     llength = 1;
-    if (c < 0x80)
-    {
+    if (c < 0x80) {
         length = c;
-    }
-    else
-    {
+    } else {
         uint8_t bytesToRead = ((uint8_t)c) & 0x7f;
         CHK_ORET(bytesToRead <= 8);
-        for (i = 0; i < bytesToRead; i++)
-        {
+        for (i = 0; i < bytesToRead; i++) {
             CHK_ORET((c = mxf_file_getc(mxfFile)) != EOF);
             length <<= 8;
             length |= (uint8_t)c;
@@ -612,30 +591,20 @@ int mxf_read_local_tl(MXFFile *mxfFile, mxfLocalTag *tag, uint16_t *len)
 
 int mxf_skip(MXFFile *mxfFile, uint64_t len)
 {
-    if (mxf_file_is_seekable(mxfFile))
-    {
+    if (mxf_file_is_seekable(mxfFile)) {
         return mxf_file_seek(mxfFile, len, SEEK_CUR);
-    }
-    else
-    {
+    } else {
         /* skip by reading and discarding data */
         uint8_t buffer[SKIP_BUFFER_SIZE];
         uint32_t numRead;
         uint64_t totalRead = 0;
-        while (totalRead < len)
-        {
+        while (totalRead < len) {
             if (len - totalRead > SKIP_BUFFER_SIZE)
-            {
                 numRead = SKIP_BUFFER_SIZE;
-            }
             else
-            {
                 numRead = (uint32_t)(len - totalRead);
-            }
             if (mxf_file_read(mxfFile, buffer, numRead) != numRead)
-            {
                 return 0;
-            }
             totalRead += numRead;
         }
 
@@ -688,32 +657,24 @@ int mxf_write_fixed_l(MXFFile *mxfFile, uint8_t llen, uint64_t len)
 
     assert(llen > 0 && llen <= 9);
 
-    if (llen == 1)
-    {
-        if (len >= 0x80)
-        {
+    if (llen == 1) {
+        if (len >= 0x80) {
             mxf_log_error("Could not write BER length %"PRId64" for llen equal 1" LOG_LOC_FORMAT, len, LOG_LOC_PARAMS);
             return 0;
         }
 
         if (mxf_file_putc(mxfFile, (int)len) != (int)len)
-        {
             return 0;
-        }
-    }
-    else
-    {
-        if (llen != 9 && (len >> ((llen - 1) * 8)) > 0)
-        {
+    } else {
+        if (llen != 9 && (len >> ((llen - 1) * 8)) > 0) {
             mxf_log_error("Could not write BER length %"PRIu64" for llen equal %u"
                           LOG_LOC_FORMAT, len, llen, LOG_LOC_PARAMS);
             return 0;
         }
 
         for (i = 0; i < llen - 1; i++)
-        {
             buffer[llen - 1 - i - 1] = (uint8_t)((len >> (i * 8)) & 0xff);
-        }
+
         CHK_ORET(mxf_file_putc(mxfFile, 0x80 + llen - 1) == 0x80 + llen - 1);
         CHK_ORET(mxf_file_write(mxfFile, buffer, llen - 1) == (uint8_t)(llen - 1));
     }
@@ -749,50 +710,29 @@ uint8_t mxf_get_llen(MXFFile *mxfFile, uint64_t len)
 {
     uint8_t llen;
 
-    if (len < 0x80)
-    {
+    if (len < 0x80) {
         llen = 1;
-    }
-    else
-    {
-        if ((len>>56) != 0)
-        {
+    } else {
+        if (     (len >> 56) != 0)
             llen = 9;
-        }
-        else if ((len>>48) != 0)
-        {
+        else if ((len >> 48) != 0)
             llen = 8;
-        }
-        else if ((len>>40) != 0)
-        {
+        else if ((len >> 40) != 0)
             llen = 7;
-        }
-        else if ((len>>32) != 0)
-        {
+        else if ((len >> 32) != 0)
             llen = 6;
-        }
-        else if ((len>>24) != 0)
-        {
+        else if ((len >> 24) != 0)
             llen = 5;
-        }
-        else if ((len>>16) != 0)
-        {
+        else if ((len >> 16) != 0)
             llen = 4;
-        }
-        else if ((len>>8) != 0)
-        {
+        else if ((len >>  8) != 0)
             llen = 3;
-        }
         else
-        {
             llen = 2;
-        }
     }
 
-    if (mxfFile != NULL && mxfFile->minLLen > 0 && llen < mxfFile->minLLen)
-    {
+    if (mxfFile && mxfFile->minLLen > 0 && llen < mxfFile->minLLen)
         llen = mxfFile->minLLen;
-    }
 
     return llen;
 }
@@ -855,14 +795,10 @@ int mxf_write_zeros(MXFFile *mxfFile, uint64_t len)
     partialCount = (uint32_t)(len % mxfFile->zerosBufferSize);
 
     for (i = 0; i < completeCount; i++)
-    {
         CHK_ORET(mxf_file_write(mxfFile, mxfFile->zerosBuffer, mxfFile->zerosBufferSize) == mxfFile->zerosBufferSize);
-    }
 
     if (partialCount > 0)
-    {
         CHK_ORET(mxf_file_write(mxfFile, mxfFile->zerosBuffer, partialCount) == partialCount);
-    }
 
     return 1;
 }
