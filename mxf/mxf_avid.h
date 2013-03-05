@@ -102,6 +102,12 @@ int mxf_avid_get_data_def(MXFHeaderMetadata *headerMetadata, mxfUUID *uuid, mxfU
 int mxf_avid_write_index_entry_array_header(MXFFile *mxfFile, uint8_t sliceCount, uint8_t posTableCount,
                                             uint32_t numIndexEntries);
 
+int mxf_avid_is_string_tagged_value(MXFMetadataSet *taggedValueSet);
+int mxf_avid_is_int32_tagged_value(MXFMetadataSet *taggedValueSet);
+
+int mxf_avid_get_string_tagged_value(MXFMetadataSet *taggedValueSet, mxfUTF16Char **value);
+int mxf_avid_get_int32_tagged_value(MXFMetadataSet *taggedValueSet, int32_t *value);
+
 int mxf_avid_attach_mob_attribute(MXFHeaderMetadata *headerMetadata, MXFMetadataSet *packageSet,
                                   const mxfUTF16Char *name, const mxfUTF16Char *value);
 int mxf_avid_attach_int32_mob_attribute(MXFHeaderMetadata *headerMetadata, MXFMetadataSet *packageSet,
