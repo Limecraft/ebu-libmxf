@@ -86,6 +86,7 @@ int is_d10_picture_essence(const mxfUL *label)
 int is_d10_essence(const mxfUL *label)
 {
     if (is_d10_picture_essence(label) ||
+        mxf_equals_ul(label, &MXF_EC_L(D10_50_625_50_defined_template)) ||
         mxf_equals_ul(label, &MXF_EC_L(D10_50_625_50_extended_template)) ||
         mxf_equals_ul(label, &MXF_EC_L(D10_50_525_60_defined_template)) ||
         mxf_equals_ul(label, &MXF_EC_L(D10_50_525_60_extended_template)) ||
