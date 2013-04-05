@@ -15,7 +15,7 @@ CLEANFILES = libMXF-$(LIBMXF_MAJORMINOR).pc
 BUILT_SOURCES = mxf_scm_version.h
 
 mxf_scm_version.h:
-	sh $(top_srcdir)/gen_scm_version.sh
+	sh $(top_srcdir)/gen_scm_version.sh mxf_scm_version.h $(top_srcdir)/mxf_scm_version.h LIBMXF_SCM_VERSION
 
 .PHONY: mxf_scm_version.h
 

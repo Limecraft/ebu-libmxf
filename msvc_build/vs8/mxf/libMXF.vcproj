@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../..;.."
+				AdditionalIncludeDirectories=".;..;..\..\.."
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE"
 				MinimalRebuild="true"
 				ExceptionHandling="0"
@@ -107,7 +107,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="../../..;.."
+				AdditionalIncludeDirectories=".;..;..\..\.."
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="2"
@@ -259,11 +259,11 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath="..\inttypes.h"
+				RelativePath="mxf_scm_version.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\mxf_scm_version.h"
+				RelativePath="..\inttypes.h"
 				>
 			</File>
 			<File
@@ -413,6 +413,30 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 		</Filter>
+		<File
+			RelativePath=".\gen_scm_version.cmd"
+			>
+			<FileConfiguration
+				Name="Debug|Win32"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+					Description="Creating or touching mxf_scm_version.h"
+					CommandLine="CALL gen_scm_version.cmd mxf_scm_version.h ..\..\..\mxf_scm_version.h LIBMXF_SCM_VERSION"
+					Outputs="mxf_scm_version.h"
+				/>
+			</FileConfiguration>
+			<FileConfiguration
+				Name="Release|Win32"
+				>
+				<Tool
+					Name="VCCustomBuildTool"
+					Description="Creating or touching mxf_scm_version.h"
+					CommandLine="CALL gen_scm_version.cmd mxf_scm_version.h ..\..\..\mxf_scm_version.h LIBMXF_SCM_VERSION"
+					Outputs="mxf_scm_version.h"
+				/>
+			</FileConfiguration>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

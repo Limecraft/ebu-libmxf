@@ -6,6 +6,7 @@ EXTRA_DIST = \
 	readme_transfertop2.txt \
 	transfertop2.sln \
 	mxf/libMXF.vcproj \
+	mxf/gen_scm_version.cmd \
 	examples/archive/archivemxfinfo/archivemxfinfo.vcproj \
 	examples/archive/test_writearchivemxf/test_writearchivemxf.vcproj \
 	examples/archive/writearchivemxf/writearchivemxf.vcproj \
