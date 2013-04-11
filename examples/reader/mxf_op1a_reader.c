@@ -1061,11 +1061,15 @@ int op1a_is_supported(MXFPartition *headerPartition)
                  mxf_equals_ul(label, &MXF_EC_L(HD_Unc_1080_25p_422_FrameWrapped)) ||
                  mxf_equals_ul(label, &MXF_EC_L(HD_Unc_1080_50p_422_FrameWrapped)) ||
                  mxf_equals_ul(label, &MXF_EC_L(HD_Unc_1080_2997p_422_FrameWrapped)) ||
+                 mxf_equals_ul(label, &MXF_EC_L(HD_Unc_1080_30p_422_FrameWrapped)) ||
                  mxf_equals_ul(label, &MXF_EC_L(HD_Unc_1080_5994p_422_FrameWrapped)) ||
+                 mxf_equals_ul(label, &MXF_EC_L(HD_Unc_1080_60p_422_FrameWrapped)) ||
                  mxf_equals_ul(label, &MXF_EC_L(HD_Unc_720_25p_422_FrameWrapped)) ||
                  mxf_equals_ul(label, &MXF_EC_L(HD_Unc_720_2997p_422_FrameWrapped)) ||
+                 mxf_equals_ul(label, &MXF_EC_L(HD_Unc_720_30p_422_FrameWrapped)) ||
                  mxf_equals_ul(label, &MXF_EC_L(HD_Unc_720_50p_422_FrameWrapped)) ||
-                 mxf_equals_ul(label, &MXF_EC_L(HD_Unc_720_5994p_422_FrameWrapped)))
+                 mxf_equals_ul(label, &MXF_EC_L(HD_Unc_720_5994p_422_FrameWrapped)) ||
+                 mxf_equals_ul(label, &MXF_EC_L(HD_Unc_720_60p_422_FrameWrapped)))
         {
             supportCount++;
         }
