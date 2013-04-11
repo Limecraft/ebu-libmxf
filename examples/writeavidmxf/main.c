@@ -919,7 +919,7 @@ static int parse_frame_rate(const char *rateStr, mxfRational *frameRate)
     if (sscanf(rateStr, "%u", &value) != 1)
         return 0;
 
-    if (value == 24 || value == 25 || value == 50) {
+    if (value == 24 || value == 25 || value == 30 || value == 50 || value == 60) {
         frameRate->numerator   = (int32_t)value;
         frameRate->denominator = 1;
     } else if (value == 23976) {
@@ -951,7 +951,7 @@ static void usage(const char *cmd)
     fprintf(stderr, "  --ntsc                     NTSC framerate and frame size. Default is DV file frame rate or PAL\n");
     fprintf(stderr, "  --film24                   use framerate of 24 instead of default 25fps\n");
     fprintf(stderr, "  --film23.976               use framerate of 23.976 (24000/1001) instead of default 25fps\n");
-    fprintf(stderr, "  --fps <rate>               set frame rate: 23976 (24000/1001), 24, 25, 2997 (30000/1001), 50 or 5994 (60000/1001).\n");
+    fprintf(stderr, "  --fps <rate>               set frame rate: 23976 (24000/1001), 24, 25, 2997 (30000/1001), 30, 50, 5994 (60000/1001) or 60.\n");
     fprintf(stderr, "                             Default is the DV file frame rate, 50 for progressive video, otherwise 25\n");
     fprintf(stderr, "  --legacy                   use legacy DataDefs, for DV essence use legacy descriptor properties\n");
     fprintf(stderr, "  --legacy-umid              use the legacy UMID generation method (e.g. for Pro Tools v5.3.1)\n");
@@ -989,6 +989,7 @@ static void usage(const char *cmd)
     fprintf(stderr, "  --unc <filename>           Uncompressed 8-bit UYVY SD\n");
     fprintf(stderr, "       --height <value>           image height. Default is 576 for PAL or 486 for NTSC\n");
     fprintf(stderr, "  --unc1080i <filename>      Uncompressed 8-bit UYVY HD 1920x1080i\n");
+    fprintf(stderr, "  --unc1080p <filename>      Uncompressed 8-bit UYVY HD 1920x1080p\n");
     fprintf(stderr, "  --unc720p <filename>       Uncompressed 8-bit UYVY HD 1280x720p\n");
     fprintf(stderr, "  --pcm <filename>           raw 48kHz PCM audio\n");
     fprintf(stderr, "       --bps <bits per sample>    # bits per sample. Default is 16\n");
@@ -1749,6 +1750,24 @@ int main(int argc, const char *argv[])
             inputIndex++;
             cmdlnIndex += 2;
         }
+        else if (strcmp(argv[cmdlnIndex], "--unc1080p") == 0)
+        {
+            if (cmdlnIndex + 1 >= argc)
+            {
+                usage(argv[0]);
+                fprintf(stderr, "Missing argument for %s\n", argv[cmdlnIndex]);
+                return 1;
+            }
+            init_essence_info(&inputs[inputIndex].essenceInfo);
+            inputs[inputIndex].isVideo = 1;
+            inputs[inputIndex].essenceType = Unc1080pUYVY;
+            inputs[inputIndex].essenceInfo.imageAspectRatio.numerator = 16;
+            inputs[inputIndex].essenceInfo.imageAspectRatio.denominator = 9;
+            inputs[inputIndex].filename = argv[cmdlnIndex + 1];
+            inputs[inputIndex].trackNumber = ++videoTrackNumber;
+            inputIndex++;
+            cmdlnIndex += 2;
+        }
         else if (strcmp(argv[cmdlnIndex], "--unc720p") == 0)
         {
             if (cmdlnIndex + 1 >= argc)
@@ -2054,8 +2073,10 @@ int main(int argc, const char *argv[])
         /* TODO: isPAL is defined here as !'NTSC' to keep existing code logic. Longer term fix would be to
                  use a mxfRational rather than a isPAL boolean
         */
-        isPAL                   = (videoSampleRate.numerator != 30000 && videoSampleRate.numerator != 60000);
-        haveProgressive2Video   = (videoSampleRate.numerator == 50 || videoSampleRate.numerator == 60000);
+        isPAL                   = (videoSampleRate.numerator != 30000 && videoSampleRate.numerator != 30 &&
+                                   videoSampleRate.numerator != 60000 && videoSampleRate.numerator != 60);
+        haveProgressive2Video   = (videoSampleRate.numerator == 50 || videoSampleRate.numerator == 60000 ||
+                                   videoSampleRate.numerator == 60);
     }
     else
     {
@@ -2288,7 +2309,7 @@ int main(int argc, const char *argv[])
             inputs[i].frameSize = 720 * inputs[i].essenceInfo.inputHeight * 2;
             CHK_MALLOC_ARRAY_OFAIL(inputs[i].buffer, unsigned char, inputs[i].frameSize);
         }
-        else if (inputs[i].essenceType == Unc1080iUYVY)
+        else if (inputs[i].essenceType == Unc1080iUYVY || inputs[i].essenceType == Unc1080pUYVY)
         {
             inputs[i].frameSize = 1920 * 1080 * 2;
             CHK_MALLOC_ARRAY_OFAIL(inputs[i].buffer, unsigned char, inputs[i].frameSize);
@@ -2659,6 +2680,7 @@ int main(int argc, const char *argv[])
             }
             else if (inputs[i].essenceType == UncUYVY ||
                      inputs[i].essenceType == Unc1080iUYVY ||
+                     inputs[i].essenceType == Unc1080pUYVY ||
                      inputs[i].essenceType == Unc720pUYVY)
             {
                 if (rf_read(inputs[i].file, inputs[i].buffer, inputs[i].frameSize) != inputs[i].frameSize)

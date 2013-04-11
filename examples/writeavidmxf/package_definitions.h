@@ -73,6 +73,7 @@ typedef enum
     DNxHD1080p1253,
     UncUYVY,
     Unc1080iUYVY,
+    Unc1080pUYVY,
     Unc720pUYVY,
     PCM
 } EssenceType;

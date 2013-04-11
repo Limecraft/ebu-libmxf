@@ -257,9 +257,9 @@ static const uint32_t g_uncAlignedNTSCFrameSize  = 720896;
 static const uint32_t g_uncNTSCStartOffsetSize   = 6656;
 static const uint32_t g_uncNTSCVBISize           = 720 * 10 * 2;
 
-static const uint32_t g_unc1080iFrameSize        = 4147200; /* 1920*1080*2 */
-static const uint32_t g_uncAligned1080iFrameSize = 4153344;
-static const uint32_t g_unc1080iStartOffsetSize  = 6144;
+static const uint32_t g_unc1080FrameSize         = 4147200; /* 1920*1080*2 */
+static const uint32_t g_uncAligned1080FrameSize  = 4153344;
+static const uint32_t g_unc1080StartOffsetSize   = 6144;
 
 static const uint32_t g_unc720pFrameSize         = 1843200; /* 1280*720*2 */
 
@@ -2096,32 +2096,81 @@ static int create_track_writer(AvidClipWriter *clipWriter, PackageDefinitions *p
             break;
 
         case Unc1080iUYVY:
+        case Unc1080pUYVY:
             newTrackWriter->cdciEssenceContainerLabel = MXF_EC_L(AvidAAFKLVEssenceContainer);
             newTrackWriter->codingEquationsLabel = ITUR_BT709_CODING_EQ;
-            if (clipWriter->projectFormat == PAL_25i)
-            {
-                newTrackWriter->essenceContainerLabel = MXF_EC_L(HD_Unc_1080_50i_422_ClipWrapped);
-            }
-            else
-            {
-                newTrackWriter->essenceContainerLabel = MXF_EC_L(HD_Unc_1080_5994i_422_ClipWrapped);
-            }
-            newTrackWriter->frameSize = g_uncAligned1080iFrameSize;
+            newTrackWriter->frameSize = g_uncAligned1080FrameSize;
             newTrackWriter->storedHeight = 1080;
             newTrackWriter->storedWidth = 1920;
             newTrackWriter->displayHeight = 1080;
             newTrackWriter->displayWidth = 1920;
             newTrackWriter->displayYOffset = 0;
             newTrackWriter->displayXOffset = 0;
-            newTrackWriter->videoLineMap[0] = 21;
-            newTrackWriter->videoLineMap[1] = 584;
-            newTrackWriter->videoLineMapLen = 2;
             newTrackWriter->horizSubsampling = 2;
             newTrackWriter->vertSubsampling = 1;
             newTrackWriter->colorSiting = MXF_COLOR_SITING_REC601;
-            newTrackWriter->frameLayout = MXF_MIXED_FIELDS;
             newTrackWriter->imageAlignmentOffset = g_uncImageAlignmentOffset;
-            newTrackWriter->imageStartOffset = g_unc1080iStartOffsetSize;
+            newTrackWriter->imageStartOffset = g_unc1080StartOffsetSize;
+            if (filePackage->essenceType == Unc1080iUYVY)
+            {
+                if (clipWriter->projectEditRate.numerator == 25 && clipWriter->projectEditRate.denominator == 1)
+                {
+                    newTrackWriter->essenceContainerLabel = MXF_EC_L(HD_Unc_1080_50i_422_ClipWrapped);
+                }
+                else if (clipWriter->projectEditRate.numerator == 30000 && clipWriter->projectEditRate.denominator == 1001)
+                {
+                    newTrackWriter->essenceContainerLabel = MXF_EC_L(HD_Unc_1080_5994i_422_ClipWrapped);
+                }
+                else
+                {
+                    mxf_log_error("Unsupported project edit rate %d/%d" LOG_LOC_FORMAT,
+                                  clipWriter->projectEditRate.numerator, clipWriter->projectEditRate.denominator,
+                                  LOG_LOC_PARAMS);
+                    goto fail;
+                }
+                newTrackWriter->videoLineMapLen = 2;
+                newTrackWriter->videoLineMap[0] = 21;
+                newTrackWriter->videoLineMap[1] = 584;
+                newTrackWriter->frameLayout = MXF_MIXED_FIELDS;
+            }
+            else
+            {
+                if (clipWriter->projectEditRate.numerator == 25 && clipWriter->projectEditRate.denominator == 1)
+                {
+                    newTrackWriter->essenceContainerLabel = MXF_EC_L(HD_Unc_1080_25p_422_ClipWrapped);
+                }
+                else if (clipWriter->projectEditRate.numerator == 30000 && clipWriter->projectEditRate.denominator == 1001)
+                {
+                    newTrackWriter->essenceContainerLabel = MXF_EC_L(HD_Unc_1080_2997p_422_ClipWrapped);
+                }
+                else if (clipWriter->projectEditRate.numerator == 30 && clipWriter->projectEditRate.denominator == 1)
+                {
+                    newTrackWriter->essenceContainerLabel = MXF_EC_L(HD_Unc_1080_30p_422_ClipWrapped);
+                }
+                else if (clipWriter->projectEditRate.numerator == 50 && clipWriter->projectEditRate.denominator == 1)
+                {
+                    newTrackWriter->essenceContainerLabel = MXF_EC_L(HD_Unc_1080_50p_422_ClipWrapped);
+                }
+                else if (clipWriter->projectEditRate.numerator == 60000 && clipWriter->projectEditRate.denominator == 1001)
+                {
+                    newTrackWriter->essenceContainerLabel = MXF_EC_L(HD_Unc_1080_5994p_422_ClipWrapped);
+                }
+                else if (clipWriter->projectEditRate.numerator == 60 && clipWriter->projectEditRate.denominator == 1)
+                {
+                    newTrackWriter->essenceContainerLabel = MXF_EC_L(HD_Unc_1080_60p_422_ClipWrapped);
+                }
+                else
+                {
+                    mxf_log_error("Unsupported project edit rate %d/%d" LOG_LOC_FORMAT,
+                                  clipWriter->projectEditRate.numerator, clipWriter->projectEditRate.denominator,
+                                  LOG_LOC_PARAMS);
+                    goto fail;
+                }
+                newTrackWriter->videoLineMapLen = 2;
+                newTrackWriter->videoLineMap[0] = 42;
+                newTrackWriter->videoLineMap[1] = 0;
+                newTrackWriter->frameLayout = MXF_FULL_FRAME;
+            }
 
             CHK_MALLOC_ARRAY_OFAIL(newTrackWriter->startOffsetData, uint8_t, newTrackWriter->imageStartOffset);
             memset(newTrackWriter->startOffsetData, 0, newTrackWriter->imageStartOffset);
@@ -2138,13 +2187,36 @@ static int create_track_writer(AvidClipWriter *clipWriter, PackageDefinitions *p
         case Unc720pUYVY:
             newTrackWriter->cdciEssenceContainerLabel = MXF_EC_L(AvidAAFKLVEssenceContainer);
             newTrackWriter->codingEquationsLabel = ITUR_BT709_CODING_EQ;
-            if (clipWriter->projectFormat == PAL_25i)
+            if (clipWriter->projectEditRate.numerator == 25 && clipWriter->projectEditRate.denominator == 1)
+            {
+                newTrackWriter->essenceContainerLabel = MXF_EC_L(HD_Unc_720_25p_422_ClipWrapped);
+            }
+            else if (clipWriter->projectEditRate.numerator == 30000 && clipWriter->projectEditRate.denominator == 1001)
+            {
+                newTrackWriter->essenceContainerLabel = MXF_EC_L(HD_Unc_720_2997p_422_ClipWrapped);
+            }
+            else if (clipWriter->projectEditRate.numerator == 30 && clipWriter->projectEditRate.denominator == 1)
+            {
+                newTrackWriter->essenceContainerLabel = MXF_EC_L(HD_Unc_720_30p_422_ClipWrapped);
+            }
+            else if (clipWriter->projectEditRate.numerator == 50 && clipWriter->projectEditRate.denominator == 1)
             {
                 newTrackWriter->essenceContainerLabel = MXF_EC_L(HD_Unc_720_50p_422_ClipWrapped);
             }
-            else
+            else if (clipWriter->projectEditRate.numerator == 60000 && clipWriter->projectEditRate.denominator == 1001)
             {
                 newTrackWriter->essenceContainerLabel = MXF_EC_L(HD_Unc_720_5994p_422_ClipWrapped);
+            }
+            else if (clipWriter->projectEditRate.numerator == 60 && clipWriter->projectEditRate.denominator == 1)
+            {
+                newTrackWriter->essenceContainerLabel = MXF_EC_L(HD_Unc_720_60p_422_ClipWrapped);
+            }
+            else
+            {
+                mxf_log_error("Unsupported project edit rate %d/%d" LOG_LOC_FORMAT,
+                              clipWriter->projectEditRate.numerator, clipWriter->projectEditRate.denominator,
+                              LOG_LOC_PARAMS);
+                goto fail;
             }
             newTrackWriter->frameSize = g_unc720pFrameSize;
             newTrackWriter->storedHeight = 720;
@@ -2390,6 +2462,7 @@ int write_samples(AvidClipWriter *clipWriter, uint32_t materialTrackID, uint32_t
             break;
         case UncUYVY:
         case Unc1080iUYVY:
+        case Unc1080pUYVY:
             CHK_ORET(numSamples == 1);
             CHK_ORET(size + writer->imageStartOffset + writer->vbiSize == writer->editUnitByteCount);
             CHK_ORET(mxf_write_essence_element_data(writer->mxfFile, writer->essenceElement, writer->startOffsetData,
@@ -2436,7 +2509,7 @@ int write_sample_data(AvidClipWriter *clipWriter, uint32_t materialTrackID, cons
     CHK_ORET(get_track_writer(clipWriter, materialTrackID, &writer));
 
     /* Uncompressed video data has a start offset and SD also has VBI data */
-    if ((writer->essenceType == UncUYVY || writer->essenceType == Unc1080iUYVY) &&
+    if ((writer->essenceType == UncUYVY || writer->essenceType == Unc1080iUYVY || writer->essenceType == Unc1080pUYVY) &&
         writer->sampleDataSize == 0)
     {
         CHK_ORET(mxf_write_essence_element_data(writer->mxfFile, writer->essenceElement, writer->startOffsetData,
@@ -2504,6 +2577,7 @@ int end_write_samples(AvidClipWriter *clipWriter, uint32_t materialTrackID, uint
             break;
         case UncUYVY:
         case Unc1080iUYVY:
+        case Unc1080pUYVY:
             /* Avid uncompressed video requires padding and VBI and currently only accepts 1 sample at a time */
             CHK_ORET(numSamples == 1);
             CHK_ORET((writer->sampleDataSize + writer->imageStartOffset + writer->vbiSize) == writer->editUnitByteCount);
