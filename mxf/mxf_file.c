@@ -42,6 +42,11 @@
 #include <sys/stat.h>
 #include <errno.h>
 
+#if defined(_WIN32)
+#include <io.h>
+#include <fcntl.h>
+#endif
+
 #include <mxf/mxf.h>
 #include <mxf/mxf_stream_file.h>
 #include <mxf/mxf_macros.h>
@@ -279,11 +284,29 @@ int mxf_disk_file_open_modify(const char *filename, MXFFile **mxfFile)
 
 int mxf_stdin_wrap_read(MXFFile **mxfFile)
 {
+#if defined(_WIN32)
+    char errorBuf[128];
+    int res = _setmode(_fileno(stdin), _O_BINARY);
+    if (res == -1) {
+        mxf_log_error("failed to set 'stdin' to binary mode: %s\n", mxf_strerror(errno, errorBuf, sizeof(errorBuf)));
+        return 0;
+    }
+#endif
+
     return disk_file_open(stdin, READ_MODE, mxfFile);
 }
 
 int mxf_stdout_wrap_write(MXFFile **mxfFile)
 {
+#if defined(_WIN32)
+    char errorBuf[128];
+    int res = _setmode(_fileno(stdout), _O_BINARY);
+    if (res == -1) {
+        mxf_log_error("failed to set 'stdout' to binary mode: %s\n", mxf_strerror(errno, errorBuf, sizeof(errorBuf)));
+        return 0;
+    }
+#endif
+
     return disk_file_open(stdout, NEW_MODE, mxfFile);
 }
 
