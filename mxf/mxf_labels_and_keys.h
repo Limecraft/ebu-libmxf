@@ -427,6 +427,12 @@ static const mxfUL MXF_EC_L(VC3FrameWrapped) = MXF_VC3_EC_L(0x01);
 static const mxfUL MXF_EC_L(VC3ClipWrapped)  = MXF_VC3_EC_L(0x02);
 
 
+/* Data */
+
+static const mxfUL MXF_EC_L(VBIData) = MXF_GENERIC_CONTAINER_LABEL(0x09, 0x0d, 0x00, 0x00);
+static const mxfUL MXF_EC_L(ANCData) = MXF_GENERIC_CONTAINER_LABEL(0x09, 0x0e, 0x00, 0x00);
+
+
 
 /*
  *
@@ -490,7 +496,8 @@ static const mxfUL ITUR_BT709_CODING_EQ =
  *
  */
 
-#define MXF_EE_K(name)  g_##name##_esselement_key
+#define MXF_EE_K(name)          g_##name##_esselement_key
+#define MXF_EE_TRACKNUM(name)   g_##name##_tracknum
 
 
 
@@ -626,6 +633,15 @@ static const mxfKey MXF_EE_K(SDTI_CP_System_Pack) =
 
 #define MXF_VC3_FRAME_WRAPPED_EE_TYPE      0x05
 #define MXF_VC3_CLIP_WRAPPED_EE_TYPE       0x06
+
+
+/* Data mappings */
+
+static const mxfUL MXF_EE_K(VBIData) = MXF_GENERIC_CONTAINER_ELEMENT_KEY(0x01, 0x17, 0x01, 0x01, 0x01);
+static const mxfUL MXF_EE_K(ANCData) = MXF_GENERIC_CONTAINER_ELEMENT_KEY(0x01, 0x17, 0x01, 0x02, 0x01);
+
+static const uint32_t MXF_EE_TRACKNUM(VBIData) = MXF_TRACK_NUM(0x17, 0x01, 0x01, 0x01);
+static const uint32_t MXF_EE_TRACKNUM(ANCData) = MXF_TRACK_NUM(0x17, 0x01, 0x02, 0x01);
 
 
 
