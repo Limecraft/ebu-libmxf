@@ -98,6 +98,48 @@ int mxf_is_descriptive_metadata(const mxfUL *label)
     return memcmp(label, &MXF_DDEF_L(DescriptiveMetadata), sizeof(mxfUL)) == 0;
 }
 
+MXFDataDefEnum mxf_get_ddef_enum(const mxfUL *label)
+{
+    if (mxf_is_picture(label))
+        return MXF_PICTURE_DDEF;
+    else if (mxf_is_sound(label))
+        return MXF_SOUND_DDEF;
+    else if (mxf_is_timecode(label))
+        return MXF_TIMECODE_DDEF;
+    else if (mxf_is_data(label))
+        return MXF_DATA_DDEF;
+    else if (mxf_is_descriptive_metadata(label))
+        return MXF_DM_DDEF;
+    else
+        return MXF_UNKNOWN_DDEF;
+}
+
+int mxf_get_ddef_label(MXFDataDefEnum data_def, mxfUL *label)
+{
+    switch (data_def)
+    {
+        case MXF_PICTURE_DDEF:
+            memcpy(label, &MXF_DDEF_L(Picture), sizeof(*label));
+            return 1;
+        case MXF_SOUND_DDEF:
+            memcpy(label, &MXF_DDEF_L(Sound), sizeof(*label));
+            return 1;
+        case MXF_TIMECODE_DDEF:
+            memcpy(label, &MXF_DDEF_L(Timecode), sizeof(*label));
+            return 1;
+        case MXF_DATA_DDEF:
+            memcpy(label, &MXF_DDEF_L(Data), sizeof(*label));
+            return 1;
+        case MXF_DM_DDEF:
+            memcpy(label, &MXF_DDEF_L(DescriptiveMetadata), sizeof(*label));
+            return 1;
+        case MXF_UNKNOWN_DDEF:
+            break;
+    }
+
+    return 0;
+}
+
 
 
 int mxf_is_generic_container_label(const mxfUL *label)

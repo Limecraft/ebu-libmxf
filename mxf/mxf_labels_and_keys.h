@@ -134,6 +134,9 @@ int mxf_is_timecode(const mxfUL *label);
 int mxf_is_data(const mxfUL *label);
 int mxf_is_descriptive_metadata(const mxfUL *label);
 
+MXFDataDefEnum mxf_get_ddef_enum(const mxfUL *label);
+int mxf_get_ddef_label(MXFDataDefEnum data_def, mxfUL *label);
+
 
 
 /*

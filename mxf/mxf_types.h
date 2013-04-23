@@ -87,6 +87,16 @@ typedef enum
 
 typedef uint8_t MXFColorSiting;
 
+/* software-only enumerations corresponding to data definition SMPTE labels */
+typedef enum
+{
+    MXF_UNKNOWN_DDEF,
+    MXF_PICTURE_DDEF,
+    MXF_SOUND_DDEF,
+    MXF_TIMECODE_DDEF,
+    MXF_DATA_DDEF,
+    MXF_DM_DDEF,
+} MXFDataDefEnum;
 
 typedef struct
 {
