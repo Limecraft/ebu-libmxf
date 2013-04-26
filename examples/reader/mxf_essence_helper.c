@@ -529,7 +529,10 @@ int process_cdci_descriptor(MXFMetadataSet *descriptorSet, MXFTrack *track, Esse
                 CHK_ORET(mxf_get_int32_item(descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, FrameSampleSize), &avidFrameSize));
                 CHK_ORET(avidFrameSize > 0);
                 essenceTrack->frameSize = avidFrameSize;
-                CHK_ORET(mxf_get_uint32_item(descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, ImageStartOffset), &essenceTrack->imageStartOffset));
+                if (mxf_have_item(descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, ImageStartOffset)))
+                {
+                    CHK_ORET(mxf_get_uint32_item(descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, ImageStartOffset), &essenceTrack->imageStartOffset));
+                }
             }
         }
         else
@@ -628,7 +631,10 @@ int process_cdci_descriptor(MXFMetadataSet *descriptorSet, MXFTrack *track, Esse
             CHK_ORET(mxf_get_int32_item(descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, FrameSampleSize), &avidFrameSize));
             CHK_ORET(avidFrameSize > 0);
             essenceTrack->frameSize = avidFrameSize;
-            CHK_ORET(mxf_get_uint32_item(descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, ImageStartOffset), &essenceTrack->imageStartOffset));
+            if (mxf_have_item(descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, ImageStartOffset)))
+            {
+                CHK_ORET(mxf_get_uint32_item(descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, ImageStartOffset), &essenceTrack->imageStartOffset));
+            }
         }
         else
         {
@@ -830,7 +836,10 @@ int process_cdci_descriptor(MXFMetadataSet *descriptorSet, MXFTrack *track, Esse
             CHK_ORET(mxf_get_int32_item(descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, FrameSampleSize), &avidFrameSize));
             CHK_ORET(avidFrameSize > 0);
             essenceTrack->frameSize = avidFrameSize;
-            CHK_ORET(mxf_get_uint32_item(descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, ImageStartOffset), &essenceTrack->imageStartOffset));
+            if (mxf_have_item(descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, ImageStartOffset)))
+            {
+                CHK_ORET(mxf_get_uint32_item(descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, ImageStartOffset), &essenceTrack->imageStartOffset));
+            }
         }
         else
         {
