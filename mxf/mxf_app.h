@@ -72,6 +72,7 @@ typedef struct
 int mxf_app_load_extensions(MXFDataModel *dataModel);
 
 int mxf_app_is_app_mxf(MXFHeaderMetadata *headerMetadata);
+int mxf_app_check_issues(MXFHeaderMetadata *headerMetadata);
 int mxf_app_get_info(MXFHeaderMetadata *headerMetadata, ArchiveMXFInfo *info);
 int mxf_app_get_pse_failures(MXFHeaderMetadata *headerMetadata, PSEFailure **failures, size_t *numFailures);
 int mxf_app_get_vtr_errors(MXFHeaderMetadata *headerMetadata, VTRErrorAtPos **errors, size_t *numErrors);

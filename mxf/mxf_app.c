@@ -263,6 +263,36 @@ static int archive_mxf_get_package_infax_data(MXFHeaderMetadata *headerMetadata,
     return haveInfaxData;
 }
 
+static int archive_mxf_check_issues(MXFHeaderMetadata *headerMetadata, MXFMetadataSet *packageSet)
+{
+    MXFArrayItemIterator arrayIter;
+    mxfUL dataDef;
+    MXFMetadataSet *packageTrackSet;
+    MXFMetadataSet *sequenceSet;
+
+    /* check whether there are any descriptive metadata tracks containing a Sequence set with
+       missing required property StructuralComponents */
+    CHK_ORET(mxf_uu_get_package_tracks(packageSet, &arrayIter));
+    while (mxf_uu_next_track(headerMetadata, &arrayIter, &packageTrackSet))
+    {
+        CHK_ORET(mxf_uu_get_track_datadef(packageTrackSet, &dataDef));
+        if (mxf_is_descriptive_metadata(&dataDef))
+        {
+            CHK_ORET(mxf_get_strongref_item(packageTrackSet, &MXF_ITEM_K(GenericTrack, Sequence), &sequenceSet));
+            if (mxf_is_subclass_of(headerMetadata->dataModel, &sequenceSet->key, &MXF_SET_K(Sequence)))
+            {
+                if (!mxf_have_item(sequenceSet, &MXF_ITEM_K(Sequence, StructuralComponents)))
+                {
+                    mxf_log_error("Descriptive metadata track's Sequence set is missing the required StructuralComponents property\n");
+                    return 0;
+                }
+            }
+        }
+    }
+
+    return 1;
+}
+
 static int archive_mxf_get_package_pse_failures(MXFHeaderMetadata *headerMetadata, MXFMetadataSet *packageSet,
                                                 PSEFailure **failures, size_t *numFailures)
 {
@@ -293,6 +323,13 @@ static int archive_mxf_get_package_pse_failures(MXFHeaderMetadata *headerMetadat
             CHK_OFAIL(mxf_get_strongref_item(packageTrackSet, &MXF_ITEM_K(GenericTrack, Sequence), &sequenceSet));
             if (mxf_is_subclass_of(headerMetadata->dataModel, &sequenceSet->key, &MXF_SET_K(Sequence)))
             {
+                /* first check required property exists to workaround bug in writer */
+                if (!mxf_have_item(sequenceSet, &MXF_ITEM_K(Sequence, StructuralComponents)))
+                {
+                    mxf_log_error("Descriptive metadata track's Sequence set is missing the required StructuralComponents property\n");
+                    continue;
+                }
+
                 CHK_OFAIL(mxf_get_array_item_count(sequenceSet, &MXF_ITEM_K(Sequence, StructuralComponents), &count));
                 if (count == 0)
                 {
@@ -394,6 +431,13 @@ static int archive_mxf_get_package_vtr_errors(MXFHeaderMetadata *headerMetadata,
             CHK_OFAIL(mxf_get_strongref_item(packageTrackSet, &MXF_ITEM_K(GenericTrack, Sequence), &sequenceSet));
             if (mxf_is_subclass_of(headerMetadata->dataModel, &sequenceSet->key, &MXF_SET_K(Sequence)))
             {
+                /* first check required property exists to workaround bug in writer */
+                if (!mxf_have_item(sequenceSet, &MXF_ITEM_K(Sequence, StructuralComponents)))
+                {
+                    mxf_log_error("Descriptive metadata track's Sequence set is missing the required StructuralComponents property\n");
+                    continue;
+                }
+
                 CHK_OFAIL(mxf_get_array_item_count(sequenceSet, &MXF_ITEM_K(Sequence, StructuralComponents), &count));
                 if (count == 0)
                 {
@@ -490,6 +534,13 @@ static int archive_mxf_get_package_digibeta_dropouts(MXFHeaderMetadata *headerMe
             CHK_OFAIL(mxf_get_strongref_item(packageTrackSet, &MXF_ITEM_K(GenericTrack, Sequence), &sequenceSet));
             if (mxf_is_subclass_of(headerMetadata->dataModel, &sequenceSet->key, &MXF_SET_K(Sequence)))
             {
+                /* first check required property exists to workaround bug in writer */
+                if (!mxf_have_item(sequenceSet, &MXF_ITEM_K(Sequence, StructuralComponents)))
+                {
+                    mxf_log_error("Descriptive metadata track's Sequence set is missing the required StructuralComponents property\n");
+                    continue;
+                }
+
                 CHK_OFAIL(mxf_get_array_item_count(sequenceSet, &MXF_ITEM_K(Sequence, StructuralComponents), &count));
                 if (count == 0)
                 {
@@ -586,6 +637,13 @@ static int archive_mxf_get_package_timecode_breaks(MXFHeaderMetadata *headerMeta
             CHK_OFAIL(mxf_get_strongref_item(packageTrackSet, &MXF_ITEM_K(GenericTrack, Sequence), &sequenceSet));
             if (mxf_is_subclass_of(headerMetadata->dataModel, &sequenceSet->key, &MXF_SET_K(Sequence)))
             {
+                /* first check required property exists to workaround bug in writer */
+                if (!mxf_have_item(sequenceSet, &MXF_ITEM_K(Sequence, StructuralComponents)))
+                {
+                    mxf_log_error("Descriptive metadata track's Sequence set is missing the required StructuralComponents property\n");
+                    continue;
+                }
+
                 CHK_OFAIL(mxf_get_array_item_count(sequenceSet, &MXF_ITEM_K(Sequence, StructuralComponents), &count));
                 if (count == 0)
                 {
@@ -853,6 +911,20 @@ fail:
     mxf_free_list(&nameList);
     mxf_free_list(&valueList);
     return 0;
+}
+
+int mxf_app_check_issues(MXFHeaderMetadata *headerMetadata)
+{
+    MXFMetadataSet *materialPackageSet;
+    MXFMetadataSet *fileSourcePackageSet;
+
+    if (is_metadata_only_file(headerMetadata, &materialPackageSet))
+    {
+        return archive_mxf_check_issues(headerMetadata, materialPackageSet);
+    }
+
+    CHK_ORET(mxf_uu_get_top_file_package(headerMetadata, &fileSourcePackageSet));
+    return archive_mxf_check_issues(headerMetadata, fileSourcePackageSet);
 }
 
 int mxf_app_get_pse_failures(MXFHeaderMetadata *headerMetadata, PSEFailure **failures, size_t *numFailures)

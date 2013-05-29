@@ -608,7 +608,7 @@ static int get_infax_data(Reader *reader, InfaxData *infaxData)
     return 1;
 }
 
-static int get_info(Reader *reader, int showPSEFailures, int showVTRErrors, int showDigiBetaDropouts,
+static int get_info(Reader *reader, int checkIssues, int showPSEFailures, int showVTRErrors, int showDigiBetaDropouts,
                     int showTimecodeBreaks)
 {
     mxfKey key;
@@ -685,7 +685,7 @@ static int get_info(Reader *reader, int showPSEFailures, int showVTRErrors, int 
 
 
     /* read the header metadata in the footer is showing PSE failures, etc */
-    if (showPSEFailures || showVTRErrors || showDigiBetaDropouts || showTimecodeBreaks)
+    if (checkIssues || showPSEFailures || showVTRErrors || showDigiBetaDropouts || showTimecodeBreaks)
     {
         if (fileIsComplete)
         {
@@ -890,6 +890,17 @@ static int get_info(Reader *reader, int showPSEFailures, int showVTRErrors, int 
             CHK_ORET(mxf_get_strongref_item(reader->sourcePackageTrackSet, &MXF_ITEM_K(GenericTrack, Sequence), &reader->sequenceSet));
             if (mxf_is_subclass_of(reader->headerMetadata->dataModel, &reader->sequenceSet->key, &MXF_SET_K(Sequence)))
             {
+                /* first check required property exists to workaround bug in writer */
+                if (!mxf_have_item(reader->sequenceSet, &MXF_ITEM_K(Sequence, StructuralComponents)))
+                {
+                    mxf_log_error("Descriptive metadata track's Sequence set is missing the required StructuralComponents property\n");
+                    if (checkIssues)
+                    {
+                        return 0;
+                    }
+                    continue;
+                }
+
                 CHK_ORET(mxf_get_array_item_count(reader->sequenceSet, &MXF_ITEM_K(Sequence, StructuralComponents), &sequenceComponentCount));
                 if (sequenceComponentCount > 0)
                 {
@@ -1684,6 +1695,7 @@ static void usage(const char *cmd)
     fprintf(stderr, "  -b, --show-tc-breaks     show detailed timecode breaks\n");
     fprintf(stderr, "  -s, --summary-info       show summary (omit detail)\n");
     fprintf(stderr, "  -t, --no-src-tc          don't search for source VITC and LTC timecodes\n");
+    fprintf(stderr, "  --check-issues           exit with error if file contains known issues\n");
 }
 
 int main(int argc, const char *argv[])
@@ -1697,6 +1709,7 @@ int main(int argc, const char *argv[])
     int cmdlnIndex = 1;
     const char *mxfFilename = NULL;
     int noSourceTimecode = 0;
+    int checkIssues = 0;
 
     if (argc == 2 &&
         (strcmp(argv[cmdlnIndex], "-h") == 0 ||
@@ -1750,6 +1763,11 @@ int main(int argc, const char *argv[])
             noSourceTimecode = 1;
             cmdlnIndex += 1;
         }
+        else if (strcmp(argv[cmdlnIndex], "--check-issues") == 0)
+        {
+            checkIssues = 1;
+            cmdlnIndex += 1;
+        }
         else
         {
             usage(argv[0]);
@@ -1791,7 +1809,7 @@ int main(int argc, const char *argv[])
         }
     }
 
-    if (!get_info(reader, showPSEFailures, showVTRErrors, showDigiBetaDropouts, showTimecodeBreaks))
+    if (!get_info(reader, checkIssues, showPSEFailures, showVTRErrors, showDigiBetaDropouts, showTimecodeBreaks))
     {
         mxf_log_error("Failed to extract info from '%s'\n", mxfFilename);
         goto fail;
