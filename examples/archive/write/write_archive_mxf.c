@@ -1548,7 +1548,7 @@ int complete_archive_mxf_file(ArchiveMXFWriter **outputRef, const InfaxData *sou
     {
         /* if num PSE failures exceeds MAX_STRONG_REF_ARRAY_COUNT then the failures are
            written in > 1 tracks */
-        numTracks = 1 + numPSEFailures / MAX_STRONG_REF_ARRAY_COUNT;
+        numTracks = (numPSEFailures + MAX_STRONG_REF_ARRAY_COUNT - 1) / MAX_STRONG_REF_ARRAY_COUNT;
         for (i = 0; i < numTracks; i++)
         {
             /* Preface - ContentStorage - SourcePackage - DM Event Track */
@@ -1629,7 +1629,7 @@ int complete_archive_mxf_file(ArchiveMXFWriter **outputRef, const InfaxData *sou
         {
             /* if numVTRErrors exceeds MAX_STRONG_REF_ARRAY_COUNT then the errors are
                written in > 1 tracks */
-            numTracks = 1 + numVTRErrors / MAX_STRONG_REF_ARRAY_COUNT;
+            numTracks = (numVTRErrors + MAX_STRONG_REF_ARRAY_COUNT - 1) / MAX_STRONG_REF_ARRAY_COUNT;
             for (j = 0; j < numTracks; j++)
             {
                 /* Preface - ContentStorage - SourcePackage - DM Event Track */
@@ -1657,7 +1657,7 @@ int complete_archive_mxf_file(ArchiveMXFWriter **outputRef, const InfaxData *sou
     {
         /* if num dropouts exceeds MAX_STRONG_REF_ARRAY_COUNT then the failures are
            written in > 1 tracks */
-        numTracks = 1 + numDigiBetaDropouts / MAX_STRONG_REF_ARRAY_COUNT;
+        numTracks = (numDigiBetaDropouts + MAX_STRONG_REF_ARRAY_COUNT - 1) / MAX_STRONG_REF_ARRAY_COUNT;
         for (i = 0; i < numTracks; i++)
         {
             /* Preface - ContentStorage - SourcePackage - DM Event Track */
@@ -1682,7 +1682,7 @@ int complete_archive_mxf_file(ArchiveMXFWriter **outputRef, const InfaxData *sou
     {
         /* if num breaks exceeds MAX_STRONG_REF_ARRAY_COUNT then the failures are
            written in > 1 tracks */
-        numTracks = 1 + numTimecodeBreaks / MAX_STRONG_REF_ARRAY_COUNT;
+        numTracks = (numTimecodeBreaks + MAX_STRONG_REF_ARRAY_COUNT - 1) / MAX_STRONG_REF_ARRAY_COUNT;
         for (i = 0; i < numTracks; i++)
         {
             /* Preface - ContentStorage - SourcePackage - DM Event Track */
