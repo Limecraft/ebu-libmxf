@@ -51,10 +51,6 @@
 /* (2^16 - 8) / 16*/
 #define MAX_STRONG_REF_ARRAY_COUNT      4095
 
-/* the maximum number of VTR errors in which a check is made that a timeode can be
-   converted to a position. If not, then no errors are stored and a warning is given */
-#define MAXIMUM_ERROR_CHECK             100
-
 /* we expect the URL to be the filename used on the LTO tape which is around 16 characters */
 /* the value is much larger here to allow for unforseen changes or for testing purposes */
 /* note that the filename will always be truncated if it exceeds this length (-1) */
@@ -1441,7 +1437,7 @@ int complete_archive_mxf_file(ArchiveMXFWriter **outputRef, const InfaxData *sou
     TimecodeIndexSearcher vitcIndexSearcher;
     TimecodeIndexSearcher ltcIndexSearcher;
     int64_t errorPosition;
-    int locatedAtLeastOneVTRError;
+    long numVTRErrorsLocated = 0;
     long errorIndex;
     long failureIndex;
     long digiBetaDropoutIndex;
@@ -1450,6 +1446,7 @@ int complete_archive_mxf_file(ArchiveMXFWriter **outputRef, const InfaxData *sou
     int vitcIndexIsNull;
     int ltcIndexIsNull;
     int useVTRLTC = 1;
+    int setUseVTRLTC = 0;
 
     vitcIndexIsNull = is_null_timecode_index(&output->vitcIndex);
     ltcIndexIsNull = is_null_timecode_index(&output->ltcIndex);
@@ -1574,11 +1571,8 @@ int complete_archive_mxf_file(ArchiveMXFWriter **outputRef, const InfaxData *sou
         initialise_timecode_index_searcher(&output->vitcIndex, &vitcIndexSearcher);
         initialise_timecode_index_searcher(&output->ltcIndex, &ltcIndexSearcher);
 
-        /* check we can at least find one VTR error position in the first MAXIMUM_ERROR_CHECK */
-        /* if we can't then somethng is badly wrong with the rs-232 or SDI links
-           and we decide to store nothing */
-        locatedAtLeastOneVTRError = 0;
-        for (j = 0; j < MAXIMUM_ERROR_CHECK && j < numVTRErrors; j++)
+        /* count the number of VTR errors that can be matched to a track position */
+        for (j = 0; j < numVTRErrors; j++)
         {
             vtrError = (const VTRError*)&vtrErrors[j];
 
@@ -1591,45 +1585,50 @@ int complete_archive_mxf_file(ArchiveMXFWriter **outputRef, const InfaxData *sou
             {
                 if (find_position(&ltcIndexSearcher, &vtrError->ltcTimecode, &errorPosition))
                 {
-                    locatedAtLeastOneVTRError = 1;
-                    break;
+                    numVTRErrorsLocated++;
                 }
             }
             else if (ltcIndexIsNull)
             {
                 if (find_position(&vitcIndexSearcher, &vtrError->vitcTimecode, &errorPosition))
                 {
-                    locatedAtLeastOneVTRError = 1;
-                    break;
+                    numVTRErrorsLocated++;
                 }
             }
             else
             {
-                if (find_position(&ltcIndexSearcher, &vtrError->ltcTimecode, &errorPosition))
+                if ((!setUseVTRLTC || useVTRLTC) &&
+                    find_position(&ltcIndexSearcher, &vtrError->ltcTimecode, &errorPosition))
                 {
-                    locatedAtLeastOneVTRError = 1;
-                    useVTRLTC = 1;
-                    break;
+                    numVTRErrorsLocated++;
+                    if (!setUseVTRLTC)
+                    {
+                        useVTRLTC = 1;
+                        setUseVTRLTC = 1;
+                    }
                 }
-                else if (find_position(&vitcIndexSearcher, &vtrError->vitcTimecode, &errorPosition))
+                else if ((!setUseVTRLTC || !useVTRLTC) &&
+                         find_position(&vitcIndexSearcher, &vtrError->vitcTimecode, &errorPosition))
                 {
-                    locatedAtLeastOneVTRError = 1;
-                    useVTRLTC = 0;
-                    break;
+                    numVTRErrorsLocated++;
+                    if (!setUseVTRLTC)
+                    {
+                        useVTRLTC = 0;
+                        setUseVTRLTC = 1;
+                    }
                 }
             }
         }
 
-        if (!locatedAtLeastOneVTRError)
+        if (numVTRErrorsLocated <= 0)
         {
-            mxf_log_warn("Failed to find the position of at least one VTR error in first %d "
-                         "- not recording any errors" LOG_LOC_FORMAT, MAXIMUM_ERROR_CHECK, LOG_LOC_PARAMS);
+            mxf_log_warn("Failed to find the position of any the %ld VTR errors" LOG_LOC_FORMAT, numVTRErrors, LOG_LOC_PARAMS);
         }
         else
         {
-            /* if numVTRErrors exceeds MAX_STRONG_REF_ARRAY_COUNT then the errors are
+            /* if numVTRErrorsLocated exceeds MAX_STRONG_REF_ARRAY_COUNT then the errors are
                written in > 1 tracks */
-            numTracks = (numVTRErrors + MAX_STRONG_REF_ARRAY_COUNT - 1) / MAX_STRONG_REF_ARRAY_COUNT;
+            numTracks = (numVTRErrorsLocated + MAX_STRONG_REF_ARRAY_COUNT - 1) / MAX_STRONG_REF_ARRAY_COUNT;
             for (j = 0; j < numTracks; j++)
             {
                 /* Preface - ContentStorage - SourcePackage - DM Event Track */
