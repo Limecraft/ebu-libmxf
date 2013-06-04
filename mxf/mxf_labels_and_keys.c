@@ -51,21 +51,27 @@ int mxf_is_op_atom(const mxfUL *label)
 {
     static const mxfUL opAtomPrefix = MXF_ATOM_OP_L(0);
 
-    return memcmp(label, &opAtomPrefix, 13) == 0;
+    /* ignoring octet7, the registry version byte */
+    return memcmp(label,          &opAtomPrefix,        7) == 0 &&
+           memcmp(&label->octet8, &opAtomPrefix.octet8, 5) == 0;
 }
 
 int mxf_is_op_1a(const mxfUL *label)
 {
     static const mxfUL op1APrefix = MXF_1A_OP_L(0);
 
-    return memcmp(label, &op1APrefix, 13) == 0;
+    /* ignoring octet7, the registry version byte */
+    return memcmp(label,          &op1APrefix,        7) == 0 &&
+           memcmp(&label->octet8, &op1APrefix.octet8, 5) == 0;
 }
 
 int mxf_is_op_1b(const mxfUL *label)
 {
     static const mxfUL op1BPrefix = MXF_1B_OP_L(0);
 
-    return memcmp(label, &op1BPrefix, 13) == 0;
+    /* ignoring octet7, the registry version byte */
+    return memcmp(label,          &op1BPrefix,        7) == 0 &&
+           memcmp(&label->octet8, &op1BPrefix.octet8, 5) == 0;
 }
 
 
