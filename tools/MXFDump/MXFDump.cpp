@@ -38,6 +38,10 @@
 // progress understanding an MXF file even if all you have is this source and
 // a C++ compiler.
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
