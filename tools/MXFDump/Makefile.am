@@ -1,4 +1,4 @@
-noinst_PROGRAMS = MXFDump
+bin_PROGRAMS = MXFDump
 
 MXFDump_SOURCES = \
 	MXFDump.cpp \
