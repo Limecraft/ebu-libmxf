@@ -219,7 +219,6 @@ if test x"$GCC" = xyes; then
 fi
 AC_SUBST(WARN_CFLAGS)
 
-
 LIBMXF_CFLAGS="$WARN_CFLAGS -I\$(top_srcdir)"
 AC_SUBST(LIBMXF_CFLAGS)
 
@@ -229,6 +228,20 @@ AC_SUBST(LIBMXF_LIBADDLIBS)
 LIBMXF_LDADDLIBS="$LIBMXF_LIBADDLIBS \
 	\$(top_builddir)/mxf/libMXF-$LIBMXF_MAJORMINOR.la"
 AC_SUBST(LIBMXF_LDADDLIBS)
+
+LIBMXF_LDFLAGS=
+AC_MSG_CHECKING([whether $CC supports -Wl,--no-undefined])
+orig_ldflags="$LDFLAGS"
+LDFLAGS="$LDFLAGS -Werror -Wl,--no-undefined"
+AC_LINK_IFELSE([AC_LANG_PROGRAM()],
+			[support_ld_flag=yes],
+			[support_ld_flag=no])
+if test "x$support_ld_flag" = "xyes"; then
+	LIBMXF_LDFLAGS="$LIBMXF_LDFLAGS -Wl,--no-undefined"
+fi
+LDFLAGS="$orig_ldflags"
+AC_MSG_RESULT([$support_ld_flag])
+AC_SUBST(LIBMXF_LDFLAGS)
 
 
 if test x"$with_aafsdk" != xno; then
