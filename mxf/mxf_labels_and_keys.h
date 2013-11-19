@@ -370,6 +370,11 @@ static const mxfUL MXF_EC_L(HD_Unc_720_5994p_422_ClipWrapped)  = MXF_UNC_EC_L(0x
 static const mxfUL MXF_EC_L(HD_Unc_720_60p_422_FrameWrapped)   = MXF_UNC_EC_L(0x01, 0x03, 0x25);
 static const mxfUL MXF_EC_L(HD_Unc_720_60p_422_ClipWrapped)    = MXF_UNC_EC_L(0x01, 0x03, 0x26);
 
+/* non-standard - number of lines and field rate provided by essence descriptor */
+
+static const mxfUL MXF_EC_L(Unc_FrameWrapped)                  = MXF_UNC_EC_L(0x01, 0x7f, 0x01);
+static const mxfUL MXF_EC_L(Unc_ClipWrapped)                   = MXF_UNC_EC_L(0x01, 0x7f, 0x02);
+
 
 /* D-10 mapping */
 
