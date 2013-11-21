@@ -87,6 +87,17 @@ typedef enum
 
 typedef uint8_t MXFColorSiting;
 
+typedef enum
+{
+    MXF_AVC_UNKNOWN_CODED_CONTENT_TYPE          = 0x00,
+    MXF_AVC_PROGRESSIVE_FRAME_PICTURE           = 0x01,
+    MXF_AVC_INTERLACED_FIELD_PICTURE            = 0x02,
+    MXF_AVC_INTERLACED_FRAME_PICTURE            = 0x03,
+    MXF_AVC_INTERLACED_FRAME_AND_FIELD_PICTURE  = 0x04,
+} MXFAVCCodedContentTypeEnum;
+
+typedef uint8_t MXFAVCCodedContentType;
+
 /* software-only enumerations corresponding to data definition SMPTE labels */
 typedef enum
 {
