@@ -518,7 +518,7 @@ static int get_package_tagged_values(MXFMetadataSet *packageSet, const mxfKey *i
                                      AvidTaggedValue **values, int printDebugError)
 {
     MXFMetadataSet *taggedValueSet;
-    uint32_t count;
+    uint32_t count = 0;
     uint32_t i;
     uint8_t *element;
     mxfUTF16Char *taggedValueName = NULL;
