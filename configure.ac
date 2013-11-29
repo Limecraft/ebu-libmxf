@@ -214,9 +214,7 @@ dnl -- Compiler flags etc.
 dnl-----------------------------------------------------------------------------
 
 WARN_CFLAGS=
-if test x"$GCC" = xyes; then
-	WARN_CFLAGS="-W -Wall"
-fi
+AC_APPEND_SUPPORTED_CFLAGS(WARN_CFLAGS, [-W -Wall])
 AC_SUBST(WARN_CFLAGS)
 
 LIBMXF_CFLAGS="$WARN_CFLAGS -I\$(top_srcdir)"
@@ -230,19 +228,8 @@ LIBMXF_LDADDLIBS="$LIBMXF_LIBADDLIBS \
 AC_SUBST(LIBMXF_LDADDLIBS)
 
 LIBMXF_LDFLAGS=
-AC_MSG_CHECKING([whether $CC supports -Wl,--no-undefined])
-orig_ldflags="$LDFLAGS"
-LDFLAGS="$LDFLAGS -Werror -Wl,--no-undefined"
-AC_LINK_IFELSE([AC_LANG_PROGRAM()],
-			[support_ld_flag=yes],
-			[support_ld_flag=no])
-if test "x$support_ld_flag" = "xyes"; then
-	LIBMXF_LDFLAGS="$LIBMXF_LDFLAGS -Wl,--no-undefined"
-fi
-LDFLAGS="$orig_ldflags"
-AC_MSG_RESULT([$support_ld_flag])
+AC_APPEND_SUPPORTED_LDFLAGS(LIBMXF_LDFLAGS, [-Wl,--no-undefined])
 AC_SUBST(LIBMXF_LDFLAGS)
-
 
 if test x"$with_aafsdk" != xno; then
 	AAFSDK_CXXFLAGS="-I$with_aafsdk/include"
