@@ -1,6 +1,6 @@
 #!/bin/sh
 
-temp=/tmp/libmxf_test.mxf
+temp=/tmp/libmxf_test_$$.mxf
 
 ./test_mxf_cache_file $temp
 res=$?

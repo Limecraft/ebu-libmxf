@@ -1,6 +1,6 @@
 #!/bin/sh
 
-temp=/tmp/libmxf_test.mxf
+temp=/tmp/libmxf_test_$$.mxf
 
 ./test_essencecontainer $temp && \
     ./file_md5 < $temp > $temp.md5 && \
