@@ -108,6 +108,9 @@ int mxf_equals_rgba_layout(const mxfRGBALayout *layoutA, const mxfRGBALayout *la
 int mxf_is_ul(const mxfUID *uid);
 
 
+MXFEssenceWrappingType mxf_get_essence_wrapping_type(const mxfUL *label);
+
+
 size_t mxf_utf16_to_utf8(char *u8_str, const mxfUTF16Char *u16_str, size_t u8_size);
 size_t mxf_utf8_to_utf16(mxfUTF16Char *u16_str, const char *u8_str, size_t u16_size);
 

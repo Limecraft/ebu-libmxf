@@ -109,6 +109,13 @@ typedef enum
     MXF_DM_DDEF,
 } MXFDataDefEnum;
 
+typedef enum
+{
+    MXF_UNKNOWN_WRAPPING_TYPE,
+    MXF_FRAME_WRAPPED,
+    MXF_CLIP_WRAPPED,
+} MXFEssenceWrappingType;
+
 typedef struct
 {
     uint8_t octet0;
