@@ -210,7 +210,7 @@ static int disk_file_open(FILE *file, OpenMode mode, MXFFile **mxfFile)
     int isSeekable = 0;
 
     if (!check_file_is_seekable(file, &isSeekable))
-        return 0;
+        goto fail;
 
     CHK_MALLOC_OFAIL(newMXFFile, MXFFile);
     memset(newMXFFile, 0, sizeof(MXFFile));
