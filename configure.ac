@@ -294,7 +294,7 @@ AC_CONFIG_FILES([
     tools/MXFDump/Makefile
     tools/extract_avid_extensions/Makefile
     msvc_build/Makefile
-    msvc_build/vs8/Makefile
+    msvc_build/vs10/Makefile
     libMXF.pc])
 
 AC_OUTPUT
