@@ -4115,9 +4115,9 @@ bool dumpFill = false;
 bool isFill(mxfKey& k)
 {
   bool result;
-  if (memcmp(&KLVFill, &k, sizeof(mxfKey)) == 0) {
-    result = true;
-  } else if (memcmp(&BogusFill, &k, sizeof(mxfKey)) == 0) {
+  if (memcmp(&KLVFill, &k, sizeof(mxfKey)) == 0 ||
+      memcmp(&LegacyKLVFill, &k, sizeof(mxfKey)) == 0 ||
+      memcmp(&BogusFill, &k, sizeof(mxfKey)) == 0) {
     result = true;
   } else {
     result = false;
@@ -4824,7 +4824,8 @@ void checkFill(const mxfKey& key,
                mxfUInt64 keyPosition,
                const mxfKey& previousKey)
 {
-  if (memcmp(&KLVFill, &previousKey, sizeof(mxfKey)) == 0) {
+  if (memcmp(&KLVFill, &previousKey, sizeof(mxfKey)) == 0 ||
+      memcmp(&LegacyKLVFill, &previousKey, sizeof(mxfKey)) == 0) {
     mxfError(key, keyPosition, "Consecutive fill items");
   }
 }
