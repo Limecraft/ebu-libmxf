@@ -25,7 +25,7 @@ AC_CONFIG_SRCDIR([mxf/mxf.h])
 AC_CONFIG_HEADER([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
-AM_INIT_AUTOMAKE([1.11 -Wall parallel-tests])
+AM_INIT_AUTOMAKE([1.11 -Wall parallel-tests tar-ustar])
 AM_SILENT_RULES([yes])
 
 dnl define for automake 1.12 to avoid warnings
