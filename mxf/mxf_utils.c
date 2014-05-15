@@ -426,7 +426,15 @@ void mxf_default_generate_uuid(mxfUUID *uuid)
 
     GUID guid;
     CoCreateGuid(&guid);
-    memcpy(uuid, &guid, 16);
+    uuid->octet0 = (uint8_t)((guid.Data1 >> 24) & 0xff);
+    uuid->octet1 = (uint8_t)((guid.Data1 >> 16) & 0xff);
+    uuid->octet2 = (uint8_t)((guid.Data1 >>  8) & 0xff);
+    uuid->octet3 = (uint8_t)((guid.Data1      ) & 0xff);
+    uuid->octet4 = (uint8_t)((guid.Data2 >>  8) & 0xff);
+    uuid->octet5 = (uint8_t)((guid.Data2      ) & 0xff);
+    uuid->octet6 = (uint8_t)((guid.Data3 >>  8) & 0xff);
+    uuid->octet7 = (uint8_t)((guid.Data3      ) & 0xff);
+    memcpy(&uuid->octet8, guid.Data4, 8);
 
 #else
 
