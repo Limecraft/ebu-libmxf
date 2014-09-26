@@ -62,6 +62,12 @@ typedef struct MXFIndexEntry
     mxfRational *posTable;
 } MXFIndexEntry;
 
+typedef enum {
+  MXF_OPT_BOOL_NOT_PRESENT = 0,
+  MXF_OPT_BOOL_TRUE        = 1,
+  MXF_OPT_BOOL_FALSE       = 2,
+} mxfOptBool;
+
 typedef struct
 {
     mxfUUID instanceUID;
@@ -75,6 +81,11 @@ typedef struct
     uint8_t posTableCount;
     MXFDeltaEntry *deltaEntryArray;
     MXFIndexEntry *indexEntryArray;
+    uint64_t extStartOffset;
+    uint64_t vbeByteCount;
+    mxfOptBool singleIndexLocation;
+    mxfOptBool singleEssenceLocation;
+    mxfOptBool forwardIndexDirection;
 } MXFIndexTableSegment;
 
 
