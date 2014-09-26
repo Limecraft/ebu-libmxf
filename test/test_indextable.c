@@ -87,6 +87,11 @@ int test_read(const char *filename)
     CHK_OFAIL(indexSegment->bodySID == 2);
     CHK_OFAIL(indexSegment->sliceCount == 0);
     CHK_OFAIL(indexSegment->posTableCount == 0);
+    CHK_OFAIL(indexSegment->extStartOffset == 0);
+    CHK_OFAIL(indexSegment->vbeByteCount == 0);
+    CHK_OFAIL(indexSegment->singleIndexLocation == MXF_OPT_BOOL_NOT_PRESENT);
+    CHK_OFAIL(indexSegment->singleEssenceLocation == MXF_OPT_BOOL_NOT_PRESENT);
+    CHK_OFAIL(indexSegment->forwardIndexDirection == MXF_OPT_BOOL_NOT_PRESENT);
     CHK_OFAIL(indexSegment->deltaEntryArray != 0);
     CHK_OFAIL(indexSegment->indexEntryArray == 0);
     deltaEntry = indexSegment->deltaEntryArray;
@@ -116,6 +121,11 @@ int test_read(const char *filename)
     CHK_OFAIL(indexSegment->bodySID == 2);
     CHK_OFAIL(indexSegment->sliceCount == 2);
     CHK_OFAIL(indexSegment->posTableCount == 2);
+    CHK_OFAIL(indexSegment->extStartOffset == 0);
+    CHK_OFAIL(indexSegment->vbeByteCount == 1);
+    CHK_OFAIL(indexSegment->singleIndexLocation == MXF_OPT_BOOL_NOT_PRESENT);
+    CHK_OFAIL(indexSegment->singleEssenceLocation == MXF_OPT_BOOL_TRUE);
+    CHK_OFAIL(indexSegment->forwardIndexDirection == MXF_OPT_BOOL_FALSE);
     CHK_OFAIL(indexSegment->deltaEntryArray == 0);
     CHK_OFAIL(indexSegment->indexEntryArray != 0);
     indexEntry = indexSegment->indexEntryArray;
@@ -219,6 +229,9 @@ int test_create_and_write(const char *filename)
     indexSegment->bodySID = 2;
     indexSegment->sliceCount = 2;
     indexSegment->posTableCount = 2;
+    indexSegment->vbeByteCount = 1;
+    indexSegment->singleEssenceLocation = MXF_OPT_BOOL_TRUE;
+    indexSegment->forwardIndexDirection = MXF_OPT_BOOL_FALSE;
     for (i = 0; i < indexSegment->indexDuration; i++)
     {
         for (k = 0; k < indexSegment->sliceCount; k++)
