@@ -1136,6 +1136,7 @@ int mxf_avid_read_index_table_segment_2(MXFFile *mxfFile, uint64_t segmentLen,
     uint32_t entry;
     uint64_t actualLen;
     uint32_t actualEntryLen;
+    uint8_t tempOptBool;
     uint8_t i;
 
     CHK_ORET(mxf_create_index_table_segment(&newSegment));
@@ -1186,6 +1187,29 @@ int mxf_avid_read_index_table_segment_2(MXFFile *mxfFile, uint64_t segmentLen,
             case 0x3f0e:
                 CHK_OFAIL(localLen == 1);
                 CHK_OFAIL(mxf_read_uint8(mxfFile, &newSegment->posTableCount));
+                break;
+            case 0x3f0f:
+                CHK_OFAIL(localLen == 8);
+                CHK_OFAIL(mxf_read_uint64(mxfFile, &newSegment->extStartOffset));
+                break;
+            case 0x3f10:
+                CHK_OFAIL(localLen == 8);
+                CHK_OFAIL(mxf_read_uint64(mxfFile, &newSegment->vbeByteCount));
+                break;
+            case 0x3f11:
+                CHK_OFAIL(localLen == 1);
+                CHK_OFAIL(mxf_read_uint8(mxfFile, &tempOptBool));
+                newSegment->singleIndexLocation = (tempOptBool ? MXF_OPT_BOOL_TRUE : MXF_OPT_BOOL_FALSE);
+                break;
+            case 0x3f12:
+                CHK_OFAIL(localLen == 1);
+                CHK_OFAIL(mxf_read_uint8(mxfFile, &tempOptBool));
+                newSegment->singleEssenceLocation = (tempOptBool ? MXF_OPT_BOOL_TRUE : MXF_OPT_BOOL_FALSE);
+                break;
+            case 0x3f13:
+                CHK_OFAIL(localLen == 1);
+                CHK_OFAIL(mxf_read_uint8(mxfFile, &tempOptBool));
+                newSegment->forwardIndexDirection = (tempOptBool ? MXF_OPT_BOOL_TRUE : MXF_OPT_BOOL_FALSE);
                 break;
             case 0x3f09:
                 CHK_ORET(mxf_read_uint32(mxfFile, &deltaEntryArrayLen));
