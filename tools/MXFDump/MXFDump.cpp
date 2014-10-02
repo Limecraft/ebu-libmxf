@@ -4860,11 +4860,11 @@ void checkPartition(mxfPartition* p, mxfUInt64 previous, mxfPartition* footer)
              p->_address + headerPosition,
              "MajorVersion");
   // Minor Version
-  checkField(2,
-             p->_minorVersion,
-             p->_key,
-             p->_address + headerPosition,
-             "MinorVersion");
+  if (p->_minorVersion < 2) {
+    mxfWarning(p->_key,
+               p->_address + headerPosition,
+               "MinorVersion expected >= 2,");
+  }
   // KAGSize
   // ThisPartition
   checkField(p->_address,
