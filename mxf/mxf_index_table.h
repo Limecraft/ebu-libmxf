@@ -78,6 +78,7 @@ typedef struct
     uint32_t indexSID;
     uint32_t bodySID;
     uint8_t sliceCount;
+    int forceWriteSliceCount;
     uint8_t posTableCount;
     MXFDeltaEntry *deltaEntryArray;
     MXFIndexEntry *indexEntryArray;

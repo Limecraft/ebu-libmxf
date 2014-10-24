@@ -271,6 +271,10 @@ int mxf_write_index_table_segment(MXFFile *mxfFile, const MXFIndexTableSegment *
             entry = entry->next;
         }
     }
+    else if (segment->forceWriteSliceCount)
+    {
+        segmentLen += 5;
+    }
     if (segment->extStartOffset)
     {
         segmentLen += 12;
@@ -315,6 +319,11 @@ int mxf_write_index_table_segment(MXFFile *mxfFile, const MXFIndexTableSegment *
         CHK_ORET(mxf_write_uint8(mxfFile, segment->sliceCount));
         CHK_ORET(mxf_write_local_tl(mxfFile, 0x3f0e, 1));
         CHK_ORET(mxf_write_uint8(mxfFile, segment->posTableCount));
+    }
+    else if (segment->forceWriteSliceCount)
+    {
+        CHK_ORET(mxf_write_local_tl(mxfFile, 0x3f08, 1));
+        CHK_ORET(mxf_write_uint8(mxfFile, segment->sliceCount));
     }
     if (segment->extStartOffset)
     {
@@ -597,6 +606,10 @@ int mxf_write_index_table_segment_header(MXFFile *mxfFile, const MXFIndexTableSe
         segmentLen += 22 /* includes PosTableCount and SliceCount */ +
             numIndexEntries * (11 + segment->sliceCount * 4 + segment->posTableCount * 8);
     }
+    else if (segment->forceWriteSliceCount)
+    {
+      segmentLen += 5;
+    }
     if (segment->extStartOffset)
     {
         segmentLen += 12;
@@ -641,6 +654,11 @@ int mxf_write_index_table_segment_header(MXFFile *mxfFile, const MXFIndexTableSe
         CHK_ORET(mxf_write_uint8(mxfFile, segment->sliceCount));
         CHK_ORET(mxf_write_local_tl(mxfFile, 0x3f0e, 1));
         CHK_ORET(mxf_write_uint8(mxfFile, segment->posTableCount));
+    }
+    else if (segment->forceWriteSliceCount)
+    {
+        CHK_ORET(mxf_write_local_tl(mxfFile, 0x3f08, 1));
+        CHK_ORET(mxf_write_uint8(mxfFile, segment->sliceCount));
     }
     if (segment->extStartOffset)
     {
