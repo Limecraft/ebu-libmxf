@@ -247,7 +247,7 @@ static const mxfUL MXF_CMDEF_L(VC3_720P_1252)  = MXF_VC3_CMDEV_L(0x12);
 static const mxfUL MXF_CMDEF_L(VC3_1080P_1253) = MXF_VC3_CMDEV_L(0x13);
 
 
-/* Uncompressed */
+/* uncompressed picture coding */
 
 /* fourcc 2vuy */
 static const mxfUL MXF_CMDEF_L(UNC_8B_422_INTERLEAVED) =
@@ -257,6 +257,14 @@ static const mxfUL MXF_CMDEF_L(UNC_8B_422_INTERLEAVED) =
 static const mxfUL MXF_CMDEF_L(UNC_10B_422_INTERLEAVED) =
     {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0a, 0x04, 0x01, 0x02, 0x01, 0x01, 0x02, 0x02, 0x01};
 
+
+/* uncompressed sound coding */
+
+#define MXF_UNC_SOUND_CMDEV_L(regver, byte13, byte14, byte15, byte16) \
+    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, regver, 0x04, 0x02, 0x02, 0x01, byte13, byte14, byte15, byte16}
+
+static const mxfUL MXF_CMDEF_L(ST382_UNC_SOUND) = MXF_UNC_SOUND_CMDEV_L(0x0a, 0x01, 0x00, 0x00, 0x00);
+static const mxfUL MXF_CMDEF_L(UNDEFINED_SOUND) = MXF_UNC_SOUND_CMDEV_L(0x01, 0x7f, 0x00, 0x00, 0x00);
 
 
 /*
