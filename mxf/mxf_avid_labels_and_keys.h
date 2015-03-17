@@ -167,12 +167,16 @@ static const mxfUL MXF_EC_L(DNxHD1080p1235ClipWrapped)  = MXF_AVID_DNXHD_EC_L(0x
 static const mxfUL MXF_EC_L(DNxHD1080p1237ClipWrapped)  = MXF_AVID_DNXHD_EC_L(0x01, 0x02);
 static const mxfUL MXF_EC_L(DNxHD1080p1238ClipWrapped)  = MXF_AVID_DNXHD_EC_L(0x01, 0x03);
 static const mxfUL MXF_EC_L(DNxHD1080p1253ClipWrapped)  = MXF_AVID_DNXHD_EC_L(0x01, 0x04);
+static const mxfUL MXF_EC_L(DNxHD1080p1259ClipWrapped)  = MXF_AVID_DNXHD_EC_L(0x01, 0x06);
 static const mxfUL MXF_EC_L(DNxHD1080i1241ClipWrapped)  = MXF_AVID_DNXHD_EC_L(0x02, 0x01);
 static const mxfUL MXF_EC_L(DNxHD1080i1242ClipWrapped)  = MXF_AVID_DNXHD_EC_L(0x02, 0x02);
 static const mxfUL MXF_EC_L(DNxHD1080i1243ClipWrapped)  = MXF_AVID_DNXHD_EC_L(0x02, 0x03);
+static const mxfUL MXF_EC_L(DNxHD1080i1244ClipWrapped)  = MXF_AVID_DNXHD_EC_L(0x02, 0x04);
+static const mxfUL MXF_EC_L(DNxHD1080i1260ClipWrapped)  = MXF_AVID_DNXHD_EC_L(0x02, 0x08);
 static const mxfUL MXF_EC_L(DNxHD720p1250ClipWrapped)   = MXF_AVID_DNXHD_EC_L(0x03, 0x01);
 static const mxfUL MXF_EC_L(DNxHD720p1251ClipWrapped)   = MXF_AVID_DNXHD_EC_L(0x03, 0x02);
 static const mxfUL MXF_EC_L(DNxHD720p1252ClipWrapped)   = MXF_AVID_DNXHD_EC_L(0x03, 0x03);
+static const mxfUL MXF_EC_L(DNxHD720p1258ClipWrapped)   = MXF_AVID_DNXHD_EC_L(0x03, 0x04);
 
 
 /* 10-bit uncompressed CDCI */

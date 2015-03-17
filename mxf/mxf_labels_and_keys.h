@@ -247,10 +247,14 @@ static const mxfUL MXF_CMDEF_L(VC3_1080P_1238) = MXF_VC3_CMDEV_L(0x04);
 static const mxfUL MXF_CMDEF_L(VC3_1080I_1241) = MXF_VC3_CMDEV_L(0x07);
 static const mxfUL MXF_CMDEF_L(VC3_1080I_1242) = MXF_VC3_CMDEV_L(0x08);
 static const mxfUL MXF_CMDEF_L(VC3_1080I_1243) = MXF_VC3_CMDEV_L(0x09);
+static const mxfUL MXF_CMDEF_L(VC3_1080I_1244) = MXF_VC3_CMDEV_L(0x0a);
 static const mxfUL MXF_CMDEF_L(VC3_720P_1250)  = MXF_VC3_CMDEV_L(0x10);
 static const mxfUL MXF_CMDEF_L(VC3_720P_1251)  = MXF_VC3_CMDEV_L(0x11);
 static const mxfUL MXF_CMDEF_L(VC3_720P_1252)  = MXF_VC3_CMDEV_L(0x12);
 static const mxfUL MXF_CMDEF_L(VC3_1080P_1253) = MXF_VC3_CMDEV_L(0x13);
+static const mxfUL MXF_CMDEF_L(VC3_720P_1258)  = MXF_VC3_CMDEV_L(0x18);
+static const mxfUL MXF_CMDEF_L(VC3_1080P_1259) = MXF_VC3_CMDEV_L(0x19);
+static const mxfUL MXF_CMDEF_L(VC3_1080I_1260) = MXF_VC3_CMDEV_L(0x1a);
 
 
 /* uncompressed picture coding */
