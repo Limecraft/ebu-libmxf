@@ -98,6 +98,19 @@ typedef enum
 
 typedef uint8_t MXFAVCCodedContentType;
 
+typedef enum
+{
+    MXF_VC2_WAVELET_DESLAURIERS_DUBUC_9_7       = 0x00,
+    MXF_VC2_WAVELET_LEGALL_5_3                  = 0x01,
+    MXF_VC2_WAVELET_DESLAURIERS_DUBUC_13_7      = 0x02,
+    MXF_VC2_WAVELET_HAAR_NO_SHIFT               = 0x03,
+    MXF_VC2_WAVELET_HAAR_SINGLE_SHIFT_PER_LEVEL = 0x04,
+    MXF_VC2_WAVELET_FIDELITY_FILTER             = 0x05,
+    MXF_VC2_WAVELET_DAUBECHIES_9_7_INT_APPROX   = 0x06,
+} MXFVC2WaveletFilterEnum;
+
+typedef uint8_t MXFVC2WaveletFilterType;
+
 /* software-only enumerations corresponding to data definition SMPTE labels */
 typedef enum
 {

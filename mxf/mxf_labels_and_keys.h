@@ -256,6 +256,12 @@ static const mxfUL MXF_CMDEF_L(MPEG2_MP_H14_LONGGOP) =
     {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x08, 0x04, 0x01, 0x02, 0x02, 0x01, 0x05, 0x03, 0x00};
 
 
+/* VC-2 */
+
+static const mxfUL MXF_CMDEF_L(VC2) =
+    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0d, 0x04, 0x01, 0x02, 0x02, 0x03, 0x03, 0x01, 0x00};
+
+
 /* VC-3 */
 
 #define MXF_VC3_CMDEV_L(variant) \
@@ -468,6 +474,15 @@ static const mxfUL MXF_EC_L(MPEGES0FrameWrapped) = MXF_GENERIC_CONTAINER_LABEL(0
 static const mxfUL MXF_EC_L(MPEGES0ClipWrapped)  = MXF_GENERIC_CONTAINER_LABEL(0x02, 0x04, 0x60, 0x02);
 
 int mxf_is_mpeg_video_ec(const mxfUL *label, int frame_wrapped);
+
+
+/* VC-2 */
+
+#define MXF_VC2_EC_L(byte15) \
+    MXF_GENERIC_CONTAINER_LABEL(0x0d, 0x15, byte15, 0x00)
+
+static const mxfUL MXF_EC_L(VC2FrameWrapped) = MXF_VC2_EC_L(0x01);
+static const mxfUL MXF_EC_L(VC2ClipWrapped)  = MXF_VC2_EC_L(0x02);
 
 
 /* VC-3 */
@@ -735,6 +750,18 @@ static const mxfKey MXF_EE_K(SDTI_CP_System_Pack) =
 #define MXF_MPEG_PICT_FRAME_WRAPPED_EE_TYPE      0x05
 #define MXF_MPEG_PICT_CLIP_WRAPPED_EE_TYPE       0x06
 #define MXF_MPEG_PICT_CUSTOM_WRAPPED_EE_TYPE     0x07
+
+
+/* VC-2 mappings */
+
+#define MXF_VC2_EE_K(elecount, eletype, elenum) \
+    MXF_GENERIC_CONTAINER_ELEMENT_KEY(0x01, 0x15, elecount, eletype, elenum)
+
+#define MXF_VC2_TRACK_NUM(elecount, eletype, elenum) \
+    MXF_TRACK_NUM(0x15, elecount, eletype, elenum)
+
+#define MXF_VC2_FRAME_WRAPPED_EE_TYPE      0x10
+#define MXF_VC2_CLIP_WRAPPED_EE_TYPE       0x11
 
 
 /* VC-3 mappings */
