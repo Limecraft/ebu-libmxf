@@ -678,10 +678,19 @@ int mxf_equals_rgba_layout(const mxfRGBALayout *layoutA, const mxfRGBALayout *la
    a UL always has the MSB of the 1st byte == 0 and a UUID (non-NCS) has the MSB of the 9th byte == 1
    The UUID should be half swapped when used where a UL is expected
    Note: the UL is half swapped in AAF AUIDs
-   Note: the UL is half swapped in UMIDs when using the UUID/UL material generation method */
+   Note: the UL is half swapped in UMIDs when using the UUID/UL material generation method
+
+   MXF AUID (the opposite of AAF AUID!): the first bit is always 0 for a UL
+*/
 int mxf_is_ul(const mxfUID *uid)
 {
     return (uid->octet0 & 0x80) == 0x00;
+}
+
+/* MXF IDAU: the 65th bit is always 0 for a UL */
+int mxf_is_swapped_ul(const mxfUID *uid)
+{
+    return (uid->octet8 & 0x80) == 0x00;
 }
 
 MXFEssenceWrappingType mxf_get_essence_wrapping_type(const mxfUL *label)

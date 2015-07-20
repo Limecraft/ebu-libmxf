@@ -106,6 +106,7 @@ int mxf_equals_ext_umid(const mxfExtendedUMID *extUMIDA, const mxfExtendedUMID *
 int mxf_equals_rgba_layout(const mxfRGBALayout *layoutA, const mxfRGBALayout *layoutB);
 
 int mxf_is_ul(const mxfUID *uid);
+int mxf_is_swapped_ul(const mxfUID *uid);
 
 
 MXFEssenceWrappingType mxf_get_essence_wrapping_type(const mxfUL *label);
