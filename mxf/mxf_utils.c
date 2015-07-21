@@ -684,13 +684,15 @@ int mxf_equals_rgba_layout(const mxfRGBALayout *layoutA, const mxfRGBALayout *la
 */
 int mxf_is_ul(const mxfUID *uid)
 {
-    return (uid->octet0 & 0x80) == 0x00;
+    /* requiring more than just the 1st bit is always 0 to make it a SMPTE UL*/
+    return uid->octet0 == 0x06 && uid->octet1 == 0x0e && uid->octet2 == 0x2b && uid->octet3 == 0x34;
 }
 
 /* MXF IDAU: the 65th bit is always 0 for a UL */
 int mxf_is_swapped_ul(const mxfUID *uid)
 {
-    return (uid->octet8 & 0x80) == 0x00;
+    /* requiring more than just the 65th bit is always 0 to make it a SMPTE UL */
+    return uid->octet8 == 0x06 && uid->octet9 == 0x0e && uid->octet10 == 0x2b && uid->octet11 == 0x34;
 }
 
 MXFEssenceWrappingType mxf_get_essence_wrapping_type(const mxfUL *label)
