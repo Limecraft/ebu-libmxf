@@ -196,9 +196,32 @@ static const mxfUL MXF_CMDEF_L(MP4AdvancedRealTimeSimpleL3) = MXF_MPEG4_CMDEV_L(
 static const mxfUL MXF_CMDEF_L(MP4AdvancedRealTimeSimpleL4) = MXF_MPEG4_CMDEV_L(0x02, 0x04);
 
 
-/* AVC Intra Profiles */
+/* MPEG AVC / H264 */
+
+#define MXF_AVC_CMDEV_L(version, category, profile, variant) \
+    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, version, 0x04, 0x01, 0x02, 0x02, 0x01, category, profile, variant}
+
+
+#define MXF_AVC_PRED_CMDEV_L(version, profile, variant) \
+    MXF_AVC_CMDEV_L(version, 0x31, profile, variant)
+
+static const mxfUL MXF_CMDEF_L(AVC_BASELINE)             = MXF_AVC_PRED_CMDEV_L(0x0d, 0x10, 0x01);
+static const mxfUL MXF_CMDEF_L(AVC_CONSTRAINED_BASELINE) = MXF_AVC_PRED_CMDEV_L(0x0d, 0x11, 0x01);
+static const mxfUL MXF_CMDEF_L(AVC_MAIN)                 = MXF_AVC_PRED_CMDEV_L(0x0d, 0x20, 0x01);
+static const mxfUL MXF_CMDEF_L(AVC_EXTENDED)             = MXF_AVC_PRED_CMDEV_L(0x0d, 0x30, 0x01);
+static const mxfUL MXF_CMDEF_L(AVC_HIGH)                 = MXF_AVC_PRED_CMDEV_L(0x0d, 0x40, 0x01);
+static const mxfUL MXF_CMDEF_L(AVC_HIGH_10)              = MXF_AVC_PRED_CMDEV_L(0x0d, 0x50, 0x01);
+static const mxfUL MXF_CMDEF_L(AVC_HIGH_422)             = MXF_AVC_PRED_CMDEV_L(0x0d, 0x60, 0x01);
+static const mxfUL MXF_CMDEF_L(AVC_HIGH_444)             = MXF_AVC_PRED_CMDEV_L(0x0d, 0x70, 0x01);
+
+
 #define MXF_AVC_INTRA_CMDEV_L(version, profile, variant) \
-    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, version, 0x04, 0x01, 0x02, 0x02, 0x01, 0x32, profile, variant}
+    MXF_AVC_CMDEV_L(version, 0x32, profile, variant)
+
+static const mxfUL MXF_CMDEF_L(AVC_HIGH_10_INTRA)   = MXF_AVC_INTRA_CMDEV_L(0x0a, 0x20, 0x01);
+static const mxfUL MXF_CMDEF_L(AVC_HIGH_422_INTRA)  = MXF_AVC_INTRA_CMDEV_L(0x0a, 0x30, 0x01);
+static const mxfUL MXF_CMDEF_L(AVC_HIGH_444_INTRA)  = MXF_AVC_INTRA_CMDEV_L(0x0d, 0x40, 0x01);
+static const mxfUL MXF_CMDEF_L(AVC_CAVLC_444_INTRA) = MXF_AVC_INTRA_CMDEV_L(0x0d, 0x50, 0x01);
 
 static const mxfUL MXF_CMDEF_L(AVCI_50_1080_60_I)  = MXF_AVC_INTRA_CMDEV_L(0x0a, 0x21, 0x01);
 static const mxfUL MXF_CMDEF_L(AVCI_50_1080_50_I)  = MXF_AVC_INTRA_CMDEV_L(0x0a, 0x21, 0x02);
@@ -219,9 +242,6 @@ static const mxfUL MXF_CMDEF_L(AVCI_200_1080_25_P) = MXF_AVC_INTRA_CMDEV_L(0x0d,
 static const mxfUL MXF_CMDEF_L(AVCI_200_720_60_P)  = MXF_AVC_INTRA_CMDEV_L(0x0d, 0x32, 0x08);
 static const mxfUL MXF_CMDEF_L(AVCI_200_720_50_P)  = MXF_AVC_INTRA_CMDEV_L(0x0d, 0x32, 0x09);
 
-
-static const mxfUL MXF_CMDEF_L(AVC_HIGH_10_INTRA_UNCS)   = MXF_AVC_INTRA_CMDEV_L(0x0a, 0x20, 0x01);
-static const mxfUL MXF_CMDEF_L(AVC_HIGH_422_INTRA_UNCS)  = MXF_AVC_INTRA_CMDEV_L(0x0a, 0x30, 0x01);
 
 
 /* MPEG-2 Long GOP */
@@ -431,10 +451,13 @@ static const mxfUL MXF_EC_L(ALawCustomWrapped) = MXF_ALAW_EC_L(0x03);
 
 /* MPEG mappings */
 
-/* AVC Intra Profile */
+/* AVC / H264 */
 
-static const mxfUL MXF_EC_L(AVCIFrameWrapped) = MXF_GENERIC_CONTAINER_LABEL(0x0a, 0x10, 0x60, 0x01);
-static const mxfUL MXF_EC_L(AVCIClipWrapped)  = MXF_GENERIC_CONTAINER_LABEL(0x0a, 0x10, 0x60, 0x02);
+#define MXF_AVC_BYTESTREAM_EC_L(wrapping) \
+    MXF_GENERIC_CONTAINER_LABEL(0x0a, 0x10, 0x60, wrapping) /* stream id 0 */
+
+static const mxfUL MXF_EC_L(AVCIFrameWrapped) = MXF_AVC_BYTESTREAM_EC_L(0x01);
+static const mxfUL MXF_EC_L(AVCIClipWrapped)  = MXF_AVC_BYTESTREAM_EC_L(0x02);
 
 int mxf_is_avc_ec(const mxfUL *label, int frame_wrapped);
 
