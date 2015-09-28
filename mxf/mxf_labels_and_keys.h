@@ -456,8 +456,8 @@ static const mxfUL MXF_EC_L(ALawCustomWrapped) = MXF_ALAW_EC_L(0x03);
 #define MXF_AVC_BYTESTREAM_EC_L(wrapping) \
     MXF_GENERIC_CONTAINER_LABEL(0x0a, 0x10, 0x60, wrapping) /* stream id 0 */
 
-static const mxfUL MXF_EC_L(AVCIFrameWrapped) = MXF_AVC_BYTESTREAM_EC_L(0x01);
-static const mxfUL MXF_EC_L(AVCIClipWrapped)  = MXF_AVC_BYTESTREAM_EC_L(0x02);
+static const mxfUL MXF_EC_L(AVCFrameWrapped) = MXF_AVC_BYTESTREAM_EC_L(0x01);
+static const mxfUL MXF_EC_L(AVCClipWrapped)  = MXF_AVC_BYTESTREAM_EC_L(0x02);
 
 int mxf_is_avc_ec(const mxfUL *label, int frame_wrapped);
 
