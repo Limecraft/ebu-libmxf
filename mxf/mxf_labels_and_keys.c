@@ -194,3 +194,12 @@ void mxf_complete_essence_element_track_num(uint32_t *trackNum, uint8_t count, u
     *trackNum |=  (uint32_t)(num);
 }
 
+
+
+int mxf_is_gs_data_element(const mxfKey *key)
+{
+    static const mxfUL gsKey = MXF_GS_DATA_ELEMENT_KEY(0x00, 0x00);
+
+    return memcmp(key, &gsKey, 11) == 0 &&
+           memcmp(&key->octet13, &gsKey.octet13, 3) == 0;
+}

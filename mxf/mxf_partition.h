@@ -79,6 +79,7 @@ typedef struct
 
 int mxf_is_header_partition_pack(const mxfKey *key);
 int mxf_is_body_partition_pack(const mxfKey *key);
+int mxf_is_generic_stream_partition_pack(const mxfKey *key);
 int mxf_is_footer_partition_pack(const mxfKey *key);
 int mxf_is_partition_pack(const mxfKey *key);
 int mxf_partition_is_closed(const mxfKey *key);

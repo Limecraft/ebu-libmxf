@@ -493,6 +493,12 @@ static const mxfUL MXF_DM_L(APP_PreservationDescriptiveScheme) =
     {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01, 0x0d, 0x04, 0x01, 0x01, 0x01, 0x01, 0x01, 0x00};
 
 
+/* RP 2057 - Text-Based Metadata Carriage in MXF */
+
+static const mxfUL MXF_DM_L(RP2057) =
+    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01, 0x0d, 0x01, 0x04, 0x01, 0x04, 0x01, 0x01, 0x00};
+
+
 /*
  *
  * Miscellaneous labels
@@ -676,11 +682,46 @@ static const uint32_t MXF_EE_TRACKNUM(ANCData) = MXF_TRACK_NUM(0x17, 0x01, 0x02,
 
 /*
  *
+ * Generic Stream keys
+ *
+ */
+
+
+#define MXF_GS_DATA_ELEMENT_KEY(data, wrapping) \
+    {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x0c, 0x0d, 0x01, 0x05, data, wrapping, 0x00, 0x00, 0x00}
+
+#define MXF_GS_DATA_BASE        0x01
+#define MXF_GS_DATA_INTRINSIC   0x02
+#define MXF_GS_DATA_LE          0x04
+#define MXF_GS_DATA_BE          0x08
+#define MXF_GS_DATA_BYTES       0x08
+#define MXF_GS_DATA_ENDIAN_UNK  0x0c
+
+#define MXF_GS_WRAP_BASE        0x01
+#define MXF_GS_WRAP_AU_BYTE_1   0x02
+#define MXF_GS_WRAP_AU          0x04
+#define MXF_GS_WRAP_FRAME_SYNC  0x08
+
+
+int mxf_is_gs_data_element(const mxfKey *key);
+
+
+/* RP 2057 - Text-Based Metadata Carriage in MXF */
+
+static const mxfUL MXF_EE_K(RP2057_LE)         = MXF_GS_DATA_ELEMENT_KEY(MXF_GS_DATA_BASE | MXF_GS_DATA_LE,         MXF_GS_WRAP_BASE);
+static const mxfUL MXF_EE_K(RP2057_BE)         = MXF_GS_DATA_ELEMENT_KEY(MXF_GS_DATA_BASE | MXF_GS_DATA_BE,         MXF_GS_WRAP_BASE);
+static const mxfUL MXF_EE_K(RP2057_BYTES)      = MXF_GS_DATA_ELEMENT_KEY(MXF_GS_DATA_BASE | MXF_GS_DATA_BYTES,      MXF_GS_WRAP_BASE);
+static const mxfUL MXF_EE_K(RP2057_ENDIAN_UNK) = MXF_GS_DATA_ELEMENT_KEY(MXF_GS_DATA_BASE | MXF_GS_DATA_ENDIAN_UNK, MXF_GS_WRAP_BASE);
+
+
+/*
+ *
  * Partition pack keys
  *
  */
 
 #define MXF_PP_K(statusName, kindName)  g_##statusName##_##kindName##_pp_key
+#define MXF_GS_PP_K(kindName)           g_##kindName##_pp_key
 
 #define MXF_PP_KEY(regver, kind, status) \
     {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x05, 0x01, regver, 0x0d, 0x01, 0x02, 0x01, 0x01, kind, status, 0x00}
@@ -694,6 +735,7 @@ static const mxfKey MXF_PP_K(OpenIncomplete, Body)     = MXF_PP_KEY(0x01, 0x03, 
 static const mxfKey MXF_PP_K(ClosedIncomplete, Body)   = MXF_PP_KEY(0x01, 0x03, 0x02);
 static const mxfKey MXF_PP_K(OpenComplete, Body)       = MXF_PP_KEY(0x01, 0x03, 0x03);
 static const mxfKey MXF_PP_K(ClosedComplete, Body)     = MXF_PP_KEY(0x01, 0x03, 0x04);
+static const mxfKey MXF_GS_PP_K(GenericStream)         = MXF_PP_KEY(0x01, 0x03, 0x11);
 static const mxfKey MXF_PP_K(OpenIncomplete, Footer)   = MXF_PP_KEY(0x01, 0x04, 0x01);
 static const mxfKey MXF_PP_K(ClosedIncomplete, Footer) = MXF_PP_KEY(0x01, 0x04, 0x02);
 static const mxfKey MXF_PP_K(OpenComplete, Footer)     = MXF_PP_KEY(0x01, 0x04, 0x03);

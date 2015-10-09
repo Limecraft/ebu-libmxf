@@ -72,6 +72,11 @@ int mxf_is_body_partition_pack(const mxfKey *key)
     return mxf_equals_key_prefix(key, &g_PartitionPackPrefix_key, 13) && key->octet13 == 0x03;
 }
 
+int mxf_is_generic_stream_partition_pack(const mxfKey *key)
+{
+    return mxf_equals_key_prefix(key, &g_PartitionPackPrefix_key, 13) && key->octet13 == 0x03 && key->octet14 == 0x11;
+}
+
 int mxf_is_footer_partition_pack(const mxfKey *key)
 {
     return mxf_equals_key_prefix(key, &g_PartitionPackPrefix_key, 13) && key->octet13 == 0x04;

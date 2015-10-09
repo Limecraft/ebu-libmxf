@@ -305,6 +305,9 @@ static int validate_set(MXFMetadataSet *set, MXFSetDef *setDef, int logErrors)
                 case MXF_UTF16_TYPE:
                     CHECK_LENGTH(2)
                     break;
+                case MXF_UTF8_TYPE:
+                    CHECK_LENGTH(1)
+                    break;
                 case MXF_BOOLEAN_TYPE:
                     CHECK_LENGTH(1)
                     break;
@@ -346,6 +349,7 @@ static int validate_set(MXFMetadataSet *set, MXFSetDef *setDef, int logErrors)
                 case MXF_RAW_TYPE:
                 case MXF_UTF16STRING_TYPE:
                 case MXF_UTF16STRINGARRAY_TYPE:
+                case MXF_UTF8STRING_TYPE:
                 case MXF_ISO7STRING_TYPE:
                 case MXF_STREAM_TYPE:
                 case MXF_DATAVALUE_TYPE:
@@ -1282,6 +1286,30 @@ void mxf_get_utf16string(const uint8_t *value, uint16_t valueLen, mxfUTF16Char *
     }
 }
 
+/* Note: the size always includes a null terminator */
+uint16_t mxf_get_utf8string_size(const uint8_t *value, uint16_t valueLen)
+{
+    const uint8_t *valuePtr = value;
+    const uint8_t *endValue = value + valueLen;
+
+    while (valuePtr != endValue && (*valuePtr))
+        valuePtr++;
+
+    return (uint16_t)(valuePtr - value) + 1;
+}
+
+/* Note: returns a null-terminated UTF8 string*/
+void mxf_get_utf8string(const uint8_t *value, uint16_t valueLen, char *result)
+{
+    const uint8_t *valuePtr = value;
+    const uint8_t *endValue = value + valueLen;
+    char *resultPtr         = result;
+
+    while (valuePtr != endValue && (*valuePtr))
+        *resultPtr++ = (char)(*valuePtr++);
+    *resultPtr++ = 0;
+}
+
 int mxf_get_strongref(MXFHeaderMetadata *headerMetadata, const uint8_t *value, MXFMetadataSet **set)
 {
     mxfUUID uuid;
@@ -1509,6 +1537,12 @@ void mxf_set_fixed_size_utf16string(const mxfUTF16Char *value, uint16_t size, ui
     }
 }
 
+/* Note: string must be null terminated */
+void mxf_set_utf8string(const char *value, uint8_t *result)
+{
+    strcpy((char*)result, value);
+}
+
 void mxf_set_strongref(const MXFMetadataSet *value, uint8_t *result)
 {
     mxf_set_uuid(&value->instanceUID, result);
@@ -1722,6 +1756,22 @@ int mxf_set_fixed_size_utf16string_item(MXFMetadataSet *set, const mxfKey *itemK
 
     mxf_set_fixed_size_utf16string(value, size, buffer);
     CHK_ORET(mxf_set_item_value(newItem, buffer, size * mxfUTF16Char_extlen));
+
+    return 1;
+}
+
+/* string must be null terminated */
+int mxf_set_utf8string_item(MXFMetadataSet *set, const mxfKey *itemKey, const char *value)
+{
+    MXFMetadataItem *newItem = NULL;
+    uint8_t buffer[65536];
+
+    assert(set->headerMetadata != NULL);
+
+    CHK_ORET(get_or_create_set_item(set->headerMetadata, set, itemKey, &newItem));
+
+    mxf_set_utf8string(value, buffer);
+    CHK_ORET(mxf_set_item_value(newItem, buffer, (uint16_t)(strlen(value) + 1)));
 
     return 1;
 }
@@ -2018,6 +2068,30 @@ int mxf_get_utf16string_item(MXFMetadataSet *set, const mxfKey *itemKey, mxfUTF1
     CHK_ORET(mxf_get_item(set, itemKey, &item));
 
     mxf_get_utf16string(item->value, item->length, value);
+
+    return 1;
+}
+
+/* Note: the size always includes a null terminator */
+int mxf_get_utf8string_item_size(MXFMetadataSet *set, const mxfKey *itemKey, uint16_t *size)
+{
+    MXFMetadataItem *item = NULL;
+
+    CHK_ORET(mxf_get_item(set, itemKey, &item));
+
+    *size = mxf_get_utf8string_size(item->value, item->length);
+
+    return 1;
+}
+
+/* Note: returns a null-terminated UTF8 string */
+int mxf_get_utf8string_item(MXFMetadataSet *set, const mxfKey *itemKey, char *value)
+{
+    MXFMetadataItem *item = NULL;
+
+    CHK_ORET(mxf_get_item(set, itemKey, &item));
+
+    mxf_get_utf8string(item->value, item->length, value);
 
     return 1;
 }
