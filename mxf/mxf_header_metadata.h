@@ -209,6 +209,8 @@ void mxf_set_aes3_fixed_data(const mxfAES3FixedData *value, uint8_t *result);
 void mxf_set_array_header(uint32_t arrayLen, uint32_t arrayElementLen, uint8_t *result);
 
 
+int mxf_alloc_item_value(MXFMetadataItem *item, uint16_t len, uint8_t **value);
+int mxf_complete_item_value(MXFMetadataItem *item, uint16_t len);
 int mxf_set_item_value(MXFMetadataItem *item, const uint8_t *value, uint16_t len);
 
 int mxf_set_item(MXFMetadataSet *set, const mxfKey *itemKey, const uint8_t *value, uint16_t len);
