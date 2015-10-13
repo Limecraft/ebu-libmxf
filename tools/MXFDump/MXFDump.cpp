@@ -4980,6 +4980,8 @@ void destroyPartitions(PartitionList& partitions)
 // OpenBody                    06 0e 2b 34 02 05 01 01 0d 01 02 01 01 03 03 00
 // Body                        06 0e 2b 34 02 05 01 01 0d 01 02 01 01 03 04 00
 //
+// Generic Stream              06 0e 2b 34 02 05 01 01 0d 01 02 01 01 03 11 00
+//
 // IncompleteFooter            06 0e 2b 34 02 05 01 01 0d 01 02 01 01 04 02 00
 // Footer                      06 0e 2b 34 02 05 01 01 0d 01 02 01 01 04 04 00
 //
@@ -5011,6 +5013,8 @@ bool isPartition(mxfKey& key)
   } else if (memcmp(&OpenBody, &key, sizeof(mxfKey)) == 0) {
     result = true;
   } else if (memcmp(&Body, &key, sizeof(mxfKey)) == 0) {
+    result = true;
+  } else if (memcmp(&GenericStream, &key, sizeof(mxfKey)) == 0) {
     result = true;
   } else if (memcmp(&IncompleteFooter, &key, sizeof(mxfKey)) == 0) {
     result = true;
@@ -5063,6 +5067,8 @@ bool isClosed(const mxfKey& key)
     result = true;
   } else if (memcmp(&Body, &key, sizeof(mxfKey)) == 0) {
     result = true;
+  } else if (memcmp(&GenericStream, &key, sizeof(mxfKey)) == 0) {
+    result = true;
   } else if (memcmp(&IncompleteFooter, &key, sizeof(mxfKey)) == 0) {
     result = true;
   } else if (memcmp(&Footer, &key, sizeof(mxfKey)) == 0) {
@@ -5083,6 +5089,8 @@ bool isComplete(const mxfKey& key)
   } else if (memcmp(&OpenBody, &key, sizeof(mxfKey)) == 0) {
     result = true;
   } else if (memcmp(&Body, &key, sizeof(mxfKey)) == 0) {
+    result = true;
+  } else if (memcmp(&GenericStream, &key, sizeof(mxfKey)) == 0) {
     result = true;
   } else if (memcmp(&Footer, &key, sizeof(mxfKey)) == 0) {
     result = true;
@@ -5410,6 +5418,13 @@ void printHeaderPartition(mxfKey& k, mxfLength& len, mxfFile infile)
 void printBodyPartition(mxfKey& k, mxfLength& len, mxfFile infile);
 
 void printBodyPartition(mxfKey& k, mxfLength& len, mxfFile infile)
+{
+  printPartition(k, len, infile);
+}
+
+void printGenericStreamPartition(mxfKey& k, mxfLength& len, mxfFile infile);
+
+void printGenericStreamPartition(mxfKey& k, mxfLength& len, mxfFile infile)
 {
   printPartition(k, len, infile);
 }
@@ -6284,6 +6299,8 @@ void mxfDumpKLV(mxfKey& k, mxfLength& len, mxfFile infile)
     printBodyPartition(k, len, infile);
   } else if (memcmp(&Body, &k, sizeof(mxfKey)) == 0) {
     printBodyPartition(k, len, infile);
+  } else if (memcmp(&GenericStream, &k, sizeof(mxfKey)) == 0) {
+    printGenericStreamPartition(k, len, infile);
   } else if (memcmp(&IncompleteFooter, &k, sizeof(mxfKey)) == 0) {
     printFooterPartition(k, len, infile);
   } else if (memcmp(&Footer, &k, sizeof(mxfKey)) == 0) {
