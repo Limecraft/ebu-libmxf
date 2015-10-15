@@ -544,10 +544,7 @@ void mxf_default_generate_key(mxfKey *key)
     mxfUUID uuid;
 
     mxf_generate_uuid(&uuid);
-
-    /* half-swap */
-    memcpy(key,          &uuid.octet8, 8);
-    memcpy(&key->octet8, &uuid.octet0, 8);
+    mxf_swap_uid((mxfUID*)key, (const mxfUID*)&uuid);
 }
 
 void mxf_set_regtest_funcs(void)
@@ -693,6 +690,12 @@ int mxf_is_swapped_ul(const mxfUID *uid)
 {
     /* requiring more than just the 65th bit is always 0 to make it a SMPTE UL */
     return uid->octet8 == 0x06 && uid->octet9 == 0x0e && uid->octet10 == 0x2b && uid->octet11 == 0x34;
+}
+
+void mxf_swap_uid(mxfUID *swap_uid, const mxfUID *uid)
+{
+    memcpy(&swap_uid->octet0, &uid->octet8, 8);
+    memcpy(&swap_uid->octet8, &uid->octet0, 8);
 }
 
 MXFEssenceWrappingType mxf_get_essence_wrapping_type(const mxfUL *label)

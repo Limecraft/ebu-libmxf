@@ -1353,7 +1353,6 @@ int mxf_avid_is_essence_element(const mxfKey *key)
 void mxf_avid_set_auid(const mxfUL *ul, mxfAUID *auid)
 {
     /* an AUID is an MXF UL half-swapped */
-    memcpy(&auid->octet0, &ul->octet8, 8);
-    memcpy(&auid->octet8, &ul->octet0, 8);
+    mxf_swap_uid((mxfUID*)auid, (const mxfUID*)ul);
 }
 
