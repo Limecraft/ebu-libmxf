@@ -223,7 +223,7 @@ static int test1(const char *mxfFilename, MXFTimecode *startTimecode, int source
     clip = get_mxf_clip(input);
     printf("Clip tracks = %s\n", clip->tracksString);
     printf("Clip frame rate = %d/%d fps\n", clip->frameRate.numerator, clip->frameRate.denominator);
-    printf("Clip duration = %"PRId64" frames\n", clip->duration);
+    printf("Clip duration = %" PRId64 " frames\n", clip->duration);
 
     if (startTimecode->hour != INVALID_TIMECODE_HOUR)
     {
@@ -250,7 +250,7 @@ static int test1(const char *mxfFilename, MXFTimecode *startTimecode, int source
     while (read_next_frame(input, &listener) == 1)
     {
         frameNumber = get_frame_number(input);
-        printf("frame =  %"PRId64"\n", frameNumber);
+        printf("frame =  %" PRId64 "\n", frameNumber);
         get_playout_timecode(input, &playoutTimecode);
         printf("playout timecode = ");
         print_timecode(&playoutTimecode);
@@ -284,7 +284,7 @@ static int test1(const char *mxfFilename, MXFTimecode *startTimecode, int source
     }
     if (clip->duration != -1 && frameCount != clip->duration)
     {
-        fprintf(stderr, "1) Frame count %"PRId64" != duration %"PRId64"\n", frameCount, clip->duration);
+        fprintf(stderr, "1) Frame count %" PRId64 " != duration %" PRId64 "\n", frameCount, clip->duration);
         return 0;
     }
 
@@ -362,7 +362,7 @@ static int test2(const char *mxfFilename, const char *outFilename)
     while (read_next_frame(input, &listener) == 1)
     {
         frameNumber = get_frame_number(input);
-        printf("frame =  %"PRId64"\n", frameNumber);
+        printf("frame =  %" PRId64 "\n", frameNumber);
         get_playout_timecode(input, &playoutTimecode);
         printf("playout timecode = ");
         print_timecode(&playoutTimecode);
@@ -384,17 +384,17 @@ static int test2(const char *mxfFilename, const char *outFilename)
         frameCount++;
         if (frameCount == 10)
         {
-            printf("Positioning at frame %"PRId64" + 5\n", frameCount);
+            printf("Positioning at frame %" PRId64 " + 5\n", frameCount);
             if (!position_at_frame(input, frameCount + 5))
             {
-                fprintf(stderr, "Failed to position file at %"PRId64" + 5\n", frameCount);
+                fprintf(stderr, "Failed to position file at %" PRId64 " + 5\n", frameCount);
                 break;
             }
         }
     }
     if (clip->duration != -1 && frameCount != clip->duration - 5)
     {
-        fprintf(stderr, "x) Frame count %"PRId64" != duration %"PRId64"\n", frameCount, clip->duration - 5);
+        fprintf(stderr, "x) Frame count %" PRId64 " != duration %" PRId64 "\n", frameCount, clip->duration - 5);
         return 0;
     }
 
@@ -478,7 +478,7 @@ static int test3(const char *mxfFilename, const char *outFilename)
     while (read_next_frame(input, &listener) == 1)
     {
         frameNumber = get_frame_number(input);
-        printf("frame =  %"PRId64"\n", frameNumber);
+        printf("frame =  %" PRId64 "\n", frameNumber);
         get_playout_timecode(input, &playoutTimecode);
         printf("playout timecode = ");
         print_timecode(&playoutTimecode);
@@ -501,7 +501,7 @@ static int test3(const char *mxfFilename, const char *outFilename)
     }
     if (clip->duration != -1 && frameCount != clip->duration)
     {
-        fprintf(stderr, "2) Frame count %"PRId64" != duration %"PRId64"\n", frameCount, clip->duration);
+        fprintf(stderr, "2) Frame count %" PRId64 " != duration %" PRId64 "\n", frameCount, clip->duration);
         return 0;
     }
 
@@ -514,7 +514,7 @@ static int test3(const char *mxfFilename, const char *outFilename)
     while (read_next_frame(input, &listener) == 1)
     {
         frameNumber = get_frame_number(input);
-        printf("frame =  %"PRId64"\n", frameNumber);
+        printf("frame =  %" PRId64 "\n", frameNumber);
         get_playout_timecode(input, &playoutTimecode);
         printf("playout timecode = ");
         print_timecode(&playoutTimecode);
@@ -538,7 +538,7 @@ static int test3(const char *mxfFilename, const char *outFilename)
 
     if (clip->duration != -1 && frameCount != clip->duration)
     {
-        fprintf(stderr, "3) Frame count %"PRId64" != duration %"PRId64"\n", frameCount, clip->duration);
+        fprintf(stderr, "3) Frame count %" PRId64 " != duration %" PRId64 "\n", frameCount, clip->duration);
         return 0;
     }
 
@@ -551,7 +551,7 @@ static int test3(const char *mxfFilename, const char *outFilename)
     while (read_next_frame(input, &listener) == 1)
     {
         frameNumber = get_frame_number(input);
-        printf("frame =  %"PRId64"\n", frameNumber);
+        printf("frame =  %" PRId64 "\n", frameNumber);
         get_playout_timecode(input, &playoutTimecode);
         printf("playout timecode = ");
         print_timecode(&playoutTimecode);
@@ -575,7 +575,7 @@ static int test3(const char *mxfFilename, const char *outFilename)
 
     if (clip->duration != -1 && frameCount + 5 != clip->duration)
     {
-        fprintf(stderr, "4) Frame count %"PRId64" != duration %"PRId64"\n", frameCount + 5, clip->duration);
+        fprintf(stderr, "4) Frame count %" PRId64 " != duration %" PRId64 "\n", frameCount + 5, clip->duration);
         return 0;
     }
 

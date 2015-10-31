@@ -826,7 +826,7 @@ int mxf_page_file_open_modify(const char *filenameTemplate, int64_t pageSize, MX
         }
         if (pageSize != fileSize)
         {
-            mxf_log_error("Size of first file '%s' (%"PRId64" does not equal page size %"PRId64"\n", filename, fileSize, pageSize);
+            mxf_log_error("Size of first file '%s' (%" PRId64 " does not equal page size %" PRId64 "\n", filename, fileSize, pageSize);
             return 0;
         }
     }

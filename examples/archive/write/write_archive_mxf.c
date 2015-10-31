@@ -2396,7 +2396,7 @@ uint32_t get_archive_mxf_content_package_size(const mxfRational *frameRate, uint
 { \
     if (endField - startField > 0) \
     { \
-        CHK_ORET(sscanf(startField, "%"PRId64"", &member) == 1); \
+        CHK_ORET(sscanf(startField, "%" PRId64 "", &member) == 1); \
     } \
     else \
     { \

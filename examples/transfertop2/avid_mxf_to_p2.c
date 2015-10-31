@@ -665,7 +665,7 @@ static int preprocess_avid_input(AvidMXFToP2Transfer *transfer, int inputFileInd
     }
     if (output->containerDuration != output->duration)
     {
-        mxf_log_warn("File container duration %"PRId64" does not equal track duration %"PRId64"\n",
+        mxf_log_warn("File container duration %" PRId64 " does not equal track duration %" PRId64 "\n",
             output->containerDuration, output->duration);
     }
 
@@ -1150,7 +1150,7 @@ static int write_clip_document(AvidMXFToP2Transfer *transfer)
     CHK_OFAIL(xml_writer_element_end(writer, "GlobalClipID"));
 
     CHK_OFAIL(xml_writer_element_start(writer, "Duration"));
-    mxf_snprintf(buffer, sizeof(buffer), "%"PRId64, transfer->duration);
+    mxf_snprintf(buffer, sizeof(buffer), "%" PRId64, transfer->duration);
     CHK_OFAIL(xml_writer_character_data(writer, buffer));
     CHK_OFAIL(xml_writer_element_end(writer, "Duration"));
 
@@ -1217,11 +1217,11 @@ static int write_clip_document(AvidMXFToP2Transfer *transfer)
 
         CHK_OFAIL(xml_writer_element_start(writer, "VideoIndex"));
         CHK_OFAIL(xml_writer_element_start(writer, "StartByteOffset"));
-        mxf_snprintf(buffer, sizeof(buffer), "%"PRId64, output->startByteOffset);
+        mxf_snprintf(buffer, sizeof(buffer), "%" PRId64, output->startByteOffset);
         CHK_OFAIL(xml_writer_character_data(writer, buffer));
         CHK_OFAIL(xml_writer_element_end(writer, "StartByteOffset"));
         CHK_OFAIL(xml_writer_element_start(writer, "DataSize"));
-        mxf_snprintf(buffer, sizeof(buffer), "%"PRId64, output->dataSize);
+        mxf_snprintf(buffer, sizeof(buffer), "%" PRId64, output->dataSize);
         CHK_OFAIL(xml_writer_character_data(writer, buffer));
         CHK_OFAIL(xml_writer_element_end(writer, "DataSize"));
         CHK_OFAIL(xml_writer_element_end(writer, "VideoIndex"));
@@ -1254,11 +1254,11 @@ static int write_clip_document(AvidMXFToP2Transfer *transfer)
 
             CHK_OFAIL(xml_writer_element_start(writer, "AudioIndex"));
             CHK_OFAIL(xml_writer_element_start(writer, "StartByteOffset"));
-            mxf_snprintf(buffer, sizeof(buffer), "%"PRId64, output->startByteOffset);
+            mxf_snprintf(buffer, sizeof(buffer), "%" PRId64, output->startByteOffset);
             CHK_OFAIL(xml_writer_character_data(writer, buffer));
             CHK_OFAIL(xml_writer_element_end(writer, "StartByteOffset"));
             CHK_OFAIL(xml_writer_element_start(writer, "DataSize"));
-            mxf_snprintf(buffer, sizeof(buffer), "%"PRId64, output->dataSize);
+            mxf_snprintf(buffer, sizeof(buffer), "%" PRId64, output->dataSize);
             CHK_OFAIL(xml_writer_character_data(writer, buffer));
             CHK_OFAIL(xml_writer_element_end(writer, "DataSize"));
             CHK_OFAIL(xml_writer_element_end(writer, "AudioIndex"));

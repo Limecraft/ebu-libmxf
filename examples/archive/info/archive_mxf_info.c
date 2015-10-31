@@ -241,7 +241,7 @@ static void report_actual_frame_count(Reader *reader)
         if (reader->headerPartition->footerPartition == 0 ||
             essenceStartPos + frameCount * reader->contentPackageLen < (int64_t)reader->headerPartition->footerPartition)
         {
-            mxf_log_warn("%"PRId64" complete frames are present in the MXF file\n", frameCount);
+            mxf_log_warn("%" PRId64 " complete frames are present in the MXF file\n", frameCount);
         }
         else
         {
@@ -1100,7 +1100,7 @@ static void write_vtr_errors(Reader *reader, int noSourceTimecode)
         while (mxf_next_list_iter_element(&iter))
         {
             vtrError = (VTRErrorAtPos*)mxf_get_iter_element(&iter);
-            printf("    %10"PRId64":%10"PRId64, count, vtrError->position);
+            printf("    %10" PRId64 ":%10" PRId64, count, vtrError->position);
             if (!noSourceTimecode)
             {
                 read_time_string_at_position(reader, vtrError->position, vitcStr, sizeof(vitcStr), ltcStr, sizeof(ltcStr));
@@ -1191,7 +1191,7 @@ static void write_digibeta_dropouts(Reader *reader, int noSourceTimecode)
         while (mxf_next_list_iter_element(&iter))
         {
             digiBetaDropout = (DigiBetaDropout*)mxf_get_iter_element(&iter);
-            printf("    %10"PRId64":%10"PRId64, count, digiBetaDropout->position);
+            printf("    %10" PRId64 ":%10" PRId64, count, digiBetaDropout->position);
             if (!noSourceTimecode)
             {
                 read_time_string_at_position(reader, digiBetaDropout->position, vitcStr, sizeof(vitcStr), ltcStr, sizeof(ltcStr));
@@ -1232,7 +1232,7 @@ static void write_timecode_breaks(Reader *reader, int noSourceTimecode)
         while (mxf_next_list_iter_element(&iter))
         {
             timecodeBreak = (TimecodeBreak*)mxf_get_iter_element(&iter);
-            printf("    %10"PRId64":%10"PRId64, count, timecodeBreak->position);
+            printf("    %10" PRId64 ":%10" PRId64, count, timecodeBreak->position);
             if (!noSourceTimecode)
             {
                 read_time_string_at_position(reader, timecodeBreak->position, vitcStr, sizeof(vitcStr), ltcStr, sizeof(ltcStr));
@@ -1264,7 +1264,7 @@ static void write_infax_data(InfaxData *infaxData)
            infaxData->stockDate.day);
     printf("    Spool descriptor: %s\n", infaxData->spoolDesc);
     printf("    Memo: %s\n", infaxData->memo);
-    printf("    Duration: %02"PRId64":%02"PRId64":%02"PRId64"\n",
+    printf("    Duration: %02" PRId64 ":%02" PRId64 ":%02" PRId64 "\n",
            infaxData->duration / (60 * 60),
            (infaxData->duration % (60 * 60)) / 60,
            (infaxData->duration % (60 * 60)) % 60);
@@ -1373,7 +1373,7 @@ static int write_info(Reader *reader, int showPSEFailures, int showVTRErrors, in
     {
         printf(" (bits: %d, rate: %s)\n", reader->audioQuantizationBits, audioSamplingRateStr);
     }
-    printf("    duration is %"PRId64" frames at %s fps (%02u:%02u:%02u:%02u)\n",
+    printf("    duration is %" PRId64 " frames at %s fps (%02u:%02u:%02u:%02u)\n",
            reader->duration,
            rateStr,
            (uint16_t)(  reader->duration / (roundedRate * 60 * 60)),
@@ -1445,7 +1445,7 @@ static int write_info(Reader *reader, int showPSEFailures, int showVTRErrors, in
             while (mxf_next_list_iter_element(&iter))
             {
                 pseFailure = (PSEFailure*)mxf_get_iter_element(&iter);
-                printf("    %10"PRId64": %10"PRId64, count, pseFailure->position);
+                printf("    %10" PRId64 ": %10" PRId64, count, pseFailure->position);
                 if (!noSourceTimecode)
                 {
                     read_time_string_at_position(reader, pseFailure->position, vitcStr, sizeof(vitcStr), ltcStr, sizeof(ltcStr));
@@ -1552,7 +1552,7 @@ static int write_summary(Reader *reader, int showPSEFailures, int showVTRErrors,
     printf("Magazine prefix: %s\n", infaxData->magPrefix);
     printf("Programme number: %s\n", infaxData->progNo);
     printf("Production code: %s\n", infaxData->prodCode);
-    printf("Duration: %02"PRId64":%02"PRId64":%02"PRId64"\n",
+    printf("Duration: %02" PRId64 ":%02" PRId64 ":%02" PRId64 "\n",
            infaxData->duration / (60 * 60),
            (infaxData->duration % (60 * 60)) / 60,
            (infaxData->duration % (60 * 60)) % 60);

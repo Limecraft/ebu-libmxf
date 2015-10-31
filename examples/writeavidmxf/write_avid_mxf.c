@@ -935,7 +935,7 @@ static int create_header_metadata(AvidClipWriter *clipWriter, PackageDefinitions
             }
             CHK_ORET(mxf_set_length_item(writer->sequenceSet, &MXF_ITEM_K(StructuralComponent, Duration), track->length));
 
-            //fprintf(stderr, "Track name %2s, length %"PRId64", origin %"PRId64", editrate numerator %d\n", track->name, track->length, track->origin, track->editRate.numerator);
+            //fprintf(stderr, "Track name %2s, length %" PRId64 ", origin %" PRId64 ", editrate numerator %d\n", track->name, track->length, track->origin, track->editRate.numerator);
 
             /* Preface - ContentStorage - SourcePackage - Timeline Track - Sequence - SourceClip */
             CHK_ORET(mxf_create_set(writer->headerMetadata, &MXF_SET_K(SourceClip), &writer->sourceClipSet));

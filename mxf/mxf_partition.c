@@ -463,7 +463,7 @@ int mxf_read_partition(MXFFile *mxfFile, const mxfKey *key, uint64_t len, MXFPar
     }
 
     if (len > expectedLen) {
-        mxf_log_warn("Partition pack len %"PRIu64" is larger than expected len %"PRIu64"\n",
+        mxf_log_warn("Partition pack len %" PRIu64 " is larger than expected len %" PRIu64 "\n",
                      len, expectedLen);
         CHK_OFAIL(mxf_file_seek(mxfFile, (int64_t)(len - expectedLen), SEEK_CUR));
     }

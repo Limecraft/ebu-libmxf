@@ -288,7 +288,7 @@ static int print_uint32_item(MXFMetadataSet *set, const mxfKey *itemKey, int spa
 static int print_int64(int64_t value, int spaceCount)
 {
     print_spaces(spaceCount);
-    printf("%"PRId64"", value);
+    printf("%" PRId64 "", value);
 
     return 1;
 }

@@ -165,7 +165,7 @@ static int parse_infax_user_comments(const MXFList *nameList, const MXFList *val
     PARSE_DATE_MEMBER(APP_StockDate, stockDate);
     PARSE_STRING_MEMBER(APP_SpoolDescriptor, spoolDesc);
     PARSE_STRING_MEMBER(APP_Memo, memo);
-    PARSE_INTEGER_MEMBER(APP_Duration, "%"PRId64, duration);
+    PARSE_INTEGER_MEMBER(APP_Duration, "%" PRId64, duration);
     PARSE_STRING_MEMBER(APP_SpoolNumber, spoolNo);
     PARSE_STRING_MEMBER(APP_AccessionNumber, accNo);
     PARSE_STRING_MEMBER(APP_CatalogueDetail, catDetail);

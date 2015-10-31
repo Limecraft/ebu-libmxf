@@ -682,7 +682,7 @@ int mxf_write_fixed_l(MXFFile *mxfFile, uint8_t llen, uint64_t len)
 
     if (llen == 1) {
         if (len >= 0x80) {
-            mxf_log_error("Could not write BER length %"PRId64" for llen equal 1" LOG_LOC_FORMAT, len, LOG_LOC_PARAMS);
+            mxf_log_error("Could not write BER length %" PRId64 " for llen equal 1" LOG_LOC_FORMAT, len, LOG_LOC_PARAMS);
             return 0;
         }
 
@@ -690,7 +690,7 @@ int mxf_write_fixed_l(MXFFile *mxfFile, uint8_t llen, uint64_t len)
             return 0;
     } else {
         if (llen != 9 && (len >> ((llen - 1) * 8)) > 0) {
-            mxf_log_error("Could not write BER length %"PRIu64" for llen equal %u"
+            mxf_log_error("Could not write BER length %" PRIu64 " for llen equal %u"
                           LOG_LOC_FORMAT, len, llen, LOG_LOC_PARAMS);
             return 0;
         }

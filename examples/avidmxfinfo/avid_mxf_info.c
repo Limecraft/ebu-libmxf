@@ -1411,7 +1411,7 @@ void ami_print_info(AvidMXFInfo *info)
     print_timestamp(&info->clipCreated);
     printf("\n");
     printf("Clip edit rate = %d/%d\n", info->projectEditRate.numerator, info->projectEditRate.denominator);
-    printf("Clip duration = %"PRId64" samples (", info->clipDuration);
+    printf("Clip duration = %" PRId64 " samples (", info->clipDuration);
     print_timecode(info->clipDuration, &info->projectEditRate);
     printf(")\n");
     printf("Clip video tracks = %d\n", info->numVideoTracks);
@@ -1424,16 +1424,16 @@ void ami_print_info(AvidMXFInfo *info)
     printf("\n");
     printf("Track number = %d\n", info->trackNumber);
     printf("Edit rate = %d/%d\n", info->editRate.numerator, info->editRate.denominator);
-    printf("Track duration = %"PRId64" samples (", info->trackDuration);
+    printf("Track duration = %" PRId64 " samples (", info->trackDuration);
     print_timecode(convert_length(&info->projectEditRate, &info->editRate, info->trackDuration), &info->projectEditRate);
     printf(")\n");
-    printf("Track segment duration = %"PRId64" samples (", info->segmentDuration);
+    printf("Track segment duration = %" PRId64 " samples (", info->segmentDuration);
     print_timecode(convert_length(&info->projectEditRate, &info->editRate, info->segmentDuration), &info->projectEditRate);
     printf(")\n");
-    printf("Track segment offset = %"PRId64" samples (", info->segmentOffset);
+    printf("Track segment offset = %" PRId64 " samples (", info->segmentOffset);
     print_timecode(convert_length(&info->projectEditRate, &info->editRate, info->segmentOffset), &info->projectEditRate);
     printf(")\n");
-    printf("Start timecode = %"PRId64" samples (", info->startTimecode);
+    printf("Start timecode = %" PRId64 " samples (", info->startTimecode);
     print_timecode(convert_length(&info->projectEditRate, &info->editRate, info->startTimecode), &info->projectEditRate);
     printf(")\n");
     if (info->isVideo)

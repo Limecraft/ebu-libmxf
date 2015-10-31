@@ -364,7 +364,7 @@ static int read_next_mjpeg_image_data(RawFile *file, MJPEGState *state, unsigned
                 else
                 {
                     fprintf(stderr, "Warning: MJPEG image start is non-0xFF byte - trailing data ignored\n");
-                    fprintf(stderr, "Warning: near file offset %"PRId64"\n", rf_tell(file));
+                    fprintf(stderr, "Warning: near file offset %" PRId64 "\n", rf_tell(file));
                     return 0;
                 }
                 break;
@@ -803,7 +803,7 @@ int parse_timecode(const char *timecodeStr, const mxfRational *videoSampleRate, 
     }
 
     /* frame count */
-    result = sscanf(timecodeStr, "%"PRId64"", frameCount);
+    result = sscanf(timecodeStr, "%" PRId64 "", frameCount);
     if (result == 1)
     {
         /* make sure it was a number */

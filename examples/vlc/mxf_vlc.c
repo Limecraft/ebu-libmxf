@@ -474,7 +474,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             {
                 *pi64 = (int64_t)(I64C(1000000) * get_duration(p_mxfReader) *
                     p_clip->frameRate.numerator / (double)p_clip->frameRate.denominator);
-                printf("\t = %"PRId64"\n", *pi64);
+                printf("\t = %" PRId64 "\n", *pi64);
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
@@ -487,7 +487,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             {
                 *pi64 = (int64_t)(I64C(1000000) * ( get_frame_number( p_mxfReader ) + 1 ) *
                     p_clip->frameRate.numerator / (double)p_clip->frameRate.denominator);
-                printf("\t = %"PRId64"\n", *pi64);
+                printf("\t = %" PRId64 "\n", *pi64);
                 return VLC_SUCCESS;
             }
             return VLC_EGENERIC;
@@ -526,7 +526,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_TIME:
             i64 = (int64_t)va_arg( args, int64_t );
-            printf("DEMUX_SET_TIME = %"PRId64"\n", i64);
+            printf("DEMUX_SET_TIME = %" PRId64 "\n", i64);
             if ( i64 >= 0 && get_duration(p_mxfReader) > 0 )
             {
                 if ( position_at_frame( p_mxfReader, (int64_t)( i64 /
