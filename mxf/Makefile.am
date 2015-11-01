@@ -28,7 +28,7 @@ libMXF_@LIBMXF_MAJORMINOR@_la_SOURCES = \
 	mxf_version.c
 
 if IS_WIN32
-libMXF_@LIBMXF_MAJORMINOR@_la_SOURCES += mxf_win32_file.c
+libMXF_@LIBMXF_MAJORMINOR@_la_SOURCES += mxf_win32_file.c mxf_win32_mmap.c
 endif
 
 
@@ -70,6 +70,7 @@ library_include_HEADERS = \
 	mxf_utils.h \
 	mxf_uu_metadata.h \
 	mxf_version.h \
-	mxf_win32_file.h
+	mxf_win32_file.h \
+	mxf_win32_mmap.h
 
 
