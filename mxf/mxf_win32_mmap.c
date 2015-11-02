@@ -34,7 +34,13 @@
 #include "config.h"
 #endif
 
+#if (_MSC_VER >= 1700) // Visual C++ 2010 has conflicts with stdint.h and so disable this include for that version
 #include <intsafe.h>
+#else
+#define LODWORD(_qw)    ((DWORD)(_qw))
+#define HIDWORD(_qw)    ((DWORD)(((_qw) >> 32) & 0xffffffff))
+#endif
+
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -103,13 +109,15 @@ static void mxf_win32_log_errorId(DWORD dwMessageId, const char *file, int line)
 
 static BOOL mxf_win32_mmap_CreateFileMapping(MXFFileSysData *sysData)
 {
+    DWORD flProtect;
+
     if (sysData->hmap != NULL)
     {
         CloseHandle(sysData->hmap);
         sysData->hmap = NULL;
     }
 
-    DWORD flProtect = sysData->openMode == READ_MODE ? PAGE_READONLY : PAGE_READWRITE;
+    flProtect = sysData->openMode == READ_MODE ? PAGE_READONLY : PAGE_READWRITE;
 
     sysData->hmap = CreateFileMappingW(sysData->file, NULL, flProtect,
                         HIDWORD(sysData->diskFileSize), LODWORD(sysData->diskFileSize), NULL);
@@ -118,6 +126,9 @@ static BOOL mxf_win32_mmap_CreateFileMapping(MXFFileSysData *sysData)
 
 static BOOL mxf_win32_mmap_MapViewOfFile(MXFFileSysData *sysData)
 {
+    size_t viewSize;
+    DWORD dwDesiredAccess;
+
     // unmap old view
     if (sysData->pData != NULL)
     {
@@ -127,7 +138,7 @@ static BOOL mxf_win32_mmap_MapViewOfFile(MXFFileSysData *sysData)
     }
 
     // map new view
-    size_t viewSize = sysData->defaultViewSize;
+    viewSize = sysData->defaultViewSize;
     if (sysData->offset + viewSize > sysData->diskFileSize)
     {
         if (sysData->openMode == READ_MODE)
@@ -136,9 +147,11 @@ static BOOL mxf_win32_mmap_MapViewOfFile(MXFFileSysData *sysData)
         }
         else /* NEW_MODE, MODIFY_MODE */
         {
+            int32_t chunkSize;
+
             sysData->diskFileSize = sysData->offset + viewSize;
 
-            int32_t chunkSize = sysData->defaultViewSize;
+            chunkSize = sysData->defaultViewSize;
             if (sysData->diskFileSize > FILE_GROW_CHUNK_SIZE)
             {
                 chunkSize = FILE_GROW_CHUNK_SIZE;
@@ -154,7 +167,7 @@ static BOOL mxf_win32_mmap_MapViewOfFile(MXFFileSysData *sysData)
         }
     }
 
-    DWORD dwDesiredAccess = sysData->openMode == READ_MODE ? FILE_MAP_READ : (FILE_MAP_READ | FILE_MAP_WRITE);
+    dwDesiredAccess = sysData->openMode == READ_MODE ? FILE_MAP_READ : (FILE_MAP_READ | FILE_MAP_WRITE);
 
     sysData->size = viewSize;
     sysData->pData = (uint8_t*)MapViewOfFile(sysData->hmap, dwDesiredAccess,
@@ -199,6 +212,9 @@ static void mxf_win32_mmap_close(MXFFileSysData *sysData)
 static int mxf_win32_mmap_seek(MXFFileSysData *sysData, int64_t offset, int whence)
 {
     int64_t newPosition = 0;
+    BOOL mustGrowFile;
+    uint32_t newCursor;
+    uint64_t newOffset;
 
     switch (whence)
     {
@@ -218,12 +234,12 @@ static int mxf_win32_mmap_seek(MXFFileSysData *sysData, int64_t offset, int when
     if (newPosition < 0)
         return FALSE;
 
-    BOOL mustGrowFile = (uint64_t)newPosition >= sysData->diskFileSize;
+    mustGrowFile = (uint64_t)newPosition >= sysData->diskFileSize;
     if (mustGrowFile && sysData->openMode == READ_MODE)
         return FALSE;
 
-    uint32_t newCursor = newPosition % sysData->defaultViewSize;
-    uint64_t newOffset = newPosition - newCursor;
+    newCursor = newPosition % sysData->defaultViewSize;
+    newOffset = newPosition - newCursor;
 
     sysData->cursor = newCursor;
 
@@ -370,6 +386,7 @@ static int mxf_win32_mmap_open(const TCHAR *filename, int flags, OpenMode mode, 
     MXFFile *newMXFFile = NULL;
     MXFFileSysData *newDiskFile = NULL;
     DWORD attrs_and_flags = FILE_ATTRIBUTE_NORMAL;
+    LARGE_INTEGER fileSize;
 
     CHK_MALLOC_OFAIL(newMXFFile, MXFFile);
     memset(newMXFFile, 0, sizeof(MXFFile));
@@ -406,7 +423,6 @@ static int mxf_win32_mmap_open(const TCHAR *filename, int flags, OpenMode mode, 
     GetSystemInfo(&sysinfo);
     newDiskFile->defaultViewSize = (sysinfo.dwAllocationGranularity * 16) * 4;      // 4 MB
 
-    LARGE_INTEGER fileSize;
     CHK_OFAIL(GetFileSizeEx(newDiskFile->file, &fileSize));
 
     newDiskFile->diskFileSize = fileSize.QuadPart;
