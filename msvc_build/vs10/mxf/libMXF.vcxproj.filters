@@ -87,6 +87,9 @@
     <ClCompile Include="..\..\..\mxf\mxf_win32_file.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\mxf\mxf_win32_mmap.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mxf_scm_version.h">
@@ -198,6 +201,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\mxf\mxf_win32_file.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\mxf\mxf_win32_mmap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -105,6 +105,7 @@
     <ClCompile Include="..\..\..\mxf\mxf_uu_metadata.c" />
     <ClCompile Include="..\..\..\mxf\mxf_version.c" />
     <ClCompile Include="..\..\..\mxf\mxf_win32_file.c" />
+    <ClCompile Include="..\..\..\mxf\mxf_win32_mmap.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mxf_scm_version.h" />
@@ -144,6 +145,7 @@
     <ClInclude Include="..\..\..\mxf\mxf_uu_metadata.h" />
     <ClInclude Include="..\..\..\mxf\mxf_version.h" />
     <ClInclude Include="..\..\..\mxf\mxf_win32_file.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_win32_mmap.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="gen_scm_version.cmd">
