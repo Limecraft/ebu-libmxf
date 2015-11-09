@@ -130,8 +130,6 @@ typedef struct
 
 static const mxfKey g_SysItemElementKey = MXF_SS1_ELEMENT_KEY(0x01, 0x00);
 
-static const uint32_t g_timecodeElementLen = 28;
-
 
 
 static void get_content_package_len(Reader *reader)

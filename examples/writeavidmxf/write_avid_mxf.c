@@ -247,17 +247,17 @@ static uint32_t g_dmTrackNumber = 1;
 
 static const uint32_t g_uncImageAlignmentOffset  = 8192;
 
-static const uint32_t g_uncPALFrameSize          = 852480; /* 720*592*2 */
+//static const uint32_t g_uncPALFrameSize          = 852480; /* 720*592*2 */
 static const uint32_t g_uncAlignedPALFrameSize   = 860160;
 static const uint32_t g_uncPALStartOffsetSize    = 7680;
 static const uint32_t g_uncPALVBISize            = 720 * 16 * 2;
 
-static const uint32_t g_uncNTSCFrameSize         = 714240; /* 720*496*2 */
+//static const uint32_t g_uncNTSCFrameSize         = 714240; /* 720*496*2 */
 static const uint32_t g_uncAlignedNTSCFrameSize  = 720896;
 static const uint32_t g_uncNTSCStartOffsetSize   = 6656;
 static const uint32_t g_uncNTSCVBISize           = 720 * 10 * 2;
 
-static const uint32_t g_unc1080FrameSize         = 4147200; /* 1920*1080*2 */
+//static const uint32_t g_unc1080FrameSize         = 4147200; /* 1920*1080*2 */
 static const uint32_t g_uncAligned1080FrameSize  = 4153344;
 static const uint32_t g_unc1080StartOffsetSize   = 6144;
 

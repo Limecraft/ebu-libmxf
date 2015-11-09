@@ -161,7 +161,6 @@ typedef struct
 static const unsigned char RIFF_ID[4] = {'R', 'I', 'F', 'F'};
 static const unsigned char WAVE_ID[4] = {'W', 'A', 'V', 'E'};
 static const unsigned char FMT_ID[4]  = {'f', 'm', 't', ' '};
-static const unsigned char BEXT_ID[4] = {'b', 'e', 'x', 't'};
 static const unsigned char DATA_ID[4] = {'d', 'a', 't', 'a'};
 static const uint16_t WAVE_FORMAT_PCM = 0x0001;
 
