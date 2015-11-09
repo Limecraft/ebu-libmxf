@@ -89,6 +89,9 @@
 #elif defined(__GNUC__) && defined(__sparc__) && defined(__sun__)
 #define MXF_COMPILER_GCC_SPARC_SUNOS
 #define MXF_OS_UNIX
+#elif defined(__GNUC__) && defined(__x86_64__) && defined(_WIN32)
+#define MXF_COMPILER_GCC_INTEL_WINDOWS
+#define MXF_OS_WINDOWS
 #else
 #error "Unknown compiler"
 #endif
