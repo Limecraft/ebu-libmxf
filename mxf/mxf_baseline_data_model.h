@@ -1026,7 +1026,7 @@ MXF_SET_DEFINITION(CDCIEssenceDescriptor, MPEGVideoDescriptor,
         0
     );
 
-    MXF_ITEM_DEFINITION(MPEGVideoDescriptor, BPictureCount,
+    MXF_ITEM_DEFINITION(MPEGVideoDescriptor, MaxBPictureCount,
         MXF_LABEL(0x06,0x0e,0x2b,0x34,0x01,0x01,0x01,0x05,0x04,0x01,0x06,0x02,0x01,0x09,0x00,0x00),
         0x0000,
         MXF_UINT16_TYPE,
