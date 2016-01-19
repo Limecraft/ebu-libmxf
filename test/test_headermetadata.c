@@ -66,6 +66,8 @@ MXF_SET_DEFINITION(InterchangeObject, TestSet1, \
     ITEM_DEF(27, MXF_UTF16STRING_TYPE) \
     ITEM_DEF(28, MXF_ULBATCH_TYPE) \
     ITEM_DEF(29, MXF_UTF8STRING_TYPE) \
+    ITEM_DEF(30, MXF_ISO7STRING_TYPE) \
+    ITEM_DEF(31, MXF_UUIDARRAY_TYPE) \
 \
 MXF_SET_DEFINITION(InterchangeObject, TestSet2, \
     MXF_LABEL(0x06, 0x0e, 0x2B, 0x34, 0x02, 0x53, 0x01, 0x7f, 0x7f, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02) \
@@ -240,6 +242,8 @@ int test_read(const char *filename)
     mxfUTF16Char value27[100];
     uint16_t value29Size;
     char value29[100];
+    uint16_t value30Size;
+    char value30[100];
     MXFArrayItemIterator arrayIter;
     uint32_t arrayCount;
     uint8_t *arrayElement;
@@ -247,6 +251,7 @@ int test_read(const char *filename)
     mxfProductVersion value26;
     MXFMetadataSet *set;
     mxfUL ul;
+    mxfUUID uuid;
     int64_t headerMetadataFilePos;
     MXFListIterator setsIter;
     FilterData filterData;
@@ -359,6 +364,10 @@ int test_read(const char *filename)
     CHK_OFAIL(value29Size == strlen("An arbitrary UTF8 String") + 1);
     CHK_OFAIL(mxf_get_utf8string_item(set1, &MXF_ITEM_K(TestSet1, TestItem29), value29));
     CHK_OFAIL(strcmp("An arbitrary UTF8 String", value29) == 0);
+    CHK_OFAIL(mxf_get_iso7string_item_size(set1, &MXF_ITEM_K(TestSet1, TestItem30), &value30Size));
+    CHK_OFAIL(value30Size == strlen("An arbitrary ISO7 String") + 1);
+    CHK_OFAIL(mxf_get_iso7string_item(set1, &MXF_ITEM_K(TestSet1, TestItem30), value30));
+    CHK_OFAIL(strcmp("An arbitrary ISO7 String", value30) == 0);
 
     CHK_OFAIL(mxf_get_array_item_count(set1, &MXF_ITEM_K(TestSet1, TestItem21), &arrayCount));
     CHK_OFAIL(arrayCount == 0);
@@ -406,6 +415,15 @@ int test_read(const char *filename)
     {
         mxf_get_ul(arrayElement, &ul);
         CHK_OFAIL(memcmp(&someUL, &ul, sizeof(mxfUL)) == 0);
+    }
+
+    CHK_OFAIL(mxf_get_array_item_count(set1, &MXF_ITEM_K(TestSet1, TestItem31), &arrayCount));
+    CHK_OFAIL(arrayCount == 2);
+    CHK_OFAIL(mxf_initialise_array_item_iterator(set1, &MXF_ITEM_K(TestSet1, TestItem31), &arrayIter));
+    while (mxf_next_array_item_element(&arrayIter, &arrayElement, &arrayElementLength))
+    {
+        mxf_get_uuid(arrayElement, &uuid);
+        CHK_OFAIL(memcmp(&someUUID, &uuid, sizeof(mxfUUID)) == 0);
     }
 
 
@@ -536,6 +554,7 @@ int test_create_and_write(const char *filename)
     CHK_OFAIL(mxf_set_boolean_item(set1, &MXF_ITEM_K(TestSet1, TestItem20), 1));
     CHK_OFAIL(mxf_set_fixed_size_utf16string_item(set1, &MXF_ITEM_K(TestSet1, TestItem27), L"A fixed size UTF16 String", 100));
     CHK_OFAIL(mxf_set_utf8string_item(set1, &MXF_ITEM_K(TestSet1, TestItem29), "An arbitrary UTF8 String"));
+    CHK_OFAIL(mxf_set_iso7string_item(set1, &MXF_ITEM_K(TestSet1, TestItem30), "An arbitrary ISO7 String"));
 
     CHK_OFAIL(mxf_set_empty_array_item(set1, &MXF_ITEM_K(TestSet1, TestItem21), mxfUL_extlen));
     CHK_OFAIL(mxf_alloc_array_item_elements(set1, &MXF_ITEM_K(TestSet1, TestItem21), mxfUL_extlen, 0, &arrayElement));
@@ -551,6 +570,10 @@ int test_create_and_write(const char *filename)
     mxf_set_ul(&someUL, arrayElement);
     CHK_OFAIL(mxf_grow_array_item(set1, &MXF_ITEM_K(TestSet1, TestItem28), mxfUL_extlen, 1, &arrayElement));
     mxf_set_ul(&someUL, arrayElement);
+    CHK_OFAIL(mxf_grow_array_item(set1, &MXF_ITEM_K(TestSet1, TestItem31), mxfUUID_extlen, 1, &arrayElement));
+    mxf_set_uuid(&someUUID, arrayElement);
+    CHK_OFAIL(mxf_grow_array_item(set1, &MXF_ITEM_K(TestSet1, TestItem31), mxfUUID_extlen, 1, &arrayElement));
+    mxf_set_uuid(&someUUID, arrayElement);
 
     /* write the header pp */
     CHK_OFAIL(mxf_append_new_partition(&partitions, &headerPartition));

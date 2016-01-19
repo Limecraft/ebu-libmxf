@@ -253,6 +253,8 @@ static int validate_set(MXFMetadataSet *set, MXFSetDef *setDef, int logErrors)
                 case MXF_AUIDARRAY_TYPE:
                 case MXF_ULARRAY_TYPE:
                 case MXF_ULBATCH_TYPE:
+                case MXF_UUIDARRAY_TYPE:
+                case MXF_UUIDBATCH_TYPE:
                 case MXF_STRONGREFARRAY_TYPE:
                 case MXF_STRONGREFBATCH_TYPE:
                 case MXF_WEAKREFARRAY_TYPE:
@@ -1310,6 +1312,30 @@ void mxf_get_utf8string(const uint8_t *value, uint16_t valueLen, char *result)
     *resultPtr++ = 0;
 }
 
+/* Note: the size always includes a null terminator */
+uint16_t mxf_get_iso7string_size(const uint8_t *value, uint16_t valueLen)
+{
+    const uint8_t *valuePtr = value;
+    const uint8_t *endValue = value + valueLen;
+
+    while (valuePtr != endValue && (*valuePtr))
+        valuePtr++;
+
+    return (uint16_t)(valuePtr - value) + 1;
+}
+
+/* Note: returns a null-terminated UTF8 string*/
+void mxf_get_iso7string(const uint8_t *value, uint16_t valueLen, char *result)
+{
+    const uint8_t *valuePtr = value;
+    const uint8_t *endValue = value + valueLen;
+    char *resultPtr         = result;
+
+    while (valuePtr != endValue && (*valuePtr))
+        *resultPtr++ = (char)(*valuePtr++);
+    *resultPtr++ = 0;
+}
+
 int mxf_get_strongref(MXFHeaderMetadata *headerMetadata, const uint8_t *value, MXFMetadataSet **set)
 {
     mxfUUID uuid;
@@ -1539,6 +1565,12 @@ void mxf_set_fixed_size_utf16string(const mxfUTF16Char *value, uint16_t size, ui
 
 /* Note: string must be null terminated */
 void mxf_set_utf8string(const char *value, uint8_t *result)
+{
+    strcpy((char*)result, value);
+}
+
+/* Note: string must be null terminated */
+void mxf_set_iso7string(const char *value, uint8_t *result)
 {
     strcpy((char*)result, value);
 }
@@ -1797,6 +1829,24 @@ int mxf_set_utf8string_item(MXFMetadataSet *set, const mxfKey *itemKey, const ch
     CHK_ORET(mxf_alloc_item_value(newItem, itemValueSize, &itemValue));
 
     mxf_set_utf8string(value, itemValue);
+    CHK_ORET(mxf_complete_item_value(newItem, itemValueSize));
+
+    return 1;
+}
+
+/* string must be null terminated */
+int mxf_set_iso7string_item(MXFMetadataSet *set, const mxfKey *itemKey, const char *value)
+{
+    MXFMetadataItem *newItem = NULL;
+    uint16_t itemValueSize = (uint16_t)(strlen(value) + 1);
+    uint8_t *itemValue = NULL;
+
+    assert(set->headerMetadata != NULL);
+
+    CHK_ORET(get_or_create_set_item(set->headerMetadata, set, itemKey, &newItem));
+    CHK_ORET(mxf_alloc_item_value(newItem, itemValueSize, &itemValue));
+
+    mxf_set_iso7string(value, itemValue);
     CHK_ORET(mxf_complete_item_value(newItem, itemValueSize));
 
     return 1;
@@ -2118,6 +2168,30 @@ int mxf_get_utf8string_item(MXFMetadataSet *set, const mxfKey *itemKey, char *va
     CHK_ORET(mxf_get_item(set, itemKey, &item));
 
     mxf_get_utf8string(item->value, item->length, value);
+
+    return 1;
+}
+
+/* Note: the size always includes a null terminator */
+int mxf_get_iso7string_item_size(MXFMetadataSet *set, const mxfKey *itemKey, uint16_t *size)
+{
+    MXFMetadataItem *item = NULL;
+
+    CHK_ORET(mxf_get_item(set, itemKey, &item));
+
+    *size = mxf_get_iso7string_size(item->value, item->length);
+
+    return 1;
+}
+
+/* Note: returns a null-terminated ISO-7 string */
+int mxf_get_iso7string_item(MXFMetadataSet *set, const mxfKey *itemKey, char *value)
+{
+    MXFMetadataItem *item = NULL;
+
+    CHK_ORET(mxf_get_item(set, itemKey, &item));
+
+    mxf_get_iso7string(item->value, item->length, value);
 
     return 1;
 }

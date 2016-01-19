@@ -165,6 +165,8 @@ uint16_t mxf_get_utf16string_size(const uint8_t *value, uint16_t valueLen);
 void mxf_get_utf16string(const uint8_t *value, uint16_t valueLen, mxfUTF16Char *result);
 uint16_t mxf_get_utf8string_size(const uint8_t *value, uint16_t valueLen);
 void mxf_get_utf8string(const uint8_t *value, uint16_t valueLen, char *result);
+uint16_t mxf_get_iso7string_size(const uint8_t *value, uint16_t valueLen);
+void mxf_get_iso7string(const uint8_t *value, uint16_t valueLen, char *result);
 
 int mxf_get_strongref(MXFHeaderMetadata *headerMetadata, const uint8_t *value, MXFMetadataSet **set);
 int mxf_get_weakref(MXFHeaderMetadata *headerMetadata, const uint8_t *value, MXFMetadataSet **set);
@@ -197,6 +199,7 @@ uint16_t mxf_get_external_utf16string_size(const mxfUTF16Char *value);
 void mxf_set_utf16string(const mxfUTF16Char *value, uint8_t *result);
 void mxf_set_fixed_size_utf16string(const mxfUTF16Char *value, uint16_t size, uint8_t *result);
 void mxf_set_utf8string(const char *value, uint8_t *result);
+void mxf_set_iso7string(const char *value, uint8_t *result);
 void mxf_set_strongref(const MXFMetadataSet *value, uint8_t *result);
 void mxf_set_weakref(const MXFMetadataSet *value, uint8_t *result);
 void mxf_set_rational(const mxfRational *value, uint8_t *result);
@@ -234,6 +237,7 @@ int mxf_set_utf16string_item(MXFMetadataSet *set, const mxfKey *itemKey, const m
 int mxf_set_fixed_size_utf16string_item(MXFMetadataSet *set, const mxfKey *itemKey,
                                         const mxfUTF16Char *value, uint16_t size);
 int mxf_set_utf8string_item(MXFMetadataSet *set, const mxfKey *itemKey, const char *value);
+int mxf_set_iso7string_item(MXFMetadataSet *set, const mxfKey *itemKey, const char *value);
 int mxf_set_strongref_item(MXFMetadataSet *set, const mxfKey *itemKey, const MXFMetadataSet *value);
 int mxf_set_weakref_item(MXFMetadataSet *set, const mxfKey *itemKey, const MXFMetadataSet *value);
 int mxf_set_rational_item(MXFMetadataSet *set, const mxfKey *itemKey, const mxfRational *value);
@@ -272,6 +276,8 @@ int mxf_get_utf16string_item_size(MXFMetadataSet *set, const mxfKey *itemKey, ui
 int mxf_get_utf16string_item(MXFMetadataSet *set, const mxfKey *itemKey, mxfUTF16Char *value);
 int mxf_get_utf8string_item_size(MXFMetadataSet *set, const mxfKey *itemKey, uint16_t *size);
 int mxf_get_utf8string_item(MXFMetadataSet *set, const mxfKey *itemKey, char *value);
+int mxf_get_iso7string_item_size(MXFMetadataSet *set, const mxfKey *itemKey, uint16_t *size);
+int mxf_get_iso7string_item(MXFMetadataSet *set, const mxfKey *itemKey, char *value);
 int mxf_get_strongref_item(MXFMetadataSet *set, const mxfKey *itemKey, MXFMetadataSet **value);
 int mxf_get_strongref_item_light(MXFMetadataSet *set, const mxfKey *itemKey, MXFMetadataSet **value);
 int mxf_get_weakref_item(MXFMetadataSet *set, const mxfKey *itemKey, MXFMetadataSet **value);
