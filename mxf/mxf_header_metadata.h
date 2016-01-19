@@ -196,10 +196,12 @@ void mxf_set_auid(const mxfAUID *value, uint8_t *result);
 void mxf_set_umid(const mxfUMID *value, uint8_t *result);
 void mxf_set_timestamp(const mxfTimestamp *value, uint8_t *result);
 uint16_t mxf_get_external_utf16string_size(const mxfUTF16Char *value);
-void mxf_set_utf16string(const mxfUTF16Char *value, uint8_t *result);
-void mxf_set_fixed_size_utf16string(const mxfUTF16Char *value, uint16_t size, uint8_t *result);
-void mxf_set_utf8string(const char *value, uint8_t *result);
-void mxf_set_iso7string(const char *value, uint8_t *result);
+void mxf_set_utf16string(const mxfUTF16Char *value, uint8_t *result, uint16_t resultSize);
+void mxf_set_fixed_size_utf16string(const mxfUTF16Char *value, uint16_t valueSize, uint8_t *result);
+uint16_t mxf_get_external_utf8string_size(const char *value);
+void mxf_set_utf8string(const char *value, uint8_t *result, uint16_t resultSize);
+uint16_t mxf_get_external_iso7string_size(const char *value);
+void mxf_set_iso7string(const char *value, uint8_t *result, uint16_t resultSize);
 void mxf_set_strongref(const MXFMetadataSet *value, uint8_t *result);
 void mxf_set_weakref(const MXFMetadataSet *value, uint8_t *result);
 void mxf_set_rational(const mxfRational *value, uint8_t *result);
@@ -235,7 +237,7 @@ int mxf_set_umid_item(MXFMetadataSet *set, const mxfKey *itemKey, const mxfUMID 
 int mxf_set_timestamp_item(MXFMetadataSet *set, const mxfKey *itemKey, const mxfTimestamp *value);
 int mxf_set_utf16string_item(MXFMetadataSet *set, const mxfKey *itemKey, const mxfUTF16Char *value);
 int mxf_set_fixed_size_utf16string_item(MXFMetadataSet *set, const mxfKey *itemKey,
-                                        const mxfUTF16Char *value, uint16_t size);
+                                        const mxfUTF16Char *value, uint16_t valueSize);
 int mxf_set_utf8string_item(MXFMetadataSet *set, const mxfKey *itemKey, const char *value);
 int mxf_set_iso7string_item(MXFMetadataSet *set, const mxfKey *itemKey, const char *value);
 int mxf_set_strongref_item(MXFMetadataSet *set, const mxfKey *itemKey, const MXFMetadataSet *value);

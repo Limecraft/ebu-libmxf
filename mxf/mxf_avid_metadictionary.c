@@ -38,6 +38,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <limits.h>
 
 #include <mxf/mxf.h>
 #include <mxf/mxf_avid.h>
@@ -168,14 +169,18 @@ static int append_name_to_string_array(MXFMetadataSet *set, const mxfKey *itemKe
         CHK_ORET(mxf_get_item(set, itemKey, &namesItem));
         existingNameArraySize = namesItem->length;
     }
-    nameArraySize = existingNameArraySize + (uint16_t)(mxfUTF16Char_extlen * (wcslen(name) + 1));
+    nameArraySize = mxf_get_external_utf16string_size(name);
+    CHK_ORET(nameArraySize < UINT16_MAX - existingNameArraySize);
+    nameArraySize += existingNameArraySize;
 
     CHK_MALLOC_ARRAY_ORET(nameArray, uint8_t, nameArraySize);
     if (existingNameArraySize > 0)
     {
         memcpy(nameArray, namesItem->value, existingNameArraySize);
     }
-    mxf_set_utf16string(name, &nameArray[existingNameArraySize]);
+    mxf_set_utf16string(name, &nameArray[existingNameArraySize], nameArraySize - existingNameArraySize);
+    nameArray[nameArraySize - 2] = 0;
+    nameArray[nameArraySize - 1] = 0;
 
     CHK_OFAIL(mxf_set_item(set, itemKey, nameArray, nameArraySize));
 

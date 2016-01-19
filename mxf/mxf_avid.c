@@ -39,6 +39,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <limits.h>
 
 
 #if defined(_WIN32)
@@ -771,13 +772,21 @@ int mxf_avid_set_indirect_string_item(MXFMetadataSet *set, const mxfKey *itemKey
         0x01, 0x10, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01
     };
 
-    size = 17 + mxf_get_external_utf16string_size(value);
+    size = mxf_get_external_utf16string_size(value);
+    if (size > UINT16_MAX - 17)
+    {
+        size = UINT16_MAX;
+    }
+    else
+    {
+        size += 17;
+    }
 
     CHK_MALLOC_ARRAY_ORET(buffer, uint8_t, size);
     memset(buffer, 0, size);
 
     memcpy(buffer, prefix, 17);
-    mxf_set_utf16string(value, &buffer[17]);
+    mxf_set_utf16string(value, &buffer[17], size - 17);
 
     CHK_OFAIL(mxf_set_item(set, itemKey, buffer, size));
 
