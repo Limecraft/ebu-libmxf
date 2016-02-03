@@ -507,6 +507,11 @@ int create_index(MXFFile *mxfFile, MXFList *partitions, uint32_t indexSID, uint3
     /* complete the index */
     CHK_OFAIL(complete_partition_index(mxfFile, newIndex));
 
+    /* position file at the start */
+    newIndex->currentPartition = -1;
+    newIndex->currentPosition = -1;
+    CHK_OFAIL(move_to_next_partition_with_essence(mxfFile, newIndex));
+    newIndex->currentPosition = 0;
 
     *index = newIndex;
     return 1;
@@ -756,7 +761,8 @@ int64_t ix_get_last_written_frame_number(MXFFile *mxfFile, FileIndex *index, int
 
 int end_of_essence(FileIndex *index)
 {
-    return index->currentPosition < 0 || !mxf_equals_key(&index->nextKey, &index->startContentPackageKey);
+    return index->currentPosition < 0 ||
+           (index->isComplete && index->currentPosition >= index->indexedDuration);
 }
 
 void set_next_kl(FileIndex *index, const mxfKey *key, uint8_t llen, uint64_t len)
