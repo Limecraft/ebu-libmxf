@@ -1871,6 +1871,7 @@ static int create_track_writer(AvidClipWriter *clipWriter, PackageDefinitions *p
                     newTrackWriter->componentDepth = 10;
                     newTrackWriter->videoLineMap[0] = 42;
                     newTrackWriter->videoLineMap[1] = 0;
+                    newTrackWriter->videoLineMapLen = 2;
                     newTrackWriter->storedHeight = 1080;
                     newTrackWriter->storedWidth = 1920;
                     newTrackWriter->displayHeight = 1080;
@@ -1884,6 +1885,7 @@ static int create_track_writer(AvidClipWriter *clipWriter, PackageDefinitions *p
                     newTrackWriter->componentDepth = 8;
                     newTrackWriter->videoLineMap[0] = 42;
                     newTrackWriter->videoLineMap[1] = 0;
+                    newTrackWriter->videoLineMapLen = 2;
                     newTrackWriter->storedHeight = 1080;
                     newTrackWriter->storedWidth = 1920;
                     newTrackWriter->displayHeight = 1080;
@@ -1897,6 +1899,7 @@ static int create_track_writer(AvidClipWriter *clipWriter, PackageDefinitions *p
                     newTrackWriter->componentDepth = 8;
                     newTrackWriter->videoLineMap[0] = 42;
                     newTrackWriter->videoLineMap[1] = 0;
+                    newTrackWriter->videoLineMapLen = 2;
                     newTrackWriter->storedHeight = 1080;
                     newTrackWriter->storedWidth = 1920;
                     newTrackWriter->displayHeight = 1080;
@@ -1952,6 +1955,7 @@ static int create_track_writer(AvidClipWriter *clipWriter, PackageDefinitions *p
                     newTrackWriter->componentDepth = 10;
                     newTrackWriter->videoLineMap[0] = 26;
                     newTrackWriter->videoLineMap[1] = 0;
+                    newTrackWriter->videoLineMapLen = 2;
                     newTrackWriter->storedWidth = 1280;
                     newTrackWriter->storedHeight = 720;
                     newTrackWriter->displayWidth = 1280;
@@ -1965,6 +1969,7 @@ static int create_track_writer(AvidClipWriter *clipWriter, PackageDefinitions *p
                     newTrackWriter->componentDepth = 8;
                     newTrackWriter->videoLineMap[0] = 26;
                     newTrackWriter->videoLineMap[1] = 0;
+                    newTrackWriter->videoLineMapLen = 2;
                     newTrackWriter->storedWidth = 1280;
                     newTrackWriter->storedHeight = 720;
                     newTrackWriter->displayWidth = 1280;
@@ -1978,6 +1983,7 @@ static int create_track_writer(AvidClipWriter *clipWriter, PackageDefinitions *p
                     newTrackWriter->componentDepth = 8;
                     newTrackWriter->videoLineMap[0] = 26;
                     newTrackWriter->videoLineMap[1] = 0;
+                    newTrackWriter->videoLineMapLen = 2;
                     newTrackWriter->storedWidth = 1280;
                     newTrackWriter->storedHeight = 720;
                     newTrackWriter->displayWidth = 1280;
@@ -1991,6 +1997,7 @@ static int create_track_writer(AvidClipWriter *clipWriter, PackageDefinitions *p
                     newTrackWriter->componentDepth = 8;
                     newTrackWriter->videoLineMap[0] = 42;
                     newTrackWriter->videoLineMap[1] = 0;
+                    newTrackWriter->videoLineMapLen = 2;
                     newTrackWriter->storedHeight = 1080;
                     newTrackWriter->storedWidth = 1920;
                     newTrackWriter->displayHeight = 1080;
