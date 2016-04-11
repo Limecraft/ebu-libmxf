@@ -1007,6 +1007,7 @@ static int create_header_metadata(AvidClipWriter *clipWriter, PackageDefinitions
     CHK_ORET(mxf_set_utf16string_item(writer->identSet, &MXF_ITEM_K(Identification, ProductName), g_mxfIdentProductName));
     CHK_ORET(mxf_set_utf16string_item(writer->identSet, &MXF_ITEM_K(Identification, VersionString), g_mxfIdentVersionString));
     CHK_ORET(mxf_set_uuid_item(writer->identSet, &MXF_ITEM_K(Identification, ProductUID), &g_mxfIdentProductUID));
+    CHK_ORET(mxf_avid_set_product_version_item(writer->identSet, &MXF_ITEM_K(Identification, ProductVersion), mxf_get_version()));
     CHK_ORET(mxf_set_timestamp_item(writer->identSet, &MXF_ITEM_K(Identification, ModificationDate), &clipWriter->now));
     CHK_ORET(mxf_avid_set_product_version_item(writer->identSet, &MXF_ITEM_K(Identification, ToolkitVersion), mxf_get_version()));
     CHK_ORET(mxf_set_utf16string_item(writer->identSet, &MXF_ITEM_K(Identification, Platform), mxf_get_platform_wstring()));
