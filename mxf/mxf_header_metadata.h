@@ -49,6 +49,9 @@ typedef struct
     uint16_t length;
     uint8_t *value;
     struct _MXFMetadataSet *set;
+    
+    uint64_t offset_in_file;
+
 } MXFMetadataItem;
 
 typedef struct _MXFMetadataSet
