@@ -465,6 +465,10 @@ static const mxfUL MXF_EC_L(ALawCustomWrapped) = MXF_ALAW_EC_L(0x03);
 static const mxfUL MXF_EC_L(AVCFrameWrapped) = MXF_AVC_BYTESTREAM_EC_L(0x01);
 static const mxfUL MXF_EC_L(AVCClipWrapped)  = MXF_AVC_BYTESTREAM_EC_L(0x02);
 
+/* Legacy naming used in Ingex player */
+static const mxfUL MXF_EC_L(AVCIFrameWrapped) = MXF_AVC_BYTESTREAM_EC_L(0x01);
+static const mxfUL MXF_EC_L(AVCIClipWrapped)  = MXF_AVC_BYTESTREAM_EC_L(0x02);
+
 int mxf_is_avc_ec(const mxfUL *label, int frame_wrapped);
 
 
