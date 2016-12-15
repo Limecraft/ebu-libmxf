@@ -51,21 +51,27 @@ int mxf_is_op_atom(const mxfUL *label)
 {
     static const mxfUL opAtomPrefix = MXF_ATOM_OP_L(0);
 
-    return memcmp(label, &opAtomPrefix, 13) == 0;
+    /* ignoring octet7, the registry version byte */
+    return memcmp(label,          &opAtomPrefix,        7) == 0 &&
+           memcmp(&label->octet8, &opAtomPrefix.octet8, 5) == 0;
 }
 
 int mxf_is_op_1a(const mxfUL *label)
 {
     static const mxfUL op1APrefix = MXF_1A_OP_L(0);
 
-    return memcmp(label, &op1APrefix, 13) == 0;
+    /* ignoring octet7, the registry version byte */
+    return memcmp(label,          &op1APrefix,        7) == 0 &&
+           memcmp(&label->octet8, &op1APrefix.octet8, 5) == 0;
 }
 
 int mxf_is_op_1b(const mxfUL *label)
 {
     static const mxfUL op1BPrefix = MXF_1B_OP_L(0);
 
-    return memcmp(label, &op1BPrefix, 13) == 0;
+    /* ignoring octet7, the registry version byte */
+    return memcmp(label,          &op1BPrefix,        7) == 0 &&
+           memcmp(&label->octet8, &op1BPrefix.octet8, 5) == 0;
 }
 
 
@@ -98,6 +104,48 @@ int mxf_is_descriptive_metadata(const mxfUL *label)
     return memcmp(label, &MXF_DDEF_L(DescriptiveMetadata), sizeof(mxfUL)) == 0;
 }
 
+MXFDataDefEnum mxf_get_ddef_enum(const mxfUL *label)
+{
+    if (mxf_is_picture(label))
+        return MXF_PICTURE_DDEF;
+    else if (mxf_is_sound(label))
+        return MXF_SOUND_DDEF;
+    else if (mxf_is_timecode(label))
+        return MXF_TIMECODE_DDEF;
+    else if (mxf_is_data(label))
+        return MXF_DATA_DDEF;
+    else if (mxf_is_descriptive_metadata(label))
+        return MXF_DM_DDEF;
+    else
+        return MXF_UNKNOWN_DDEF;
+}
+
+int mxf_get_ddef_label(MXFDataDefEnum data_def, mxfUL *label)
+{
+    switch (data_def)
+    {
+        case MXF_PICTURE_DDEF:
+            memcpy(label, &MXF_DDEF_L(Picture), sizeof(*label));
+            return 1;
+        case MXF_SOUND_DDEF:
+            memcpy(label, &MXF_DDEF_L(Sound), sizeof(*label));
+            return 1;
+        case MXF_TIMECODE_DDEF:
+            memcpy(label, &MXF_DDEF_L(Timecode), sizeof(*label));
+            return 1;
+        case MXF_DATA_DDEF:
+            memcpy(label, &MXF_DDEF_L(Data), sizeof(*label));
+            return 1;
+        case MXF_DM_DDEF:
+            memcpy(label, &MXF_DDEF_L(DescriptiveMetadata), sizeof(*label));
+            return 1;
+        case MXF_UNKNOWN_DDEF:
+            break;
+    }
+
+    return 0;
+}
+
 
 
 int mxf_is_generic_container_label(const mxfUL *label)
@@ -111,15 +159,6 @@ int mxf_is_generic_container_label(const mxfUL *label)
 
 
 
-int mxf_is_mpeg_video_ec(const mxfUL *label, int frame_wrapped)
-{
-    return mxf_is_generic_container_label(label) &&
-           label->octet13 == 0x04 &&                         /* MPEG elementary stream */
-           (label->octet14 & 0xf0) == 0x60 &&                /* video stream */
-           ((frame_wrapped && label->octet15 == 0x01) ||     /* frame wrapped or */
-               (!frame_wrapped && label->octet15 == 0x02));  /*   clip wrapped */
-}
-
 int mxf_is_avc_ec(const mxfUL *label, int frame_wrapped)
 {
     return mxf_is_generic_container_label(label) &&
@@ -129,6 +168,14 @@ int mxf_is_avc_ec(const mxfUL *label, int frame_wrapped)
                (!frame_wrapped && label->octet15 == 0x02));  /*   clip wrapped */
 }
 
+int mxf_is_mpeg_video_ec(const mxfUL *label, int frame_wrapped)
+{
+    return mxf_is_generic_container_label(label) &&
+           label->octet13 == 0x04 &&                         /* MPEG elementary stream */
+           (label->octet14 & 0xf0) == 0x60 &&                /* video stream */
+           ((frame_wrapped && label->octet15 == 0x01) ||     /* frame wrapped or */
+               (!frame_wrapped && label->octet15 == 0x02));  /*   clip wrapped */
+}
 
 
 
@@ -147,3 +194,12 @@ void mxf_complete_essence_element_track_num(uint32_t *trackNum, uint8_t count, u
     *trackNum |=  (uint32_t)(num);
 }
 
+
+
+int mxf_is_gs_data_element(const mxfKey *key)
+{
+    static const mxfUL gsKey = MXF_GS_DATA_ELEMENT_KEY(0x00, 0x00);
+
+    return memcmp(key, &gsKey, 11) == 0 &&
+           memcmp(&key->octet13, &gsKey.octet13, 3) == 0;
+}

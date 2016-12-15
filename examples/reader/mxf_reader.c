@@ -489,7 +489,7 @@ int format_is_supported(MXFFile *mxfFile)
     uint64_t len;
 
     if (!mxf_read_header_pp_kl_with_runin(mxfFile, &key, &llen, &len) ||
-        !mxf_read_partition(mxfFile, &key, &headerPartition))
+        !mxf_read_partition(mxfFile, &key, len, &headerPartition))
     {
         return 0;
     }
@@ -592,7 +592,7 @@ int init_mxf_reader_2(MXFFile **mxfFile, MXFDataModel *dataModel, MXFReader **re
         mxf_log_error("Could not find header partition pack key" LOG_LOC_FORMAT, LOG_LOC_PARAMS);
         goto fail;
     }
-    CHK_OFAIL(mxf_read_partition(newReader->mxfFile, &key, &headerPartition));
+    CHK_OFAIL(mxf_read_partition(newReader->mxfFile, &key, len, &headerPartition));
 
 
     /* create the essence reader */

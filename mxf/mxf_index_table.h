@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_INDEX_TABLE_H__
-#define __MXF_INDEX_TABLE_H__
+#ifndef MXF_INDEX_TABLE_H_
+#define MXF_INDEX_TABLE_H_
 
 
 #ifdef __cplusplus
@@ -41,18 +41,18 @@ extern "C"
 #endif
 
 
-typedef struct _MXFDeltaEntry
+typedef struct MXFDeltaEntry
 {
-    struct _MXFDeltaEntry *next;
+    struct MXFDeltaEntry *next;
 
     int8_t posTableIndex;
     uint8_t slice;
     uint32_t elementData;
 } MXFDeltaEntry;
 
-typedef struct _MXFIndexEntry
+typedef struct MXFIndexEntry
 {
-    struct _MXFIndexEntry *next;
+    struct MXFIndexEntry *next;
 
     int8_t temporalOffset;
     int8_t keyFrameOffset;
@@ -61,6 +61,12 @@ typedef struct _MXFIndexEntry
     uint32_t *sliceOffset;
     mxfRational *posTable;
 } MXFIndexEntry;
+
+typedef enum {
+  MXF_OPT_BOOL_NOT_PRESENT = 0,
+  MXF_OPT_BOOL_TRUE        = 1,
+  MXF_OPT_BOOL_FALSE       = 2,
+} mxfOptBool;
 
 typedef struct
 {
@@ -72,9 +78,15 @@ typedef struct
     uint32_t indexSID;
     uint32_t bodySID;
     uint8_t sliceCount;
+    int forceWriteSliceCount;
     uint8_t posTableCount;
     MXFDeltaEntry *deltaEntryArray;
     MXFIndexEntry *indexEntryArray;
+    uint64_t extStartOffset;
+    uint64_t vbeByteCount;
+    mxfOptBool singleIndexLocation;
+    mxfOptBool singleEssenceLocation;
+    mxfOptBool forwardIndexDirection;
 } MXFIndexTableSegment;
 
 

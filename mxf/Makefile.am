@@ -21,6 +21,8 @@ libMXF_@LIBMXF_MAJORMINOR@_la_SOURCES = \
 	mxf_partition.c \
 	mxf_primer.c \
 	mxf_rw_intl_file.c \
+	mxf_stream_file.c \
+	mxf_tree.c \
 	mxf_utils.c \
 	mxf_uu_metadata.c \
 	mxf_version.c
@@ -31,7 +33,7 @@ endif
 
 
 libMXF_@LIBMXF_MAJORMINOR@_la_CFLAGS = $(LIBMXF_CFLAGS)
-libMXF_@LIBMXF_MAJORMINOR@_la_LDFLAGS = -version-info $(LIBMXF_LIBVERSION)
+libMXF_@LIBMXF_MAJORMINOR@_la_LDFLAGS = $(LIBMXF_LDFLAGS) -version-info $(LIBMXF_LIBVERSION)
 libMXF_@LIBMXF_MAJORMINOR@_la_LIBADD = $(LIBMXF_LIBADDLIBS)
 
 library_includedir = $(includedir)/libMXF-@LIBMXF_MAJORMINOR@/mxf
@@ -62,10 +64,13 @@ library_include_HEADERS = \
 	mxf_partition.h \
 	mxf_primer.h \
 	mxf_rw_intl_file.h \
+	mxf_stream_file.h \
+	mxf_tree.h \
 	mxf_types.h \
 	mxf_utils.h \
 	mxf_uu_metadata.h \
 	mxf_version.h \
 	mxf_win32_file.h
 
+EXTRA_DIST = mxf_win32_mmap.h mxf_win32_mmap.c
 

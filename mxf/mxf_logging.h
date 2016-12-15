@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_LOGGING_H__
-#define __MXF_LOGGING_H__
+#ifndef MXF_LOGGING_H_
+#define MXF_LOGGING_H_
 
 
 #include <stdarg.h>

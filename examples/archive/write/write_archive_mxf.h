@@ -29,8 +29,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __WRITE_ARCHIVE_MXF_H__
-#define __WRITE_ARCHIVE_MXF_H__
+#ifndef WRITE_ARCHIVE_MXF_H_
+#define WRITE_ARCHIVE_MXF_H_
 
 
 #ifdef __cplusplus
@@ -46,7 +46,7 @@ extern "C"
 #define MAX_ARCHIVE_AUDIO_TRACKS        16
 
 
-typedef struct _ArchiveMXFWriter ArchiveMXFWriter;
+typedef struct ArchiveMXFWriter ArchiveMXFWriter;
 
 
 /* create a new Archive MXF file and prepare for writing the essence */

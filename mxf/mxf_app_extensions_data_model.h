@@ -30,7 +30,7 @@
  */
 
 
-/* Note: defines are undefined at the end of the file */
+/* Note: defines are undefined at the end of the file, unless KEEP_DATA_MODEL_DEFS defined */
 
 
 #if !defined (MXF_BASIC_TYPE_DEF)
@@ -282,6 +282,7 @@ MXF_SET_DEFINITION(DMFramework, APP_TimecodeBreakFramework,
 
 
 
+#if !defined(KEEP_DATA_MODEL_DEFS)
 #undef MXF_BASIC_TYPE_DEF
 #undef MXF_ARRAY_TYPE_DEF
 #undef MXF_COMPOUND_TYPE_DEF
@@ -290,4 +291,5 @@ MXF_SET_DEFINITION(DMFramework, APP_TimecodeBreakFramework,
 #undef MXF_LABEL
 #undef MXF_SET_DEFINITION
 #undef MXF_ITEM_DEFINITION
+#endif
 

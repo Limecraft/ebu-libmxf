@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_ESSENCE_HELPER_H__
-#define __MXF_ESSENCE_HELPER_H__
+#ifndef MXF_ESSENCE_HELPER_H_
+#define MXF_ESSENCE_HELPER_H_
 
 
 int is_d10_picture_essence(const mxfUL *label);

@@ -59,6 +59,70 @@
 
 
 #include <mxf/mxf.h>
+#include <mxf/mxf_macros.h>
+
+
+typedef enum
+{
+    COMMON_INDICATOR,
+    FRAME_ONLY_NO_INDICATOR,
+    UNC_INDICATOR,
+    D10_D11_INDICATOR,
+    AES_BWF_INDICATOR,
+} WrappingIndicatorType;
+
+typedef struct
+{
+    mxfUL label;
+    uint8_t indicator_byte_offset;
+    WrappingIndicatorType indicator_type;
+} ECLabelInfo;
+
+#define GC_PREFIX   0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01
+
+static const ECLabelInfo EC_LABEL_INFO[] =
+{
+    // SMPTE D-10 Mappings
+    {{GC_PREFIX, 0x01, 0x0d, 0x01, 0x03, 0x01, 0x02, 0x01, 0x00, 0x00}, 15, D10_D11_INDICATOR},
+    // DV-DIF Mappings
+    {{GC_PREFIX, 0x01, 0x0d, 0x01, 0x03, 0x01, 0x02, 0x02, 0x00, 0x00}, 15, COMMON_INDICATOR},
+    // SMPTE D-11 Mappings
+    {{GC_PREFIX, 0x01, 0x0d, 0x01, 0x03, 0x01, 0x02, 0x03, 0x00, 0x00}, 15, D10_D11_INDICATOR},
+    // MPEG ES
+    {{GC_PREFIX, 0x02, 0x0d, 0x01, 0x03, 0x01, 0x02, 0x04, 0x00, 0x00}, 15, COMMON_INDICATOR},
+    // Uncompressed Pictures
+    {{GC_PREFIX, 0x01, 0x0d, 0x01, 0x03, 0x01, 0x02, 0x05, 0x00, 0x00}, 15, UNC_INDICATOR},
+    // AES-BWF
+    {{GC_PREFIX, 0x01, 0x0d, 0x01, 0x03, 0x01, 0x02, 0x06, 0x00, 0x00}, 14, AES_BWF_INDICATOR},
+    // MPEG PES
+    {{GC_PREFIX, 0x02, 0x0d, 0x01, 0x03, 0x01, 0x02, 0x07, 0x00, 0x00}, 15, COMMON_INDICATOR},
+    // MPEG PS
+    {{GC_PREFIX, 0x02, 0x0d, 0x01, 0x03, 0x01, 0x02, 0x08, 0x00, 0x00}, 15, COMMON_INDICATOR},
+    // MPEG TS
+    {{GC_PREFIX, 0x02, 0x0d, 0x01, 0x03, 0x01, 0x02, 0x09, 0x00, 0x00}, 15, COMMON_INDICATOR},
+    // A-law
+    {{GC_PREFIX, 0x03, 0x0d, 0x01, 0x03, 0x01, 0x02, 0x0a, 0x00, 0x00}, 14, COMMON_INDICATOR},
+    // Encrypted Data Mappings
+    {{GC_PREFIX, 0x07, 0x0d, 0x01, 0x03, 0x01, 0x02, 0x0b, 0x00, 0x00}, 14, COMMON_INDICATOR},
+    // JPEG-2000 Picture Mappings
+    {{GC_PREFIX, 0x07, 0x0d, 0x01, 0x03, 0x01, 0x02, 0x0c, 0x00, 0x00}, 14, COMMON_INDICATOR},
+    // Generic VBI Data Mapping Undefined Payload
+    {{GC_PREFIX, 0x09, 0x0d, 0x01, 0x03, 0x01, 0x02, 0x0d, 0x00, 0x00},  0, FRAME_ONLY_NO_INDICATOR},
+    // Generic ANC Data Mapping Undefined Payload
+    {{GC_PREFIX, 0x09, 0x0d, 0x01, 0x03, 0x01, 0x02, 0x0e, 0x00, 0x00},  0, FRAME_ONLY_NO_INDICATOR},
+    // AVC NAL Unit Stream
+    {{GC_PREFIX, 0x0a, 0x0d, 0x01, 0x03, 0x01, 0x02, 0x0f, 0x00, 0x00}, 15, COMMON_INDICATOR},
+    // AVC Byte Stream
+    {{GC_PREFIX, 0x0a, 0x0d, 0x01, 0x03, 0x01, 0x02, 0x10, 0x00, 0x00}, 15, COMMON_INDICATOR},
+    // VC-3 Pictures
+    {{GC_PREFIX, 0x0a, 0x0d, 0x01, 0x03, 0x01, 0x02, 0x11, 0x00, 0x00}, 14, COMMON_INDICATOR},
+    // VC-1 Pictures
+    {{GC_PREFIX, 0x0a, 0x0d, 0x01, 0x03, 0x01, 0x02, 0x12, 0x00, 0x00}, 14, COMMON_INDICATOR},
+    // TIFF/EP
+    {{GC_PREFIX, 0x0b, 0x0d, 0x01, 0x03, 0x01, 0x02, 0x14, 0x00, 0x00}, 14, COMMON_INDICATOR},
+    // VC-2 Pictures
+    {{GC_PREFIX, 0x0d, 0x0d, 0x01, 0x03, 0x01, 0x02, 0x15, 0x00, 0x00}, 14, COMMON_INDICATOR},
+};
 
 
 mxf_generate_uuid_func     mxf_generate_uuid     = mxf_default_generate_uuid;
@@ -283,6 +347,29 @@ void mxf_vsnprintf(char *str, size_t size, const char *format, va_list ap)
 #endif
 }
 
+char* mxf_strerror(int errnum, char *buf, size_t size)
+{
+#ifdef HAVE_STRERROR_R
+
+#ifdef _GNU_SOURCE
+    const char *err_str = strerror_r(errnum, buf, size);
+    if (err_str != buf)
+        mxf_snprintf(buf, size, "%s", err_str);
+#else
+    if (strerror_r(errnum, buf, size) != 0)
+        mxf_snprintf(buf, size, "unknown error code %d", errnum);
+#endif
+
+#elif defined(_MSC_VER)
+    if (strerror_s(buf, size, errnum) != 0)
+        mxf_snprintf(buf, size, "unknown error code %d", errnum);
+#else
+    mxf_snprintf(buf, size, "error code %d", errnum);
+#endif
+
+    return buf;
+}
+
 void mxf_print_key(const mxfKey *key)
 {
     char keyStr[KEY_STR_SIZE];
@@ -341,7 +428,15 @@ void mxf_default_generate_uuid(mxfUUID *uuid)
 
     GUID guid;
     CoCreateGuid(&guid);
-    memcpy(uuid, &guid, 16);
+    uuid->octet0 = (uint8_t)((guid.Data1 >> 24) & 0xff);
+    uuid->octet1 = (uint8_t)((guid.Data1 >> 16) & 0xff);
+    uuid->octet2 = (uint8_t)((guid.Data1 >>  8) & 0xff);
+    uuid->octet3 = (uint8_t)((guid.Data1      ) & 0xff);
+    uuid->octet4 = (uint8_t)((guid.Data2 >>  8) & 0xff);
+    uuid->octet5 = (uint8_t)((guid.Data2      ) & 0xff);
+    uuid->octet6 = (uint8_t)((guid.Data3 >>  8) & 0xff);
+    uuid->octet7 = (uint8_t)((guid.Data3      ) & 0xff);
+    memcpy(&uuid->octet8, guid.Data4, 8);
 
 #else
 
@@ -451,10 +546,7 @@ void mxf_default_generate_key(mxfKey *key)
     mxfUUID uuid;
 
     mxf_generate_uuid(&uuid);
-
-    /* half-swap */
-    memcpy(key,          &uuid.octet8, 8);
-    memcpy(&key->octet8, &uuid.octet0, 8);
+    mxf_swap_uid((mxfUID*)key, (const mxfUID*)&uuid);
 }
 
 void mxf_set_regtest_funcs(void)
@@ -585,10 +677,65 @@ int mxf_equals_rgba_layout(const mxfRGBALayout *layoutA, const mxfRGBALayout *la
    a UL always has the MSB of the 1st byte == 0 and a UUID (non-NCS) has the MSB of the 9th byte == 1
    The UUID should be half swapped when used where a UL is expected
    Note: the UL is half swapped in AAF AUIDs
-   Note: the UL is half swapped in UMIDs when using the UUID/UL material generation method */
+   Note: the UL is half swapped in UMIDs when using the UUID/UL material generation method
+
+   MXF AUID (the opposite of AAF AUID!): the first bit is always 0 for a UL
+*/
 int mxf_is_ul(const mxfUID *uid)
 {
-    return (uid->octet0 & 0x80) == 0x00;
+    /* requiring more than just the 1st bit is always 0 to make it a SMPTE UL*/
+    return uid->octet0 == 0x06 && uid->octet1 == 0x0e && uid->octet2 == 0x2b && uid->octet3 == 0x34;
+}
+
+/* MXF IDAU: the 65th bit is always 0 for a UL */
+int mxf_is_swapped_ul(const mxfUID *uid)
+{
+    /* requiring more than just the 65th bit is always 0 to make it a SMPTE UL */
+    return uid->octet8 == 0x06 && uid->octet9 == 0x0e && uid->octet10 == 0x2b && uid->octet11 == 0x34;
+}
+
+void mxf_swap_uid(mxfUID *swap_uid, const mxfUID *uid)
+{
+    memcpy(&swap_uid->octet0, &uid->octet8, 8);
+    memcpy(&swap_uid->octet8, &uid->octet0, 8);
+}
+
+MXFEssenceWrappingType mxf_get_essence_wrapping_type(const mxfUL *label)
+{
+    size_t i;
+    for (i = 0; i < ARRAY_SIZE(EC_LABEL_INFO); i++) {
+        if (memcmp(label,          &EC_LABEL_INFO[i].label,        7) == 0 &&
+            memcmp(&label->octet8, &EC_LABEL_INFO[i].label.octet8, 6) == 0)
+        {
+            uint8_t indicator_byte = ((const uint8_t*)label)[EC_LABEL_INFO[i].indicator_byte_offset];
+            if (EC_LABEL_INFO[i].indicator_type == COMMON_INDICATOR) {
+                if (indicator_byte == 0x01)
+                    return MXF_FRAME_WRAPPED;
+                else if (indicator_byte == 0x02)
+                    return MXF_CLIP_WRAPPED;
+            } else if (EC_LABEL_INFO[i].indicator_type == FRAME_ONLY_NO_INDICATOR) {
+                return MXF_FRAME_WRAPPED;
+            } else if (EC_LABEL_INFO[i].indicator_type == UNC_INDICATOR) {
+                if ((indicator_byte & 0x03) == 0x01)
+                    return MXF_FRAME_WRAPPED;
+                else if ((indicator_byte & 0x03) == 0x02)
+                    return MXF_CLIP_WRAPPED;
+            } else if (EC_LABEL_INFO[i].indicator_type == D10_D11_INDICATOR) {
+                if (indicator_byte == 0x01 || indicator_byte == 0x02)
+                    return MXF_FRAME_WRAPPED;
+                // indicator_byte 0x7f can be either wrapping, e.g. Avid clip-wrapped D-10,
+                // contrary to what the registry says
+            } else if (EC_LABEL_INFO[i].indicator_type == AES_BWF_INDICATOR) {
+                if (indicator_byte == 0x01 || indicator_byte == 0x03)
+                    return MXF_FRAME_WRAPPED;
+                else if (indicator_byte == 0x02 || indicator_byte == 0x04)
+                    return MXF_CLIP_WRAPPED;
+            }
+            break;
+        }
+    }
+
+    return MXF_UNKNOWN_WRAPPING_TYPE;
 }
 
 size_t mxf_utf16_to_utf8(char *u8_str, const mxfUTF16Char *u16_str, size_t u8_size)
@@ -664,6 +811,7 @@ uint32_t mxf_get_system_page_size()
     SYSTEM_INFO systemInfo;
 #else
     long psResult;
+    char errorBuf[128];
 #endif
 
 #if defined (_WIN32)
@@ -674,7 +822,7 @@ uint32_t mxf_get_system_page_size()
     if (psResult < 0) {
         pageSize = 8192;
         mxf_log_warn("Failed to get system page size using sysconf(__SC_PAGESIZE): %s. Defaulting to %u\n",
-                     strerror(errno), pageSize);
+                     mxf_strerror(errno, errorBuf, sizeof(errorBuf)), pageSize);
     } else {
         pageSize = (uint32_t)psResult;
     }

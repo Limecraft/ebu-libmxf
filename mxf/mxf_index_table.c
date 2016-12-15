@@ -271,6 +271,30 @@ int mxf_write_index_table_segment(MXFFile *mxfFile, const MXFIndexTableSegment *
             entry = entry->next;
         }
     }
+    else if (segment->forceWriteSliceCount)
+    {
+        segmentLen += 5;
+    }
+    if (segment->extStartOffset)
+    {
+        segmentLen += 12;
+    }
+    if (segment->vbeByteCount)
+    {
+        segmentLen += 12;
+    }
+    if (segment->singleIndexLocation)
+    {
+        segmentLen += 5;
+    }
+    if (segment->singleEssenceLocation)
+    {
+        segmentLen += 5;
+    }
+    if (segment->forwardIndexDirection)
+    {
+        segmentLen += 5;
+    }
 
     CHK_ORET(mxf_write_kl(mxfFile, &g_IndexTableSegment_key, segmentLen));
 
@@ -295,6 +319,36 @@ int mxf_write_index_table_segment(MXFFile *mxfFile, const MXFIndexTableSegment *
         CHK_ORET(mxf_write_uint8(mxfFile, segment->sliceCount));
         CHK_ORET(mxf_write_local_tl(mxfFile, 0x3f0e, 1));
         CHK_ORET(mxf_write_uint8(mxfFile, segment->posTableCount));
+    }
+    else if (segment->forceWriteSliceCount)
+    {
+        CHK_ORET(mxf_write_local_tl(mxfFile, 0x3f08, 1));
+        CHK_ORET(mxf_write_uint8(mxfFile, segment->sliceCount));
+    }
+    if (segment->extStartOffset)
+    {
+        CHK_ORET(mxf_write_local_tl(mxfFile, 0x3f0f, 8));
+        CHK_ORET(mxf_write_uint64(mxfFile, segment->extStartOffset));
+    }
+    if (segment->vbeByteCount)
+    {
+        CHK_ORET(mxf_write_local_tl(mxfFile, 0x3f10, 8));
+        CHK_ORET(mxf_write_uint64(mxfFile, segment->vbeByteCount));
+    }
+    if (segment->singleIndexLocation)
+    {
+        CHK_ORET(mxf_write_local_tl(mxfFile, 0x3f11, 1));
+        CHK_ORET(mxf_write_uint8(mxfFile, (segment->singleIndexLocation == MXF_OPT_BOOL_TRUE)));
+    }
+    if (segment->singleEssenceLocation)
+    {
+        CHK_ORET(mxf_write_local_tl(mxfFile, 0x3f12, 1));
+        CHK_ORET(mxf_write_uint8(mxfFile, (segment->singleEssenceLocation == MXF_OPT_BOOL_TRUE)));
+    }
+    if (segment->forwardIndexDirection)
+    {
+        CHK_ORET(mxf_write_local_tl(mxfFile, 0x3f13, 1));
+        CHK_ORET(mxf_write_uint8(mxfFile, (segment->forwardIndexDirection == MXF_OPT_BOOL_TRUE)));
     }
 
     if (segment->deltaEntryArray != NULL)
@@ -365,6 +419,7 @@ int mxf_read_index_table_segment_2(MXFFile *mxfFile, uint64_t segmentLen,
     uint64_t streamOffset;
     uint32_t entry;
     uint32_t actualEntryLen;
+    uint8_t tempOptBool;
     uint8_t i;
 
     CHK_ORET(mxf_create_index_table_segment(&newSegment));
@@ -413,6 +468,29 @@ int mxf_read_index_table_segment_2(MXFFile *mxfFile, uint64_t segmentLen,
             case 0x3f0e:
                 CHK_OFAIL(localLen == 1);
                 CHK_OFAIL(mxf_read_uint8(mxfFile, &newSegment->posTableCount));
+                break;
+            case 0x3f0f:
+                CHK_OFAIL(localLen == 8);
+                CHK_OFAIL(mxf_read_uint64(mxfFile, &newSegment->extStartOffset));
+                break;
+            case 0x3f10:
+                CHK_OFAIL(localLen == 8);
+                CHK_OFAIL(mxf_read_uint64(mxfFile, &newSegment->vbeByteCount));
+                break;
+            case 0x3f11:
+                CHK_OFAIL(localLen == 1);
+                CHK_OFAIL(mxf_read_uint8(mxfFile, &tempOptBool));
+                newSegment->singleIndexLocation = (tempOptBool ? MXF_OPT_BOOL_TRUE : MXF_OPT_BOOL_FALSE);
+                break;
+            case 0x3f12:
+                CHK_OFAIL(localLen == 1);
+                CHK_OFAIL(mxf_read_uint8(mxfFile, &tempOptBool));
+                newSegment->singleEssenceLocation = (tempOptBool ? MXF_OPT_BOOL_TRUE : MXF_OPT_BOOL_FALSE);
+                break;
+            case 0x3f13:
+                CHK_OFAIL(localLen == 1);
+                CHK_OFAIL(mxf_read_uint8(mxfFile, &tempOptBool));
+                newSegment->forwardIndexDirection = (tempOptBool ? MXF_OPT_BOOL_TRUE : MXF_OPT_BOOL_FALSE);
                 break;
             case 0x3f09:
                 CHK_ORET(mxf_read_uint32(mxfFile, &deltaEntryArrayLen));
@@ -528,6 +606,30 @@ int mxf_write_index_table_segment_header(MXFFile *mxfFile, const MXFIndexTableSe
         segmentLen += 22 /* includes PosTableCount and SliceCount */ +
             numIndexEntries * (11 + segment->sliceCount * 4 + segment->posTableCount * 8);
     }
+    else if (segment->forceWriteSliceCount)
+    {
+      segmentLen += 5;
+    }
+    if (segment->extStartOffset)
+    {
+        segmentLen += 12;
+    }
+    if (segment->vbeByteCount)
+    {
+        segmentLen += 12;
+    }
+    if (segment->singleIndexLocation)
+    {
+        segmentLen += 5;
+    }
+    if (segment->singleEssenceLocation)
+    {
+        segmentLen += 5;
+    }
+    if (segment->forwardIndexDirection)
+    {
+        segmentLen += 5;
+    }
 
     CHK_ORET(mxf_write_kl(mxfFile, &g_IndexTableSegment_key, segmentLen));
 
@@ -552,6 +654,36 @@ int mxf_write_index_table_segment_header(MXFFile *mxfFile, const MXFIndexTableSe
         CHK_ORET(mxf_write_uint8(mxfFile, segment->sliceCount));
         CHK_ORET(mxf_write_local_tl(mxfFile, 0x3f0e, 1));
         CHK_ORET(mxf_write_uint8(mxfFile, segment->posTableCount));
+    }
+    else if (segment->forceWriteSliceCount)
+    {
+        CHK_ORET(mxf_write_local_tl(mxfFile, 0x3f08, 1));
+        CHK_ORET(mxf_write_uint8(mxfFile, segment->sliceCount));
+    }
+    if (segment->extStartOffset)
+    {
+        CHK_ORET(mxf_write_local_tl(mxfFile, 0x3f0f, 8));
+        CHK_ORET(mxf_write_uint64(mxfFile, segment->extStartOffset));
+    }
+    if (segment->vbeByteCount)
+    {
+        CHK_ORET(mxf_write_local_tl(mxfFile, 0x3f10, 8));
+        CHK_ORET(mxf_write_uint64(mxfFile, segment->vbeByteCount));
+    }
+    if (segment->singleIndexLocation)
+    {
+        CHK_ORET(mxf_write_local_tl(mxfFile, 0x3f11, 1));
+        CHK_ORET(mxf_write_uint8(mxfFile, (segment->singleIndexLocation == MXF_OPT_BOOL_TRUE)));
+    }
+    if (segment->singleEssenceLocation)
+    {
+        CHK_ORET(mxf_write_local_tl(mxfFile, 0x3f12, 1));
+        CHK_ORET(mxf_write_uint8(mxfFile, (segment->singleEssenceLocation == MXF_OPT_BOOL_TRUE)));
+    }
+    if (segment->forwardIndexDirection)
+    {
+        CHK_ORET(mxf_write_local_tl(mxfFile, 0x3f13, 1));
+        CHK_ORET(mxf_write_uint8(mxfFile, (segment->forwardIndexDirection == MXF_OPT_BOOL_TRUE)));
     }
 
 

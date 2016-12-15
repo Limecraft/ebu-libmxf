@@ -72,6 +72,11 @@ int mxf_is_body_partition_pack(const mxfKey *key)
     return mxf_equals_key_prefix(key, &g_PartitionPackPrefix_key, 13) && key->octet13 == 0x03;
 }
 
+int mxf_is_generic_stream_partition_pack(const mxfKey *key)
+{
+    return mxf_equals_key_prefix(key, &g_PartitionPackPrefix_key, 13) && key->octet13 == 0x03 && key->octet14 == 0x11;
+}
+
 int mxf_is_footer_partition_pack(const mxfKey *key)
 {
     return mxf_equals_key_prefix(key, &g_PartitionPackPrefix_key, 13) && key->octet13 == 0x04;
@@ -367,6 +372,12 @@ int mxf_write_partition(MXFFile *mxfFile, MXFPartition *partition)
 /* Note: positions file pointer at end of file */
 int mxf_update_partitions(MXFFile *mxfFile, MXFFilePartitions *partitions)
 {
+    mxf_update_partitions_in_memory(partitions);
+    return mxf_rewrite_partitions(mxfFile, partitions);
+}
+
+void mxf_update_partitions_in_memory(MXFFilePartitions *partitions)
+{
     MXFPartition *previousPartition;
     MXFPartition *lastPartition;
     MXFListIterator iter;
@@ -375,7 +386,7 @@ int mxf_update_partitions(MXFFile *mxfFile, MXFFilePartitions *partitions)
     /* check if anything there to update */
     if (mxf_get_list_length(partitions) == 0)
     {
-        return 1;
+        return;
     }
 
     /* update partition packs with previousPartition and footerPartition (if present) offsets */
@@ -398,8 +409,13 @@ int mxf_update_partitions(MXFFile *mxfFile, MXFFilePartitions *partitions)
 
         previousPartition = partition;
     }
+}
 
-    /* re-write the partition packs */
+/* Note: positions file pointer at end of file */
+int mxf_rewrite_partitions(MXFFile *mxfFile, MXFFilePartitions *partitions)
+{
+    MXFListIterator iter;
+
     mxf_initialise_list_iter(&iter, partitions);
     while (mxf_next_list_iter_element(&iter))
     {
@@ -414,13 +430,16 @@ int mxf_update_partitions(MXFFile *mxfFile, MXFFilePartitions *partitions)
     return 1;
 }
 
-int mxf_read_partition(MXFFile *mxfFile, const mxfKey *key, MXFPartition **partition)
+int mxf_read_partition(MXFFile *mxfFile, const mxfKey *key, uint64_t len, MXFPartition **partition)
 {
     MXFPartition *newPartition;
-    uint32_t len;
-    uint32_t eleLen;
+    uint32_t numLabels;
+    uint32_t labelLen;
     mxfUL label;
+    uint64_t expectedLen;
     uint32_t i;
+
+    CHK_ORET(len >= 88 && len <= INT64_MAX);
 
     CHK_ORET(mxf_create_partition(&newPartition));
     newPartition->key = *key;
@@ -438,11 +457,20 @@ int mxf_read_partition(MXFFile *mxfFile, const mxfKey *key, MXFPartition **parti
     CHK_OFAIL(mxf_read_uint32(mxfFile, &newPartition->bodySID));
     CHK_OFAIL(mxf_read_ul(mxfFile, &newPartition->operationalPattern));
 
-    CHK_OFAIL(mxf_read_batch_header(mxfFile, &len, &eleLen));
-    for (i = 0; i < len; i++)
+    CHK_OFAIL(mxf_read_batch_header(mxfFile, &numLabels, &labelLen));
+    CHK_OFAIL(numLabels == 0 || labelLen == 16);
+    expectedLen = 88 + (uint64_t)numLabels * labelLen;
+    CHK_OFAIL(len >= expectedLen);
+    for (i = 0; i < numLabels; i++)
     {
         CHK_OFAIL(mxf_read_ul(mxfFile, &label));
         CHK_OFAIL(mxf_append_partition_esscont_label(newPartition, &label));
+    }
+
+    if (len > expectedLen) {
+        mxf_log_warn("Partition pack len %" PRIu64 " is larger than expected len %" PRIu64 "\n",
+                     len, expectedLen);
+        CHK_OFAIL(mxf_file_seek(mxfFile, (int64_t)(len - expectedLen), SEEK_CUR));
     }
 
     *partition = newPartition;
@@ -683,12 +711,9 @@ int mxf_read_header_pp_kl(MXFFile *mxfFile, mxfKey *key, uint8_t *llen, uint64_t
     uint8_t tllen;
     uint64_t tlen;
 
-    CHK_ORET(mxf_read_kl(mxfFile, &tkey, &tllen, &tlen));
-
-    if (!mxf_is_header_partition_pack(&tkey))
-    {
-        return 0;
-    }
+    CHK_ORET(mxf_read_k(mxfFile, &tkey));
+    CHK_ORET(mxf_is_header_partition_pack(&tkey));
+    CHK_ORET(mxf_read_l(mxfFile, &tllen, &tlen));
 
     *key = tkey;
     *llen = tllen;
@@ -698,66 +723,36 @@ int mxf_read_header_pp_kl(MXFFile *mxfFile, mxfKey *key, uint8_t *llen, uint64_t
 
 int mxf_read_header_pp_kl_with_runin(MXFFile *mxfFile, mxfKey *key, uint8_t *llen, uint64_t *len)
 {
+    mxfKey tkey = MXF_PP_KEY(0x01, 0x00, 0x00);
+    uint8_t tllen;
+    uint64_t tlen;
     uint8_t keyCompareByte = 0;
     uint32_t runinCheckCount = 0;
-    mxfKey k;
-    uint8_t *keyPtr = (uint8_t*)&k;
     int byte;
 
-    /* try find first 11 bytes of partition pack */
-    while (runinCheckCount < MAX_RUNIN_LEN + 11)
-    {
-        if ((byte = mxf_file_getc(mxfFile)) == EOF)
-        {
-            return 0;
-        }
+    /* the run-in shall not contain the first 11 bytes of the partition pack label and so
+       read until the first 11 bytes are found or max run-in exceeded */
+    while (runinCheckCount <= MAX_RUNIN_LEN && keyCompareByte < 11) {
+        CHK_ORET((byte = mxf_file_getc(mxfFile)) != EOF);
 
-        runinCheckCount++;
-        if (byte == ((const uint8_t*)(&g_PartitionPackPrefix_key))[keyCompareByte])
-        {
-            keyPtr[keyCompareByte++] = (uint8_t)byte;
-            if (keyCompareByte == 11)
-            {
-                break;
-            }
-        }
-        else
-        {
-            if (runinCheckCount >= MAX_RUNIN_LEN)
-            {
-                return 0;
-            }
+        if (byte == ((uint8_t*)(&tkey))[keyCompareByte]) {
+            keyCompareByte++;
+        } else {
+            runinCheckCount += keyCompareByte + 1;
             keyCompareByte = 0;
         }
     }
-    if (runinCheckCount >= MAX_RUNIN_LEN + 11)
-    {
-        return 0;
-    }
+    CHK_ORET(runinCheckCount <= MAX_RUNIN_LEN);
 
-    /* read the remaing bytes of the key */
-    for (; keyCompareByte < 16; keyCompareByte++)
-    {
-        if ((byte = mxf_file_getc(mxfFile)) == EOF)
-        {
-            return 0;
-        }
-        keyPtr[keyCompareByte] = (uint8_t)byte;
-    }
+    CHK_ORET(mxf_file_read(mxfFile, &tkey.octet11, 5) == 5);
+    CHK_ORET(mxf_is_header_partition_pack(&tkey));
+    CHK_ORET(mxf_read_l(mxfFile, &tllen, &tlen));
 
-    if (!mxf_is_header_partition_pack(&k))
-    {
-        return 0;
-    }
+    mxf_set_runin_len(mxfFile, (uint16_t)runinCheckCount);
 
-    if (!mxf_read_l(mxfFile, llen, len))
-    {
-        return 0;
-    }
-
-    mxf_set_runin_len(mxfFile, (uint16_t)(runinCheckCount - 11));
-
-    *key = k;
+    *key = tkey;
+    *llen = tllen;
+    *len = tlen;
     return 1;
 }
 

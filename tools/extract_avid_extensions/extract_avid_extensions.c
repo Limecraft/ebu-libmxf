@@ -288,7 +288,7 @@ static int print_uint32_item(MXFMetadataSet *set, const mxfKey *itemKey, int spa
 static int print_int64(int64_t value, int spaceCount)
 {
     print_spaces(spaceCount);
-    printf("%"PRId64"", value);
+    printf("%" PRId64 "", value);
 
     return 1;
 }
@@ -754,7 +754,7 @@ int main(int argc, const char **argv)
     /* read header partition pack */
 
     CHECK(mxf_read_header_pp_kl(mxfFile, &key, &llen, &len));
-    CHECK(mxf_read_partition(mxfFile, &key, &headerPartition));
+    CHECK(mxf_read_partition(mxfFile, &key, len, &headerPartition));
 
 
     /* skip to the header metadata */

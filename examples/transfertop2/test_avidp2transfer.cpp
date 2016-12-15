@@ -159,10 +159,10 @@ int main(int argc, const char *argv[])
                 printf("    Type = Sound\n");
             }
             printf("    Name = '%s'\n", (*iter).name.c_str());
-            printf("    CompositionMob track length = (%d/%d) %"PRId64"\n",
+            printf("    CompositionMob track length = (%d/%d) %" PRId64 "\n",
                 (*iter).compositionEditRate.numerator, (*iter).compositionEditRate.denominator,
                 (*iter).compositionTrackLength);
-            printf("    SourceMob track length = (%d/%d) %"PRId64"\n",
+            printf("    SourceMob track length = (%d/%d) %" PRId64 "\n",
                 (*iter).sourceEditRate.numerator, (*iter).sourceEditRate.denominator,
                 (*iter).sourceTrackLength);
         }

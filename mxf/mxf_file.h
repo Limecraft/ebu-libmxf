@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_FILE_H__
-#define __MXF_FILE_H__
+#ifndef MXF_FILE_H_
+#define MXF_FILE_H_
 
 
 #ifdef __cplusplus
@@ -77,8 +77,9 @@ int mxf_disk_file_open_new(const char *filename, MXFFile **mxfFile);
 int mxf_disk_file_open_read(const char *filename, MXFFile **mxfFile);
 int mxf_disk_file_open_modify(const char *filename, MXFFile **mxfFile);
 
-/* wrap standard input in an MXF file */
+/* wrap standard input and output in an MXF file */
 int mxf_stdin_wrap_read(MXFFile **mxfFile);
+int mxf_stdout_wrap_write(MXFFile **mxfFile);
 
 void mxf_file_close(MXFFile **mxfFile);
 void mxf_file_close_2(MXFFile **mxfFile, void (*free_func)(void*));

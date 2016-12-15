@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_MXF_H__
-#define __MXF_MXF_H__
+#ifndef MXF_MXF_H_
+#define MXF_MXF_H_
 
 #ifdef __cplusplus
 extern "C"
@@ -44,6 +44,7 @@ extern "C"
 #include <mxf/mxf_version.h>
 #include <mxf/mxf_labels_and_keys.h>
 #include <mxf/mxf_list.h>
+#include <mxf/mxf_tree.h>
 #include <mxf/mxf_logging.h>
 #include <mxf/mxf_file.h>
 #include <mxf/mxf_utils.h>

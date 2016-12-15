@@ -79,10 +79,21 @@ int test_read(const char *filename)
     uint32_t ablen;
     uint32_t abelen;
 
-    if (!mxf_disk_file_open_read(filename, &mxfFile))
+    if (filename == NULL)
     {
-        mxf_log_error("Failed to open '%s'" LOG_LOC_FORMAT, filename, LOG_LOC_PARAMS);
-        return 0;
+        if (!mxf_stdin_wrap_read(&mxfFile))
+        {
+            mxf_log_error("Failed to open stdin" LOG_LOC_FORMAT, LOG_LOC_PARAMS);
+            return 0;
+        }
+    }
+    else
+    {
+        if (!mxf_disk_file_open_read(filename, &mxfFile))
+        {
+            mxf_log_error("Failed to open '%s'" LOG_LOC_FORMAT, filename, LOG_LOC_PARAMS);
+            return 0;
+        }
     }
 
     /* TEST */
@@ -149,6 +160,9 @@ int test_read(const char *filename)
     CHK_OFAIL(mxf_read_array_header(mxfFile, &ablen, &abelen));
     CHK_OFAIL(ablen == 4 && abelen == 32);
 
+    /* skip junk */
+    CHK_ORET(mxf_file_seek(mxfFile, 99, SEEK_CUR));
+    CHK_ORET(mxf_file_getc(mxfFile) == 0);
 
     mxf_file_close(&mxfFile);
 
@@ -162,8 +176,6 @@ fail:
 
 int do_write(MXFFile *mxfFile)
 {
-    memset(data, 0xaa, 256);
-
     CHK_ORET(mxf_file_write(mxfFile, NULL, 0) == 0);
     CHK_ORET(mxf_file_write(mxfFile, data, 0) == 0);
     CHK_ORET(mxf_file_write(mxfFile, data, 100) == 100);
@@ -206,14 +218,36 @@ int test_write(const char *filename)
     MXFFile *mxfFile = NULL;
 
 
-    if (!mxf_disk_file_open_new(filename, &mxfFile))
+    if (filename == NULL)
     {
-        mxf_log_error("Failed to create '%s'" LOG_LOC_FORMAT, filename, LOG_LOC_PARAMS);
-        return 0;
+        if (!mxf_stdout_wrap_write(&mxfFile))
+        {
+            mxf_log_error("Failed to open stdout" LOG_LOC_FORMAT, LOG_LOC_PARAMS);
+            return 0;
+        }
+    }
+    else
+    {
+        if (!mxf_disk_file_open_new(filename, &mxfFile))
+        {
+            mxf_log_error("Failed to create '%s'" LOG_LOC_FORMAT, filename, LOG_LOC_PARAMS);
+            return 0;
+        }
     }
 
     /* TEST */
     CHK_OFAIL(do_write(mxfFile));
+
+    /* write junk */
+    if (filename == NULL)
+    {
+        CHK_ORET(mxf_file_seek(mxfFile, 99, SEEK_CUR));
+        CHK_ORET(mxf_file_putc(mxfFile, 0) != EOF);
+    }
+    else
+    {
+        CHK_ORET(mxf_write_zeros(mxfFile, 100));
+    }
 
     mxf_file_close(&mxfFile);
     return 1;
@@ -263,19 +297,31 @@ int main(int argc, const char *argv[])
         return 1;
     }
 
-    if (!test_write(argv[1]))
-    {
-        return 1;
-    }
+    memset(data, 0xaa, 256);
 
-    if (!test_read(argv[1]))
+    if (strcmp(argv[1], "stdin") == 0)
     {
-        return 1;
+        if (!test_read(NULL))
+        {
+            return 1;
+        }
     }
-
-    if (!test_modify(argv[1]))
+    else if (strcmp(argv[1], "stdout") == 0)
     {
-        return 1;
+        if (!test_write(NULL))
+        {
+            return 1;
+        }
+    }
+    else
+    {
+        if (!test_write(argv[1]) ||
+            !test_read(argv[1]) ||
+            !test_modify(argv[1]) ||
+            !test_write(argv[1])) /* reset for next run of test_read(NULL) */
+        {
+            return 1;
+        }
     }
 
     return 0;

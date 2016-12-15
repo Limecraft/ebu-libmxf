@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_READER_H__
-#define __MXF_READER_H__
+#ifndef MXF_READER_H_
+#define MXF_READER_H_
 
 
 #ifdef __cplusplus
@@ -53,25 +53,25 @@ extern "C"
 
 
 
-typedef struct _MXFReader MXFReader;
+typedef struct MXFReader MXFReader;
 
-typedef struct _MXFReaderListenerData MXFReaderListenerData;
+typedef struct MXFReaderListenerData MXFReaderListenerData;
 
-typedef struct _MXFReaderListener
+typedef struct MXFReaderListener
 {
     /* returns true if listener will accept frame */
-    int (*accept_frame)(struct _MXFReaderListener *listener, int trackIndex);
+    int (*accept_frame)(struct MXFReaderListener *listener, int trackIndex);
 
     /* the listener must allocate a buffer for the data to be written to */
-    int (*allocate_buffer)(struct _MXFReaderListener *listener, int trackIndex, uint8_t **buffer, uint32_t bufferSize);
+    int (*allocate_buffer)(struct MXFReaderListener *listener, int trackIndex, uint8_t **buffer, uint32_t bufferSize);
 
     /* this function is only called if the reader fails to read a frame _before_ calling receive_frame */
-    void (*deallocate_buffer)(struct _MXFReaderListener *listener, int trackIndex, uint8_t **buffer);
+    void (*deallocate_buffer)(struct MXFReaderListener *listener, int trackIndex, uint8_t **buffer);
 
     /* passes the frame to the listener
     The buffer pointer equals the pointer for the data allocated in allocate_buffer()
     The listener is responsible for deleting the buffer data */
-    int (*receive_frame)(struct _MXFReaderListener *listener, int trackIndex, uint8_t *buffer, uint32_t bufferSize);
+    int (*receive_frame)(struct MXFReaderListener *listener, int trackIndex, uint8_t *buffer, uint32_t bufferSize);
 
     MXFReaderListenerData *data;
 } MXFReaderListener;
@@ -101,9 +101,9 @@ typedef struct
     uint32_t channelCount;
 } MXFAudioTrack;
 
-typedef struct _MXFTrack
+typedef struct MXFTrack
 {
-    struct _MXFTrack *next;
+    struct MXFTrack *next;
 
     mxfUL essenceContainerLabel;
     mxfUL pictureEssenceCodingLabel;

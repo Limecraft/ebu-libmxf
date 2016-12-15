@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_LIST_H__
-#define __MXF_LIST_H__
+#ifndef MXF_LIST_H_
+#define MXF_LIST_H_
 
 
 #ifdef __cplusplus
@@ -44,9 +44,9 @@ extern "C"
 typedef void (*free_func_type)(void *data);
 typedef int (*eq_func_type)(void *data, void *info);
 
-typedef struct _MXFListElement
+typedef struct MXFListElement
 {
-    struct _MXFListElement *next;
+    struct MXFListElement *next;
     void *data;
 } MXFListElement;
 

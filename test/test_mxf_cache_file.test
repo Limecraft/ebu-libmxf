@@ -1,8 +1,10 @@
 #!/bin/sh
 
-RESULT=`./test_mxf_cache_file /tmp/libmxf_test.mxf`
+temp=/tmp/libmxf_test_$$.mxf
 
-rm /tmp/libmxf_test.mxf
+./test_mxf_cache_file $temp
+res=$?
 
-exit $RESULT
+rm -f $temp
 
+exit $res

@@ -86,6 +86,7 @@ int is_d10_picture_essence(const mxfUL *label)
 int is_d10_essence(const mxfUL *label)
 {
     if (is_d10_picture_essence(label) ||
+        mxf_equals_ul(label, &MXF_EC_L(D10_50_625_50_defined_template)) ||
         mxf_equals_ul(label, &MXF_EC_L(D10_50_625_50_extended_template)) ||
         mxf_equals_ul(label, &MXF_EC_L(D10_50_525_60_defined_template)) ||
         mxf_equals_ul(label, &MXF_EC_L(D10_50_525_60_extended_template)) ||
@@ -528,7 +529,10 @@ int process_cdci_descriptor(MXFMetadataSet *descriptorSet, MXFTrack *track, Esse
                 CHK_ORET(mxf_get_int32_item(descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, FrameSampleSize), &avidFrameSize));
                 CHK_ORET(avidFrameSize > 0);
                 essenceTrack->frameSize = avidFrameSize;
-                CHK_ORET(mxf_get_uint32_item(descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, ImageStartOffset), &essenceTrack->imageStartOffset));
+                if (mxf_have_item(descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, ImageStartOffset)))
+                {
+                    CHK_ORET(mxf_get_uint32_item(descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, ImageStartOffset), &essenceTrack->imageStartOffset));
+                }
             }
         }
         else
@@ -556,10 +560,14 @@ int process_cdci_descriptor(MXFMetadataSet *descriptorSet, MXFTrack *track, Esse
              mxf_equals_ul(&track->essenceContainerLabel, &MXF_EC_L(HD_Unc_1080_25p_422_ClipWrapped)) ||
              mxf_equals_ul(&track->essenceContainerLabel, &MXF_EC_L(HD_Unc_1080_2997p_422_FrameWrapped)) ||
              mxf_equals_ul(&track->essenceContainerLabel, &MXF_EC_L(HD_Unc_1080_2997p_422_ClipWrapped)) ||
+             mxf_equals_ul(&track->essenceContainerLabel, &MXF_EC_L(HD_Unc_1080_30p_422_FrameWrapped)) ||
+             mxf_equals_ul(&track->essenceContainerLabel, &MXF_EC_L(HD_Unc_1080_30p_422_ClipWrapped)) ||
              mxf_equals_ul(&track->essenceContainerLabel, &MXF_EC_L(HD_Unc_1080_50p_422_FrameWrapped)) ||
              mxf_equals_ul(&track->essenceContainerLabel, &MXF_EC_L(HD_Unc_1080_50p_422_ClipWrapped)) ||
              mxf_equals_ul(&track->essenceContainerLabel, &MXF_EC_L(HD_Unc_1080_5994p_422_FrameWrapped)) ||
-             mxf_equals_ul(&track->essenceContainerLabel, &MXF_EC_L(HD_Unc_1080_5994p_422_ClipWrapped)))
+             mxf_equals_ul(&track->essenceContainerLabel, &MXF_EC_L(HD_Unc_1080_5994p_422_ClipWrapped)) ||
+             mxf_equals_ul(&track->essenceContainerLabel, &MXF_EC_L(HD_Unc_1080_60p_422_FrameWrapped)) ||
+             mxf_equals_ul(&track->essenceContainerLabel, &MXF_EC_L(HD_Unc_1080_60p_422_ClipWrapped)))
     {
         CHK_ORET(track->video.componentDepth == 8 || track->video.componentDepth == 10);
 
@@ -623,7 +631,10 @@ int process_cdci_descriptor(MXFMetadataSet *descriptorSet, MXFTrack *track, Esse
             CHK_ORET(mxf_get_int32_item(descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, FrameSampleSize), &avidFrameSize));
             CHK_ORET(avidFrameSize > 0);
             essenceTrack->frameSize = avidFrameSize;
-            CHK_ORET(mxf_get_uint32_item(descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, ImageStartOffset), &essenceTrack->imageStartOffset));
+            if (mxf_have_item(descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, ImageStartOffset)))
+            {
+                CHK_ORET(mxf_get_uint32_item(descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, ImageStartOffset), &essenceTrack->imageStartOffset));
+            }
         }
         else
         {
@@ -646,10 +657,14 @@ int process_cdci_descriptor(MXFMetadataSet *descriptorSet, MXFTrack *track, Esse
              mxf_equals_ul(&track->essenceContainerLabel, &MXF_EC_L(HD_Unc_720_25p_422_ClipWrapped)) ||
              mxf_equals_ul(&track->essenceContainerLabel, &MXF_EC_L(HD_Unc_720_2997p_422_FrameWrapped)) ||
              mxf_equals_ul(&track->essenceContainerLabel, &MXF_EC_L(HD_Unc_720_2997p_422_ClipWrapped)) ||
+             mxf_equals_ul(&track->essenceContainerLabel, &MXF_EC_L(HD_Unc_720_30p_422_FrameWrapped)) ||
+             mxf_equals_ul(&track->essenceContainerLabel, &MXF_EC_L(HD_Unc_720_30p_422_ClipWrapped)) ||
              mxf_equals_ul(&track->essenceContainerLabel, &MXF_EC_L(HD_Unc_720_50p_422_FrameWrapped)) ||
              mxf_equals_ul(&track->essenceContainerLabel, &MXF_EC_L(HD_Unc_720_50p_422_ClipWrapped)) ||
              mxf_equals_ul(&track->essenceContainerLabel, &MXF_EC_L(HD_Unc_720_5994p_422_FrameWrapped)) ||
-             mxf_equals_ul(&track->essenceContainerLabel, &MXF_EC_L(HD_Unc_720_5994p_422_ClipWrapped)))
+             mxf_equals_ul(&track->essenceContainerLabel, &MXF_EC_L(HD_Unc_720_5994p_422_ClipWrapped)) ||
+             mxf_equals_ul(&track->essenceContainerLabel, &MXF_EC_L(HD_Unc_720_60p_422_FrameWrapped)) ||
+             mxf_equals_ul(&track->essenceContainerLabel, &MXF_EC_L(HD_Unc_720_60p_422_ClipWrapped)))
     {
         CHK_ORET(track->video.componentDepth == 8 || track->video.componentDepth == 10);
 
@@ -821,7 +836,10 @@ int process_cdci_descriptor(MXFMetadataSet *descriptorSet, MXFTrack *track, Esse
             CHK_ORET(mxf_get_int32_item(descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, FrameSampleSize), &avidFrameSize));
             CHK_ORET(avidFrameSize > 0);
             essenceTrack->frameSize = avidFrameSize;
-            CHK_ORET(mxf_get_uint32_item(descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, ImageStartOffset), &essenceTrack->imageStartOffset));
+            if (mxf_have_item(descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, ImageStartOffset)))
+            {
+                CHK_ORET(mxf_get_uint32_item(descriptorSet, &MXF_ITEM_K(GenericPictureEssenceDescriptor, ImageStartOffset), &essenceTrack->imageStartOffset));
+            }
         }
         else
         {

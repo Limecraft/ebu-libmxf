@@ -39,6 +39,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
 
 #include <mxf/mxf.h>
 #include <mxf/mxf_macros.h>
@@ -253,6 +254,8 @@ static int validate_set(MXFMetadataSet *set, MXFSetDef *setDef, int logErrors)
                 case MXF_AUIDARRAY_TYPE:
                 case MXF_ULARRAY_TYPE:
                 case MXF_ULBATCH_TYPE:
+                case MXF_UUIDARRAY_TYPE:
+                case MXF_UUIDBATCH_TYPE:
                 case MXF_STRONGREFARRAY_TYPE:
                 case MXF_STRONGREFBATCH_TYPE:
                 case MXF_WEAKREFARRAY_TYPE:
@@ -305,6 +308,9 @@ static int validate_set(MXFMetadataSet *set, MXFSetDef *setDef, int logErrors)
                 case MXF_UTF16_TYPE:
                     CHECK_LENGTH(2)
                     break;
+                case MXF_UTF8_TYPE:
+                    CHECK_LENGTH(1)
+                    break;
                 case MXF_BOOLEAN_TYPE:
                     CHECK_LENGTH(1)
                     break;
@@ -346,6 +352,7 @@ static int validate_set(MXFMetadataSet *set, MXFSetDef *setDef, int logErrors)
                 case MXF_RAW_TYPE:
                 case MXF_UTF16STRING_TYPE:
                 case MXF_UTF16STRINGARRAY_TYPE:
+                case MXF_UTF8STRING_TYPE:
                 case MXF_ISO7STRING_TYPE:
                 case MXF_STREAM_TYPE:
                 case MXF_DATAVALUE_TYPE:
@@ -1243,6 +1250,11 @@ void mxf_get_rgba_layout(const uint8_t *value, mxfRGBALayout *result)
     }
 }
 
+void mxf_get_aes3_fixed_data(const uint8_t *value, mxfAES3FixedData *result)
+{
+    memcpy(result->bytes, value, mxfAES3FixedData_extlen);
+}
+
 void mxf_get_array_header(const uint8_t *value, uint32_t *arrayLen, uint32_t *arrayItemLen)
 {
     mxf_get_uint32(value, arrayLen);
@@ -1302,7 +1314,6 @@ void mxf_get_utf16string(const uint8_t *value, uint16_t valueLen, mxfUTF16Char *
     }
 }
 
-
 /* Note: returns a null-terminated UTF16 string, using fixed 2-byte length characters*/
 void mxf_get_fixed_item_length_utf16string(const uint8_t *value, uint16_t valueLen, uint16_t *result)
 {
@@ -1327,6 +1338,53 @@ void mxf_get_fixed_item_length_utf16string(const uint8_t *value, uint16_t valueL
     {
         result[i] = 0;
     }
+
+/* Note: the size always includes a null terminator */
+uint16_t mxf_get_utf8string_size(const uint8_t *value, uint16_t valueLen)
+{
+    const uint8_t *valuePtr = value;
+    const uint8_t *endValue = value + valueLen;
+
+    while (valuePtr != endValue && (*valuePtr))
+        valuePtr++;
+
+    return (uint16_t)(valuePtr - value) + 1;
+}
+
+/* Note: returns a null-terminated UTF8 string*/
+void mxf_get_utf8string(const uint8_t *value, uint16_t valueLen, char *result)
+{
+    const uint8_t *valuePtr = value;
+    const uint8_t *endValue = value + valueLen;
+    char *resultPtr         = result;
+
+    while (valuePtr != endValue && (*valuePtr))
+        *resultPtr++ = (char)(*valuePtr++);
+    *resultPtr++ = 0;
+}
+
+/* Note: the size always includes a null terminator */
+uint16_t mxf_get_iso7string_size(const uint8_t *value, uint16_t valueLen)
+{
+    const uint8_t *valuePtr = value;
+    const uint8_t *endValue = value + valueLen;
+
+    while (valuePtr != endValue && (*valuePtr))
+        valuePtr++;
+
+    return (uint16_t)(valuePtr - value) + 1;
+}
+
+/* Note: returns a null-terminated UTF8 string*/
+void mxf_get_iso7string(const uint8_t *value, uint16_t valueLen, char *result)
+{
+    const uint8_t *valuePtr = value;
+    const uint8_t *endValue = value + valueLen;
+    char *resultPtr         = result;
+
+    while (valuePtr != endValue && (*valuePtr))
+        *resultPtr++ = (char)(*valuePtr++);
+    *resultPtr++ = 0;
 }
 
 int mxf_get_strongref(MXFHeaderMetadata *headerMetadata, const uint8_t *value, MXFMetadataSet **set)
@@ -1522,43 +1580,105 @@ void mxf_set_timestamp(const mxfTimestamp *value, uint8_t *result)
 
 uint16_t mxf_get_external_utf16string_size(const mxfUTF16Char *value)
 {
-    return (uint16_t)((wcslen(value) + 1) * mxfUTF16Char_extlen);
+    size_t valueLen = wcslen(value);
+    if (valueLen >= UINT16_MAX / 2)
+    {
+        return UINT16_MAX - 1; /* not null terminated in output */
+    }
+    else
+    {
+        return (uint16_t)((valueLen + 1) * 2);
+    }
 }
 
 /* Note: string must be null terminated */
-void mxf_set_utf16string(const mxfUTF16Char *value, uint8_t *result)
+void mxf_set_utf16string(const mxfUTF16Char *value, uint8_t *result, uint16_t resultSize)
 {
-    uint16_t size = (uint16_t)(wcslen(value) + 1);
+    uint16_t size = mxf_get_external_utf16string_size(value) / 2;
     uint16_t i;
+
+    if (size * 2 > resultSize)
+    {
+        size = resultSize / 2;
+    }
+
     for (i = 0; i < size; i++)
     {
-        result[i * 2] =     (value[i] >> 8) & 0xff;
+        result[i * 2]     = (value[i] >> 8) & 0xff;
         result[i * 2 + 1] =  value[i]       & 0xff;
     }
 }
 
 /* Note: string must be null terminated */
-void mxf_set_fixed_size_utf16string(const mxfUTF16Char *value, uint16_t size, uint8_t *result)
+void mxf_set_fixed_size_utf16string(const mxfUTF16Char *value, uint16_t valueSize, uint8_t *result)
 {
-    uint16_t stringSize = (uint16_t)(wcslen(value) + 1);
+    uint16_t size = mxf_get_external_utf16string_size(value) / 2;
+    uint16_t resultSize;
     uint16_t i;
 
-    if (stringSize > size)
+    if (valueSize > UINT16_MAX / 2)
     {
-        stringSize = size;
+        resultSize = UINT16_MAX - 1;
+    }
+    else
+    {
+        resultSize = valueSize * 2;
     }
 
-    for (i = 0; i < stringSize; i++)
+    if (size * 2 > resultSize)
     {
-        result[i * 2] =    (value[i] >> 8) & 0xff;
-        result[i * 2 + 1] = value[i]       & 0xff;
+        size = resultSize / 2;
+    }
+
+    for (i = 0; i < size; i++)
+    {
+        result[i * 2]     = (value[i] >> 8) & 0xff;
+        result[i * 2 + 1] =  value[i]       & 0xff;
     }
 
     /* pad remaining space with zeros */
-    if (stringSize < size)
+    if (size * 2 < resultSize)
     {
-        memset(&result[stringSize * mxfUTF16Char_extlen], 0, (size - stringSize) * mxfUTF16Char_extlen);
+        memset(&result[size * 2], 0, resultSize - size * 2);
     }
+}
+
+uint16_t mxf_get_external_utf8string_size(const char *value)
+{
+    size_t valueLen = strlen(value);
+    if (valueLen > UINT16_MAX)
+    {
+        return UINT16_MAX; /* not null terminated in output */
+    }
+    else
+    {
+        return (uint16_t)(valueLen + 1);
+    }
+}
+
+/* Note: string must be null terminated */
+void mxf_set_utf8string(const char *value, uint8_t *result, uint16_t resultSize)
+{
+    strncpy((char*)result, value, resultSize);
+}
+
+uint16_t mxf_get_external_iso7string_size(const char *value)
+{
+    size_t valueLen = strlen(value);
+    if (valueLen > UINT16_MAX)
+    {
+        return UINT16_MAX; /* not null terminated in output */
+    }
+    else
+    {
+        return (uint16_t)(valueLen + 1);
+    }
+}
+
+/* Note: string must be null terminated */
+void mxf_set_iso7string(const char *value, uint8_t *result, uint16_t resultSize)
+{
+    strncpy((char*)result, value, resultSize);
 }
 
 void mxf_set_strongref(const MXFMetadataSet *value, uint8_t *result)
@@ -1610,6 +1730,11 @@ void mxf_set_rgba_layout(const mxfRGBALayout *value, uint8_t *result)
     }
 }
 
+void mxf_set_aes3_fixed_data(const mxfAES3FixedData *value, uint8_t *result)
+{
+    memcpy(result, value->bytes, mxfAES3FixedData_extlen);
+}
+
 void mxf_set_array_header(uint32_t arrayLen, uint32_t arrayElementLen, uint8_t *result)
 {
     mxf_set_uint32(arrayLen, result);
@@ -1617,19 +1742,39 @@ void mxf_set_array_header(uint32_t arrayLen, uint32_t arrayElementLen, uint8_t *
 }
 
 
-int mxf_set_item_value(MXFMetadataItem *item, const uint8_t *value, uint16_t len)
+int mxf_alloc_item_value(MXFMetadataItem *item, uint16_t len, uint8_t **value)
 {
-    if (item->value != NULL && item->length != len)
+    if (item->value && item->length != len)
     {
         free_metadata_item_value(item);
     }
-    if (item->value == NULL)
+    if (!item->value)
     {
         CHK_MALLOC_ARRAY_ORET(item->value, uint8_t, len);
     }
-    memcpy(item->value, value, len);
-    item->length = len;
     item->isPersistent = 0;
+    item->length = len;
+
+    *value = item->value;
+    return 1;
+}
+
+int mxf_complete_item_value(MXFMetadataItem *item, uint16_t len)
+{
+    CHK_ORET(len <= item->length);
+    item->length = len;
+
+    return 1;
+}
+
+int mxf_set_item_value(MXFMetadataItem *item, const uint8_t *value, uint16_t len)
+{
+    if (value != item->value) {
+        uint8_t *itemValue;
+        CHK_ORET(mxf_alloc_item_value(item, len, &itemValue));
+        memcpy(itemValue, value, len);
+    }
+    CHK_ORET(mxf_complete_item_value(item, len));
 
     return 1;
 }
@@ -1749,31 +1894,71 @@ int mxf_set_timestamp_item(MXFMetadataSet *set, const mxfKey *itemKey, const mxf
 int mxf_set_utf16string_item(MXFMetadataSet *set, const mxfKey *itemKey, const mxfUTF16Char *value)
 {
     MXFMetadataItem *newItem = NULL;
-    uint8_t buffer[65536];
+    uint16_t itemValueSize = mxf_get_external_utf16string_size(value);
+    uint8_t *itemValue = NULL;
 
     assert(set->headerMetadata != NULL);
 
     CHK_ORET(get_or_create_set_item(set->headerMetadata, set, itemKey, &newItem));
+    CHK_ORET(mxf_alloc_item_value(newItem, itemValueSize, &itemValue));
 
-    mxf_set_utf16string(value, buffer);
-    CHK_ORET(mxf_set_item_value(newItem, buffer, (uint16_t)((wcslen(value) + 1) * mxfUTF16Char_extlen)));
+    mxf_set_utf16string(value, itemValue, itemValueSize);
+    CHK_ORET(mxf_complete_item_value(newItem, itemValueSize));
 
     return 1;
 }
 
 /* string must be null terminated */
 int mxf_set_fixed_size_utf16string_item(MXFMetadataSet *set, const mxfKey *itemKey, const mxfUTF16Char *value,
-    uint16_t size)
+    uint16_t valueSize)
 {
     MXFMetadataItem *newItem = NULL;
-    uint8_t buffer[65536];
+    uint16_t itemValueSize = valueSize * 2;
+    uint8_t *itemValue = NULL;
 
     assert(set->headerMetadata != NULL);
 
     CHK_ORET(get_or_create_set_item(set->headerMetadata, set, itemKey, &newItem));
+    CHK_ORET(mxf_alloc_item_value(newItem, itemValueSize, &itemValue));
 
-    mxf_set_fixed_size_utf16string(value, size, buffer);
-    CHK_ORET(mxf_set_item_value(newItem, buffer, size * mxfUTF16Char_extlen));
+    mxf_set_fixed_size_utf16string(value, itemValueSize / 2, itemValue);
+    CHK_ORET(mxf_complete_item_value(newItem, itemValueSize));
+
+    return 1;
+}
+
+/* string must be null terminated */
+int mxf_set_utf8string_item(MXFMetadataSet *set, const mxfKey *itemKey, const char *value)
+{
+    MXFMetadataItem *newItem = NULL;
+    uint16_t itemValueSize = mxf_get_external_utf8string_size(value);
+    uint8_t *itemValue = NULL;
+
+    assert(set->headerMetadata != NULL);
+
+    CHK_ORET(get_or_create_set_item(set->headerMetadata, set, itemKey, &newItem));
+    CHK_ORET(mxf_alloc_item_value(newItem, itemValueSize, &itemValue));
+
+    mxf_set_utf8string(value, itemValue, itemValueSize);
+    CHK_ORET(mxf_complete_item_value(newItem, itemValueSize));
+
+    return 1;
+}
+
+/* string must be null terminated */
+int mxf_set_iso7string_item(MXFMetadataSet *set, const mxfKey *itemKey, const char *value)
+{
+    MXFMetadataItem *newItem = NULL;
+    uint16_t itemValueSize = mxf_get_external_iso7string_size(value);
+    uint8_t *itemValue = NULL;
+
+    assert(set->headerMetadata != NULL);
+
+    CHK_ORET(get_or_create_set_item(set->headerMetadata, set, itemKey, &newItem));
+    CHK_ORET(mxf_alloc_item_value(newItem, itemValueSize, &itemValue));
+
+    mxf_set_iso7string(value, itemValue, itemValueSize);
+    CHK_ORET(mxf_complete_item_value(newItem, itemValueSize));
 
     return 1;
 }
@@ -2075,6 +2260,54 @@ int mxf_get_utf16string_item(MXFMetadataSet *set, const mxfKey *itemKey, mxfUTF1
     CHK_ORET(mxf_get_item(set, itemKey, &item));
 
     mxf_get_utf16string(item->value, item->length, value);
+
+    return 1;
+}
+
+/* Note: the size always includes a null terminator */
+int mxf_get_utf8string_item_size(MXFMetadataSet *set, const mxfKey *itemKey, uint16_t *size)
+{
+    MXFMetadataItem *item = NULL;
+
+    CHK_ORET(mxf_get_item(set, itemKey, &item));
+
+    *size = mxf_get_utf8string_size(item->value, item->length);
+
+    return 1;
+}
+
+/* Note: returns a null-terminated UTF8 string */
+int mxf_get_utf8string_item(MXFMetadataSet *set, const mxfKey *itemKey, char *value)
+{
+    MXFMetadataItem *item = NULL;
+
+    CHK_ORET(mxf_get_item(set, itemKey, &item));
+
+    mxf_get_utf8string(item->value, item->length, value);
+
+    return 1;
+}
+
+/* Note: the size always includes a null terminator */
+int mxf_get_iso7string_item_size(MXFMetadataSet *set, const mxfKey *itemKey, uint16_t *size)
+{
+    MXFMetadataItem *item = NULL;
+
+    CHK_ORET(mxf_get_item(set, itemKey, &item));
+
+    *size = mxf_get_iso7string_size(item->value, item->length);
+
+    return 1;
+}
+
+/* Note: returns a null-terminated ISO-7 string */
+int mxf_get_iso7string_item(MXFMetadataSet *set, const mxfKey *itemKey, char *value)
+{
+    MXFMetadataItem *item = NULL;
+
+    CHK_ORET(mxf_get_item(set, itemKey, &item));
+
+    mxf_get_iso7string(item->value, item->length, value);
 
     return 1;
 }

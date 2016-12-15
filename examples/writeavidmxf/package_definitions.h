@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __PACKAGE_DEFINITIONS_H__
-#define __PACKAGE_DEFINITIONS_H__
+#ifndef PACKAGE_DEFINITIONS_H_
+#define PACKAGE_DEFINITIONS_H_
 
 
 #ifdef __cplusplus
@@ -73,6 +73,7 @@ typedef enum
     DNxHD1080p1253,
     UncUYVY,
     Unc1080iUYVY,
+    Unc1080pUYVY,
     Unc720pUYVY,
     PCM
 } EssenceType;
@@ -162,7 +163,7 @@ typedef struct
 } Locator;
 
 
-typedef struct _PackageDefinitions
+typedef struct PackageDefinitions
 {
     Package *materialPackage;
     MXFList fileSourcePackages;

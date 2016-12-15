@@ -43,7 +43,7 @@
 #include <mxf/mxf_macros.h>
 
 
-#define PAGE_SIZE   (10 * 1024 * 1024)
+#define PAGE_SIZE   1024
 #define DATA_SIZE   (PAGE_SIZE * 3 / 2)
 
 static const char *g_testFile = "pagetest___%d.mxf";

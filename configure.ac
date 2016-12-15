@@ -25,8 +25,15 @@ AC_CONFIG_SRCDIR([mxf/mxf.h])
 AC_CONFIG_HEADER([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
-AM_INIT_AUTOMAKE([-Wall -Werror  -Wno-extra-portability])
-m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+dnl [TODO] check these changes that were merged from BBC
+dnl AM_INIT_AUTOMAKE([-Wall -Werror  -Wno-extra-portability])
+dnl m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+
+AM_INIT_AUTOMAKE([1.11 -Wall parallel-tests tar-ustar])
+AM_SILENT_RULES([yes])
+
+dnl define for automake 1.12 to avoid warnings
+m4_ifdef([AM_PROG_AR], [AM_PROG_AR])
 
 
 dnl-----------------------------------------------------------------------------
@@ -55,11 +62,6 @@ AC_PROG_LIBTOOL
 AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_INSTALL
-
-AC_CHECK_PROGS(MD5TOOL, [md5sum md5])
-if test x"$MD5TOOL" = x"" ; then
-	AC_MSG_WARN(Missing md5sum/md5 tool. Cannot make check.)
-fi
 
 
 dnl-----------------------------------------------------------------------------
@@ -206,7 +208,7 @@ AC_SYS_LARGEFILE
 AC_FUNC_FSEEKO
 
 
-AC_CHECK_FUNCS([gettimeofday memmove memset sqrt strerror strncasecmp])
+AC_CHECK_FUNCS([gettimeofday memmove memset sqrt strerror strncasecmp strerror_r])
 AC_CHECK_FUNC([strdup],,
 			  AC_ERROR(require implementation for missing strdup function))
 
@@ -216,11 +218,8 @@ dnl -- Compiler flags etc.
 dnl-----------------------------------------------------------------------------
 
 WARN_CFLAGS=
-if test x"$GCC" = xyes; then
-	WARN_CFLAGS="-W -Wall"
-fi
+AC_APPEND_SUPPORTED_CFLAGS(WARN_CFLAGS, [-W -Wall])
 AC_SUBST(WARN_CFLAGS)
-
 
 LIBMXF_CFLAGS="$WARN_CFLAGS -I\$(top_srcdir)"
 AC_SUBST(LIBMXF_CFLAGS)
@@ -232,6 +231,9 @@ LIBMXF_LDADDLIBS="$LIBMXF_LIBADDLIBS \
 	\$(top_builddir)/mxf/libMXF-$LIBMXF_MAJORMINOR.la"
 AC_SUBST(LIBMXF_LDADDLIBS)
 
+LIBMXF_LDFLAGS=
+AC_APPEND_SUPPORTED_LDFLAGS(LIBMXF_LDFLAGS, [-Wl,--no-undefined])
+AC_SUBST(LIBMXF_LDFLAGS)
 
 if test x"$with_aafsdk" != xno; then
 	AAFSDK_CXXFLAGS="-I$with_aafsdk/include"
@@ -296,7 +298,7 @@ AC_CONFIG_FILES([
     tools/MXFDump/Makefile
     tools/extract_avid_extensions/Makefile
     msvc_build/Makefile
-    msvc_build/vs8/Makefile
+    msvc_build/vs10/Makefile
     libMXF.pc])
 
 AC_OUTPUT

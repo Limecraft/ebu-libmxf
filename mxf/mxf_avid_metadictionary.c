@@ -38,6 +38,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <limits.h>
 
 #include <mxf/mxf.h>
 #include <mxf/mxf_avid.h>
@@ -57,7 +58,7 @@ typedef struct
     mxfUL targetIdentification;
 } WeakRefData;
 
-struct _AvidMetaDictionary
+struct AvidMetaDictionary
 {
     MXFHeaderMetadata *headerMetadata;
     MXFMetadataSet *metaDictSet;
@@ -168,14 +169,18 @@ static int append_name_to_string_array(MXFMetadataSet *set, const mxfKey *itemKe
         CHK_ORET(mxf_get_item(set, itemKey, &namesItem));
         existingNameArraySize = namesItem->length;
     }
-    nameArraySize = existingNameArraySize + (uint16_t)(mxfUTF16Char_extlen * (wcslen(name) + 1));
+    nameArraySize = mxf_get_external_utf16string_size(name);
+    CHK_ORET(nameArraySize < UINT16_MAX - existingNameArraySize);
+    nameArraySize += existingNameArraySize;
 
     CHK_MALLOC_ARRAY_ORET(nameArray, uint8_t, nameArraySize);
     if (existingNameArraySize > 0)
     {
         memcpy(nameArray, namesItem->value, existingNameArraySize);
     }
-    mxf_set_utf16string(name, &nameArray[existingNameArraySize]);
+    mxf_set_utf16string(name, &nameArray[existingNameArraySize], nameArraySize - existingNameArraySize);
+    nameArray[nameArraySize - 2] = 0;
+    nameArray[nameArraySize - 1] = 0;
 
     CHK_OFAIL(mxf_set_item(set, itemKey, nameArray, nameArraySize));
 
@@ -236,12 +241,14 @@ static void free_avid_metadictionary(AvidMetaDictionary **metaDict)
 
 int mxf_avid_is_metadictionary(MXFDataModel *dataModel, const mxfKey *setKey)
 {
-    return mxf_is_subclass_of(dataModel, setKey, &MXF_SET_K(MetaDictionary));
+    (void)dataModel;
+    return mxf_equals_key(setKey, &MXF_SET_K(MetaDictionary));
 }
 
 int mxf_avid_is_metadef(MXFDataModel *dataModel, const mxfKey *setKey)
 {
-    return mxf_is_subclass_of(dataModel, setKey, &MXF_SET_K(MetaDefinition));
+    (void)dataModel;
+    return mxf_equals_key_prefix(setKey, &MXF_SET_K(MetaDefinition), 13);
 }
 
 

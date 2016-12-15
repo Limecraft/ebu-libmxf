@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_PARTITION_H__
-#define __MXF_PARTITION_H__
+#ifndef MXF_PARTITION_H_
+#define MXF_PARTITION_H_
 
 
 #ifdef __cplusplus
@@ -79,6 +79,7 @@ typedef struct
 
 int mxf_is_header_partition_pack(const mxfKey *key);
 int mxf_is_body_partition_pack(const mxfKey *key);
+int mxf_is_generic_stream_partition_pack(const mxfKey *key);
 int mxf_is_footer_partition_pack(const mxfKey *key);
 int mxf_is_partition_pack(const mxfKey *key);
 int mxf_partition_is_closed(const mxfKey *key);
@@ -113,7 +114,9 @@ int mxf_append_partition_esscont_label(MXFPartition *partition, const mxfUL *lab
 
 int mxf_write_partition(MXFFile *mxfFile, MXFPartition *partition);
 int mxf_update_partitions(MXFFile *mxfFile, MXFFilePartitions *partitions);
-int mxf_read_partition(MXFFile *mxfFile, const mxfKey *key, MXFPartition **partition);
+void mxf_update_partitions_in_memory(MXFFilePartitions *partitions);
+int mxf_rewrite_partitions(MXFFile *mxfFile, MXFFilePartitions *partitions);
+int mxf_read_partition(MXFFile *mxfFile, const mxfKey *key, uint64_t len, MXFPartition **partition);
 
 int mxf_is_filler(const mxfKey *key);
 int mxf_fill_to_kag(MXFFile *mxfFile, MXFPartition *partition);

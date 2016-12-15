@@ -31,18 +31,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_READER_INT_H__
-#define __MXF_READER_INT_H__
+#ifndef MXF_READER_INT_H_
+#define MXF_READER_INT_H_
 
 
 #include "mxf_reader.h"
 
 
-typedef struct _EssenceReaderData EssenceReaderData;
+typedef struct EssenceReaderData EssenceReaderData;
 
-typedef struct _EssenceTrack
+typedef struct EssenceTrack
 {
-    struct _EssenceTrack *next;
+    struct EssenceTrack *next;
 
     int isVideo;
     uint32_t trackNumber;
@@ -108,7 +108,7 @@ typedef struct
     uint8_t frame;
 } TimecodeIndex;
 
-struct _MXFReader
+struct MXFReader
 {
     MXFFile *mxfFile;
     MXFClip clip;
