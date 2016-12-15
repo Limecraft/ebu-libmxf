@@ -1338,6 +1338,7 @@ void mxf_get_fixed_item_length_utf16string(const uint8_t *value, uint16_t valueL
     {
         result[i] = 0;
     }
+}
 
 /* Note: the size always includes a null terminator */
 uint16_t mxf_get_utf8string_size(const uint8_t *value, uint16_t valueLen)

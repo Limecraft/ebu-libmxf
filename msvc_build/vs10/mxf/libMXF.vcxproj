@@ -178,10 +178,13 @@
     <ClCompile Include="..\..\..\mxf\mxf_partition.c" />
     <ClCompile Include="..\..\..\mxf\mxf_primer.c" />
     <ClCompile Include="..\..\..\mxf\mxf_rw_intl_file.c" />
+    <ClCompile Include="..\..\..\mxf\mxf_stream_file.c" />
+    <ClCompile Include="..\..\..\mxf\mxf_tree.c" />
     <ClCompile Include="..\..\..\mxf\mxf_utils.c" />
     <ClCompile Include="..\..\..\mxf\mxf_uu_metadata.c" />
     <ClCompile Include="..\..\..\mxf\mxf_version.c" />
     <ClCompile Include="..\..\..\mxf\mxf_win32_file.c" />
+    <ClCompile Include="..\..\..\mxf\mxf_win32_mmap.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\inttypes.h" />
