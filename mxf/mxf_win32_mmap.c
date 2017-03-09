@@ -169,7 +169,7 @@ static BOOL mxf_win32_mmap_MapViewOfFile(MXFFileSysData *sysData)
 
     dwDesiredAccess = sysData->openMode == READ_MODE ? FILE_MAP_READ : (FILE_MAP_READ | FILE_MAP_WRITE);
 
-    sysData->size = viewSize;
+    sysData->size = (uint32_t)viewSize;
     sysData->pData = (uint8_t*)MapViewOfFile(sysData->hmap, dwDesiredAccess,
                         HIDWORD(sysData->offset), LODWORD(sysData->offset), viewSize);
     return sysData->pData != NULL;
