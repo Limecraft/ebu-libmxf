@@ -283,6 +283,19 @@ static const mxfUL MXF_CMDEF_L(VC3_1080P_1259) = MXF_VC3_CMDEV_L(0x19);
 static const mxfUL MXF_CMDEF_L(VC3_1080I_1260) = MXF_VC3_CMDEV_L(0x1a);
 
 
+/* RDD-36 (ProRes) */
+
+#define MXF_RDD36_CMDEV_L(variant) \
+    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0d, 0x04, 0x01, 0x02, 0x02, 0x03, 0x06, variant, 0x00}
+
+static const mxfUL MXF_CMDEF_L(RDD36_422_PROXY) = MXF_RDD36_CMDEV_L(0x01);
+static const mxfUL MXF_CMDEF_L(RDD36_422_LT)    = MXF_RDD36_CMDEV_L(0x02);
+static const mxfUL MXF_CMDEF_L(RDD36_422)       = MXF_RDD36_CMDEV_L(0x03);
+static const mxfUL MXF_CMDEF_L(RDD36_422_HQ)    = MXF_RDD36_CMDEV_L(0x04);
+static const mxfUL MXF_CMDEF_L(RDD36_4444)      = MXF_RDD36_CMDEV_L(0x05);
+static const mxfUL MXF_CMDEF_L(RDD36_4444_XQ)   = MXF_RDD36_CMDEV_L(0x06);
+
+
 /* uncompressed picture coding */
 
 /* fourcc 2vuy */
@@ -496,6 +509,14 @@ static const mxfUL MXF_EC_L(VC2ClipWrapped)  = MXF_VC2_EC_L(0x02);
 
 static const mxfUL MXF_EC_L(VC3FrameWrapped) = MXF_VC3_EC_L(0x01);
 static const mxfUL MXF_EC_L(VC3ClipWrapped)  = MXF_VC3_EC_L(0x02);
+
+
+/* RDD-36 (ProRes) */
+
+#define MXF_RDD36_EC_L(byte15) \
+    MXF_GENERIC_CONTAINER_LABEL(0x0d, 0x1c, byte15, 0x00)
+
+static const mxfUL MXF_EC_L(RDD36FrameWrapped) = MXF_RDD36_EC_L(0x01);
 
 
 /* Data */
@@ -781,6 +802,17 @@ static const mxfKey MXF_EE_K(SDTI_CP_System_Pack) =
 
 #define MXF_VC3_FRAME_WRAPPED_EE_TYPE      0x05
 #define MXF_VC3_CLIP_WRAPPED_EE_TYPE       0x06
+
+
+/* RDD-36 (ProRes) */
+
+#define MXF_RDD36_EE_K(elecount, eletype, elenum) \
+    MXF_GENERIC_CONTAINER_ELEMENT_KEY(0x01, 0x15, elecount, eletype, elenum)
+
+#define MXF_RDD36_TRACK_NUM(elecount, eletype, elenum) \
+    MXF_TRACK_NUM(0x15, elecount, eletype, elenum)
+
+#define MXF_RDD36_FRAME_WRAPPED_EE_TYPE   0x17
 
 
 /* Data mappings */
