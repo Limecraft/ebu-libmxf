@@ -1421,19 +1421,23 @@ int mxf_dereference_s(MXFHeaderMetadata *headerMetadata, MXFListIterator *setsIt
     }
 
     /* go back to beginning and try find it before the previous position in the list */
+    mxf_initialise_sets_iter(headerMetadata, setsIter);
+    while (mxf_next_list_iter_element(setsIter) &&
+           (startIndex == MXF_LIST_NPOS || mxf_get_list_iter_index(setsIter) < startIndex))
+    {
+        setInList = (MXFMetadataSet*)mxf_get_iter_element(setsIter);
+
+        if (mxf_equals_uuid(uuid, &setInList->instanceUID))
+        {
+            *set = setInList;
+            return 1;
+        }
+    }
+
+    /* reset the iterator to where it was */
     if (startIndex != MXF_LIST_NPOS)
     {
-        mxf_initialise_sets_iter(headerMetadata, setsIter);
-        while (mxf_next_list_iter_element(setsIter) && mxf_get_list_iter_index(setsIter) < startIndex)
-        {
-            setInList = (MXFMetadataSet*)mxf_get_iter_element(setsIter);
-
-            if (mxf_equals_uuid(uuid, &setInList->instanceUID))
-            {
-                *set = setInList;
-                return 1;
-            }
-        }
+        mxf_initialise_list_iter_at(setsIter, &headerMetadata->sets, startIndex);
     }
 
     return 0;
