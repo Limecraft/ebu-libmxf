@@ -333,6 +333,13 @@ void mxf_initialise_list_iter_at(MXFListIterator *iter, const MXFList *list, siz
     }
 }
 
+void mxf_copy_list_iter(const MXFListIterator *fromIter, MXFListIterator *toIter)
+{
+    toIter->nextElement = fromIter->nextElement;
+    toIter->data = fromIter->data;
+    toIter->index = fromIter->index;
+}
+
 int mxf_next_list_iter_element(MXFListIterator *iter)
 {
     if (iter->nextElement) {
@@ -359,4 +366,3 @@ size_t mxf_get_list_iter_index(MXFListIterator *iter)
 {
     return iter->index;
 }
-

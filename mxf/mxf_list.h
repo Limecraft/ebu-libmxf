@@ -92,6 +92,7 @@ void mxf_free_list_element_data(MXFList *list, void *data);
 
 void mxf_initialise_list_iter(MXFListIterator *iter, const MXFList *list);
 void mxf_initialise_list_iter_at(MXFListIterator *iter, const MXFList *list, size_t index);
+void mxf_copy_list_iter(const MXFListIterator *fromIter, MXFListIterator *toIter);
 int mxf_next_list_iter_element(MXFListIterator *iter);
 void* mxf_get_iter_element(MXFListIterator *iter);
 size_t mxf_get_list_iter_index(MXFListIterator *iter);

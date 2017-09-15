@@ -1396,6 +1396,9 @@ int mxf_dereference_s(MXFHeaderMetadata *headerMetadata, MXFListIterator *setsIt
 {
     MXFMetadataSet *setInList;
     size_t startIndex = mxf_get_list_iter_index(setsIter);
+    MXFListIterator origSetsIter;
+
+    mxf_copy_list_iter(setsIter, &origSetsIter);
 
     /* try find it at the previous position in the list */
     if (startIndex != MXF_LIST_NPOS)
@@ -1434,11 +1437,7 @@ int mxf_dereference_s(MXFHeaderMetadata *headerMetadata, MXFListIterator *setsIt
         }
     }
 
-    /* reset the iterator to where it was */
-    if (startIndex != MXF_LIST_NPOS)
-    {
-        mxf_initialise_list_iter_at(setsIter, &headerMetadata->sets, startIndex);
-    }
+    mxf_copy_list_iter(&origSetsIter, setsIter);
 
     return 0;
 }
