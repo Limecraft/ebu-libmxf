@@ -524,6 +524,8 @@ static const mxfUL MXF_EC_L(RDD36FrameWrapped) = MXF_RDD36_EC_L(0x01);
 static const mxfUL MXF_EC_L(VBIData) = MXF_GENERIC_CONTAINER_LABEL(0x09, 0x0d, 0x00, 0x00);
 static const mxfUL MXF_EC_L(ANCData) = MXF_GENERIC_CONTAINER_LABEL(0x09, 0x0e, 0x00, 0x00);
 
+static const mxfUL MXF_EC_L(TimedText) = MXF_GENERIC_CONTAINER_LABEL(0x0a, 0x13, 0x01, 0x01);
+
 
 
 /*
@@ -824,6 +826,11 @@ static const uint32_t MXF_EE_TRACKNUM(VBIData) = MXF_TRACK_NUM(0x17, 0x01, 0x01,
 static const uint32_t MXF_EE_TRACKNUM(ANCData) = MXF_TRACK_NUM(0x17, 0x01, 0x02, 0x01);
 
 
+static const mxfUL MXF_EE_K(TimedText) = MXF_GENERIC_CONTAINER_ELEMENT_KEY(0x01, 0x17, 0x01, 0x0b, 0x01);
+
+static const uint32_t MXF_EE_TRACKNUM(TimedText) = MXF_TRACK_NUM(0x17, 0x01, 0x0b, 0x01);
+
+
 
 /*
  *
@@ -932,5 +939,3 @@ static const mxfKey g_IndexTableSegment_key =
 
 
 #endif
-
-
