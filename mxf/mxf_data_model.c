@@ -501,32 +501,28 @@ int mxf_check_data_model(MXFDataModel *dataModel)
     while (mxf_next_list_iter_element(&iter1)) {
         itemDef1 = (MXFItemDef*)mxf_get_iter_element(&iter1);
 
-        /* check item def is contained in a set def */
-        if (mxf_equals_key(&itemDef1->setDefKey, &g_Null_Key)) {
-            char keyStr[KEY_STR_SIZE];
-            mxf_sprint_key(keyStr, &itemDef1->key);
-            mxf_log_warn("Found item def not contained in any set def. Key = %s"
-                         LOG_LOC_FORMAT, keyStr, LOG_LOC_PARAMS);
-            return 0;
-        }
-
         /* check with item defs with higher index in list */
         mxf_initialise_list_iter_at(&iter2, &dataModel->itemDefs, listIndex + 1);
         while (mxf_next_list_iter_element(&iter2)) {
             itemDef2 = (MXFItemDef*)mxf_get_iter_element(&iter2);
             if (mxf_equals_key(&itemDef1->key, &itemDef2->key)) {
-                char keyStr[KEY_STR_SIZE];
-                mxf_sprint_key(keyStr, &itemDef1->key);
-                mxf_log_warn("Duplicate item def found. Key = %s"
-                             LOG_LOC_FORMAT, keyStr, LOG_LOC_PARAMS);
-                return 0;
-            }
-            if (itemDef1->localTag != 0 && itemDef1->localTag == itemDef2->localTag) {
-                char keyStr[KEY_STR_SIZE];
-                mxf_sprint_key(keyStr, &itemDef1->key);
-                mxf_log_warn("Duplicate item def local tag found. LocalTag = 0x%04x, Key = %s"
-                             LOG_LOC_FORMAT, itemDef1->localTag, keyStr, LOG_LOC_PARAMS);
-                return 0;
+                /* if the items have the same key then check the local tags are identical */
+                if (itemDef1->localTag != itemDef2->localTag) {
+                    char keyStr[KEY_STR_SIZE];
+                    mxf_sprint_key(keyStr, &itemDef1->key);
+                    mxf_log_warn("Duplicate item defs have different local tags. Key = %s"
+                                 LOG_LOC_FORMAT, keyStr, LOG_LOC_PARAMS);
+                    return 0;
+                }
+            } else {
+                /* if the items do not have the same key then check the local tags are different */
+                if (itemDef1->localTag != 0 && itemDef1->localTag == itemDef2->localTag) {
+                    char keyStr[KEY_STR_SIZE];
+                    mxf_sprint_key(keyStr, &itemDef1->key);
+                    mxf_log_warn("Duplicate item def local tag found. LocalTag = 0x%04x, Key = %s"
+                                 LOG_LOC_FORMAT, itemDef1->localTag, keyStr, LOG_LOC_PARAMS);
+                    return 0;
+                }
             }
         }
 
@@ -646,4 +642,3 @@ int mxf_clone_set_def(MXFDataModel *fromDataModel, MXFSetDef *fromSetDef,
     *toSetDef = clonedSetDef;
     return 1;
 }
-
