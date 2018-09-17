@@ -66,6 +66,7 @@ typedef enum
 {
     COMMON_INDICATOR,
     FRAME_ONLY_NO_INDICATOR,
+    CLIP_ONLY_NO_INDICATOR,
     UNC_INDICATOR,
     D10_D11_INDICATOR,
     AES_BWF_INDICATOR,
@@ -118,6 +119,10 @@ static const ECLabelInfo EC_LABEL_INFO[] =
     {{GC_PREFIX, 0x0a, 0x0d, 0x01, 0x03, 0x01, 0x02, 0x11, 0x00, 0x00}, 14, COMMON_INDICATOR},
     // VC-1 Pictures
     {{GC_PREFIX, 0x0a, 0x0d, 0x01, 0x03, 0x01, 0x02, 0x12, 0x00, 0x00}, 14, COMMON_INDICATOR},
+    // D-Cinema Timed Text Stream
+    {{GC_PREFIX, 0x0a, 0x0d, 0x01, 0x03, 0x01, 0x02, 0x13, 0x01, 0x01},  0, CLIP_ONLY_NO_INDICATOR},
+    // D-Cinema Aux Data Essence
+    {{GC_PREFIX, 0x0a, 0x0d, 0x01, 0x03, 0x01, 0x02, 0x13, 0x02, 0x01},  0, FRAME_ONLY_NO_INDICATOR},
     // TIFF/EP
     {{GC_PREFIX, 0x0b, 0x0d, 0x01, 0x03, 0x01, 0x02, 0x14, 0x00, 0x00}, 14, COMMON_INDICATOR},
     // VC-2 Pictures
@@ -715,6 +720,8 @@ MXFEssenceWrappingType mxf_get_essence_wrapping_type(const mxfUL *label)
                     return MXF_CLIP_WRAPPED;
             } else if (EC_LABEL_INFO[i].indicator_type == FRAME_ONLY_NO_INDICATOR) {
                 return MXF_FRAME_WRAPPED;
+            } else if (EC_LABEL_INFO[i].indicator_type == CLIP_ONLY_NO_INDICATOR) {
+                return MXF_CLIP_WRAPPED;
             } else if (EC_LABEL_INFO[i].indicator_type == UNC_INDICATOR) {
                 if ((indicator_byte & 0x03) == 0x01)
                     return MXF_FRAME_WRAPPED;
