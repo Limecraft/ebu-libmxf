@@ -47,6 +47,16 @@ mxfKey g_KLVFill_key = /* g_LegacyKLVFill_key */
 
 
 
+void mxf_set_generalized_op_label(mxfUL *label, int item_complexity, int package_complexity, int qualifier)
+{
+    static const mxfUL base_label = MXF_GEN_OP_L(0x00, 0x00, 0x00);
+
+    memcpy(label, &base_label, sizeof(*label));
+    label->octet12 = item_complexity;
+    label->octet13 = package_complexity;
+    label->octet14 = qualifier;
+}
+
 int mxf_is_op_atom(const mxfUL *label)
 {
     static const mxfUL opAtomPrefix = MXF_ATOM_OP_L(0);
@@ -58,7 +68,7 @@ int mxf_is_op_atom(const mxfUL *label)
 
 int mxf_is_op_1a(const mxfUL *label)
 {
-    static const mxfUL op1APrefix = MXF_1A_OP_L(0);
+    static const mxfUL op1APrefix = MXF_GEN_OP_L(0x01, 0x01, 0x00);
 
     /* ignoring octet7, the registry version byte */
     return memcmp(label,          &op1APrefix,        7) == 0 &&
@@ -67,7 +77,7 @@ int mxf_is_op_1a(const mxfUL *label)
 
 int mxf_is_op_1b(const mxfUL *label)
 {
-    static const mxfUL op1BPrefix = MXF_1B_OP_L(0);
+    static const mxfUL op1BPrefix = MXF_GEN_OP_L(0x01, 0x02, 0x00);
 
     /* ignoring octet7, the registry version byte */
     return memcmp(label,          &op1BPrefix,        7) == 0 &&

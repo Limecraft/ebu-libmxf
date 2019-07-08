@@ -51,8 +51,8 @@ extern "C"
 
 #define MXF_OP_L(def, name) g_##name##_op_##def##_label
 
-#define MXF_OP_L_LABEL(regver, complexity, byte14, qualifier) \
-    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, regver, 0x0d, 0x01, 0x02, 0x01, complexity, byte14, qualifier, 0x00}
+#define MXF_OP_L_LABEL(regver, byte13, byte14, byte15) \
+    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, regver, 0x0d, 0x01, 0x02, 0x01, byte13, byte14, byte15, 0x00}
 
 
 /* OP-Atom labels */
@@ -66,26 +66,31 @@ static const mxfUL MXF_OP_L(atom, NTracks_1SourceClip)  = MXF_ATOM_OP_L(0x02);
 static const mxfUL MXF_OP_L(atom, NTracks_NSourceClips) = MXF_ATOM_OP_L(0x03);
 
 
-/* OP-1A labels */
+/* Generalized OP labels */
 
-#define MXF_1A_OP_L(qualifier) \
-    MXF_OP_L_LABEL(0x01, 0x01, 0x01, qualifier)
+#define MXF_GEN_OP_L(itemcomp, packagecomp, qualifier) \
+    MXF_OP_L_LABEL(0x01, itemcomp, packagecomp, qualifier)
 
-static const mxfUL MXF_OP_L(1a, UniTrack_Stream_Internal)   = MXF_1A_OP_L(0x01);
-static const mxfUL MXF_OP_L(1a, MultiTrack_Stream_Internal) = MXF_1A_OP_L(0x09);
-static const mxfUL MXF_OP_L(1a, MultiTrack_Stream_External) = MXF_1A_OP_L(0x0b);
+static const mxfUL MXF_OP_L(1a, UniTrack_Stream_Internal)   = MXF_GEN_OP_L(0x01, 0x01, 0x01);
+static const mxfUL MXF_OP_L(1a, MultiTrack_Stream_Internal) = MXF_GEN_OP_L(0x01, 0x01, 0x09);
+static const mxfUL MXF_OP_L(1a, MultiTrack_Stream_External) = MXF_GEN_OP_L(0x01, 0x01, 0x0b);
+
+static const mxfUL MXF_OP_L(1b, UniTrack_Stream_Internal)      = MXF_GEN_OP_L(0x01, 0x02, 0x01);
+static const mxfUL MXF_OP_L(1b, UniTrack_NonStream_External)   = MXF_GEN_OP_L(0x01, 0x02, 0x07);
+static const mxfUL MXF_OP_L(1b, MultiTrack_Stream_Internal)    = MXF_GEN_OP_L(0x01, 0x02, 0x09);
+static const mxfUL MXF_OP_L(1b, MultiTrack_NonStream_External) = MXF_GEN_OP_L(0x01, 0x02, 0x0f);
+
+static const mxfUL MXF_OP_L(2a, UniTrack_Stream_Internal)   = MXF_GEN_OP_L(0x02, 0x01, 0x01);
+static const mxfUL MXF_OP_L(2a, MultiTrack_Stream_Internal) = MXF_GEN_OP_L(0x02, 0x01, 0x09);
+
+static const mxfUL MXF_OP_L(2b, UniTrack_Stream_Internal)   = MXF_GEN_OP_L(0x02, 0x02, 0x01);
+static const mxfUL MXF_OP_L(2b, MultiTrack_Stream_Internal) = MXF_GEN_OP_L(0x02, 0x02, 0x09);
+
+static const mxfUL MXF_OP_L(3b, UniTrack_Stream_Internal)   = MXF_GEN_OP_L(0x03, 0x02, 0x01);
+static const mxfUL MXF_OP_L(3b, MultiTrack_Stream_Internal) = MXF_GEN_OP_L(0x03, 0x02, 0x09);
 
 
-/* OP-1B labels */
-
-#define MXF_1B_OP_L(qualifier) \
-    MXF_OP_L_LABEL(0x01, 0x01, 0x02, qualifier)
-
-static const mxfUL MXF_OP_L(1b, UniTrack_Stream_Internal)       = MXF_1B_OP_L(0x01);
-static const mxfUL MXF_OP_L(1b, UniTrack_NonStream_External)    = MXF_1B_OP_L(0x07);
-static const mxfUL MXF_OP_L(1b, MultiTrack_Stream_Internal)     = MXF_1B_OP_L(0x09);
-static const mxfUL MXF_OP_L(1b, MultiTrack_NonStream_External)  = MXF_1B_OP_L(0x0f);
-
+void mxf_set_generalized_op_label(mxfUL *label, int item_complexity, int package_complexity, int qualifier);
 
 int mxf_is_op_atom(const mxfUL *label);
 int mxf_is_op_1a(const mxfUL *label);
