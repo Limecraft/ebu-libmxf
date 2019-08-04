@@ -71,7 +71,7 @@
 #elif defined(__GNUC__) && defined(__ppc__) && defined(__APPLE__)
 #define MXF_COMPILER_GCC_PPC_MACOSX
 #define MXF_OS_MACOSX
-#elif defined(__GNUC__) && defined(__i386__) && defined(__APPLE__)
+#elif defined(__GNUC__) && defined(__APPLE__)
 #define MXF_COMPILER_GCC_INTEL_MACOSX
 #define MXF_OS_MACOSX
 #elif defined(__GNUC__) && defined(__powerpc__) && defined(__linux__)
@@ -383,7 +383,7 @@ mxfUInt08 hostByteOrder(void);
 #if defined(MXF_OS_WINDOWS)
 #include <windows.h>
 typedef HANDLE mxfFile;
-#elif defined(MXF_OS_MACOSX)
+#elif defined(MXF_OS_MACOSX) && defined(__i386__)
 #include <CoreServices/CoreServices.h>
 typedef SInt16 mxfFile;
 #else
@@ -914,7 +914,7 @@ mxfUInt64 size(mxfFile infile)
   return result;
 }
 
-#elif defined(MXF_OS_MACOSX)
+#elif defined(MXF_OS_MACOSX) && defined(__i386__)
 mxfFile openExistingRead(char* fileName)
 {
   const UInt8* name = reinterpret_cast<UInt8*>(fileName);
