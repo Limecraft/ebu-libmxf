@@ -126,7 +126,7 @@ static BOOL mxf_win32_mmap_CreateFileMapping(MXFFileSysData *sysData)
 
 static BOOL mxf_win32_mmap_MapViewOfFile(MXFFileSysData *sysData)
 {
-    size_t viewSize;
+    uint32_t viewSize;
     DWORD dwDesiredAccess;
 
     // unmap old view
@@ -143,7 +143,7 @@ static BOOL mxf_win32_mmap_MapViewOfFile(MXFFileSysData *sysData)
     {
         if (sysData->openMode == READ_MODE)
         {
-            viewSize = (size_t)(sysData->diskFileSize - sysData->offset);
+            viewSize = (uint32_t)(sysData->diskFileSize - sysData->offset);
         }
         else /* NEW_MODE, MODIFY_MODE */
         {

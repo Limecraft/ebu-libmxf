@@ -1447,6 +1447,9 @@ int mxf_dereference_s(MXFHeaderMetadata *headerMetadata, MXFListIterator *setsIt
 {
     MXFMetadataSet *setInList;
     size_t startIndex = mxf_get_list_iter_index(setsIter);
+    MXFListIterator origSetsIter;
+
+    mxf_copy_list_iter(setsIter, &origSetsIter);
 
     /* try find it at the previous position in the list */
     if (startIndex != MXF_LIST_NPOS)
@@ -1472,20 +1475,20 @@ int mxf_dereference_s(MXFHeaderMetadata *headerMetadata, MXFListIterator *setsIt
     }
 
     /* go back to beginning and try find it before the previous position in the list */
-    if (startIndex != MXF_LIST_NPOS)
+    mxf_initialise_sets_iter(headerMetadata, setsIter);
+    while (mxf_next_list_iter_element(setsIter) &&
+           (startIndex == MXF_LIST_NPOS || mxf_get_list_iter_index(setsIter) < startIndex))
     {
-        mxf_initialise_sets_iter(headerMetadata, setsIter);
-        while (mxf_next_list_iter_element(setsIter) && mxf_get_list_iter_index(setsIter) < startIndex)
-        {
-            setInList = (MXFMetadataSet*)mxf_get_iter_element(setsIter);
+        setInList = (MXFMetadataSet*)mxf_get_iter_element(setsIter);
 
-            if (mxf_equals_uuid(uuid, &setInList->instanceUID))
-            {
-                *set = setInList;
-                return 1;
-            }
+        if (mxf_equals_uuid(uuid, &setInList->instanceUID))
+        {
+            *set = setInList;
+            return 1;
         }
     }
+
+    mxf_copy_list_iter(&origSetsIter, setsIter);
 
     return 0;
 }

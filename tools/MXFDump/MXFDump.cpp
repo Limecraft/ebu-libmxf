@@ -74,8 +74,14 @@
 #elif defined(__GNUC__) && defined(__i386__) && defined(__APPLE__)
 #define MXF_COMPILER_GCC_INTEL_MACOSX
 #define MXF_OS_MACOSX
+#elif defined(__GNUC__) && defined(__x86_64__) && defined(__APPLE__)
+#define MXF_COMPILER_GCC_INTEL_X86_64_MACOSX
+#define MXF_OS_MACOSX
 #elif defined(__GNUC__) && defined(__powerpc__) && defined(__linux__)
 #define MXF_COMPILER_GCC_PPC_LINUX
+#define MXF_OS_UNIX
+#elif defined(__GNUC__) && defined(__arm__) && defined(__linux__)
+#define MXF_COMPILER_GCC_ARM_LINUX
 #define MXF_OS_UNIX
 #elif defined(mips) && defined(sgi)
 #define MXF_COMPILER_SGICC_MIPS_SGI
@@ -230,7 +236,35 @@ typedef unsigned long long int mxfUInt64;
 #define MXFPRIx16 "hx"
 #define MXFPRIx32 "lx"
 #define MXFPRIx64 "llx"
+#elif defined(MXF_COMPILER_GCC_INTEL_X86_64_MACOSX)
+typedef unsigned char          mxfUInt08;
+typedef unsigned short int     mxfUInt16;
+typedef unsigned int           mxfUInt32;
+typedef unsigned long long int mxfUInt64;
+
+#define MXFPRIu08 "u"
+#define MXFPRIu16 "hu"
+#define MXFPRIu32 "u"
+#define MXFPRIu64 "llu"
+#define MXFPRIx08 "x"
+#define MXFPRIx16 "hx"
+#define MXFPRIx32 "x"
+#define MXFPRIx64 "llx"
 #elif defined(MXF_COMPILER_GCC_PPC_LINUX)
+typedef unsigned char          mxfUInt08;
+typedef unsigned short int     mxfUInt16;
+typedef unsigned long int      mxfUInt32;
+typedef unsigned long long int mxfUInt64;
+
+#define MXFPRIu08 "u"
+#define MXFPRIu16 "hu"
+#define MXFPRIu32 "lu"
+#define MXFPRIu64 "llu"
+#define MXFPRIx08 "x"
+#define MXFPRIx16 "hx"
+#define MXFPRIx32 "lx"
+#define MXFPRIx64 "llx"
+#elif defined(MXF_COMPILER_GCC_ARM_LINUX)
 typedef unsigned char          mxfUInt08;
 typedef unsigned short int     mxfUInt16;
 typedef unsigned long int      mxfUInt32;
@@ -366,7 +400,7 @@ mxfUInt08 hostByteOrder(void);
 #if defined(MXF_OS_WINDOWS)
 #include <windows.h>
 typedef HANDLE mxfFile;
-#elif defined(MXF_OS_MACOSX)
+#elif defined(MXF_OS_MACOSX) && defined(__i386__)
 #include <CoreServices/CoreServices.h>
 typedef SInt16 mxfFile;
 #else
@@ -897,7 +931,7 @@ mxfUInt64 size(mxfFile infile)
   return result;
 }
 
-#elif defined(MXF_OS_MACOSX)
+#elif defined(MXF_OS_MACOSX) && defined(__i386__)
 mxfFile openExistingRead(char* fileName)
 {
   const UInt8* name = reinterpret_cast<UInt8*>(fileName);

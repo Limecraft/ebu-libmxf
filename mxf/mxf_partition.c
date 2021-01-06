@@ -509,7 +509,7 @@ int mxf_fill_to_position(MXFFile *mxfFile, uint64_t position)
     assert(fillSize >= llen);
     fillSize -= llen;
 
-    CHK_ORET(mxf_write_l(mxfFile, fillSize));
+    CHK_ORET(mxf_write_fixed_l(mxfFile, llen, fillSize));
     CHK_ORET(mxf_write_zeros(mxfFile, fillSize));
 
     return 1;
@@ -551,7 +551,7 @@ int mxf_allocate_space_to_kag(MXFFile *mxfFile, MXFPartition *partition, uint32_
         {
             llen = 0;
         }
-        while (fillSize - llen < 0)
+        while (fillSize < (int64_t)llen)
         {
             fillSize += partition->kagSize;
             if (fillSize >= 0)
@@ -565,7 +565,7 @@ int mxf_allocate_space_to_kag(MXFFile *mxfFile, MXFPartition *partition, uint32_
         }
         fillSize -= llen;
 
-        CHK_ORET(mxf_write_l(mxfFile, fillSize));
+        CHK_ORET(mxf_write_fixed_l(mxfFile, llen, fillSize));
         CHK_ORET(mxf_write_zeros(mxfFile, fillSize));
     }
 
@@ -586,7 +586,7 @@ int mxf_allocate_space(MXFFile *mxfFile, uint32_t size)
     assert(fillSize >= llen);
     fillSize -= llen;
 
-    CHK_ORET(mxf_write_l(mxfFile, fillSize));
+    CHK_ORET(mxf_write_fixed_l(mxfFile, llen, fillSize));
     CHK_ORET(mxf_write_zeros(mxfFile, fillSize));
 
     return 1;
