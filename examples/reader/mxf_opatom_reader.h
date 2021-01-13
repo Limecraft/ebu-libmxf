@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_OPATOM_READER_H__
-#define __MXF_OPATOM_READER_H__
+#ifndef MXF_OPATOM_READER_H_
+#define MXF_OPATOM_READER_H_
 
 
 int opa_is_supported(MXFPartition *headerPartition);

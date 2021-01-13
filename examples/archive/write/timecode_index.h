@@ -29,8 +29,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __TIMECODE_INDEX_H__
-#define __TIMECODE_INDEX_H__
+#ifndef TIMECODE_INDEX_H_
+#define TIMECODE_INDEX_H_
 
 #ifdef __cplusplus
 extern "C"

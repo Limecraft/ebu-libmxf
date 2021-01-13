@@ -1,4 +1,5 @@
 check_PROGRAMS = \
+	file_md5 \
 	test_file \
 	test_partition \
 	test_primer \

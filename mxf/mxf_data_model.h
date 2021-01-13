@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_DATA_MODEL_H__
-#define __MXF_DATA_MODEL_H__
+#ifndef MXF_DATA_MODEL_H_
+#define MXF_DATA_MODEL_H_
 
 
 #ifdef __cplusplus
@@ -107,19 +107,19 @@ typedef struct
     int isRequired;
 } MXFItemDef;
 
-typedef struct _MXFSetDef
+typedef struct MXFSetDef
 {
     char *name;
     mxfKey parentSetDefKey;
     mxfKey key;
     MXFList itemDefs;
-    struct _MXFSetDef *parentSetDef;
+    struct MXFSetDef *parentSetDef;
 } MXFSetDef;
 
 typedef struct
 {
     MXFList itemDefs;
-    MXFList setDefs;
+    MXFTree setDefs;
     MXFItemType types[128]; /* index 0 is not used */
     unsigned int lastTypeId;
 } MXFDataModel;
@@ -145,6 +145,7 @@ typedef enum
     /* array */
     MXF_UTF16STRING_TYPE,
     MXF_UTF16STRINGARRAY_TYPE,
+    MXF_UTF8STRING_TYPE,
     MXF_INT8ARRAY_TYPE,
     MXF_INT16ARRAY_TYPE,
     MXF_INT32ARRAY_TYPE,
@@ -165,12 +166,15 @@ typedef enum
     MXF_AUIDARRAY_TYPE,
     MXF_ULARRAY_TYPE,
     MXF_ULBATCH_TYPE,
+    MXF_UUIDARRAY_TYPE,
+    MXF_UUIDBATCH_TYPE,
     MXF_STRONGREFARRAY_TYPE,
     MXF_STRONGREFBATCH_TYPE,
     MXF_WEAKREFARRAY_TYPE,
     MXF_WEAKREFBATCH_TYPE,
     MXF_RATIONALARRAY_TYPE,
     MXF_RGBALAYOUT_TYPE,
+    MXF_AES3_FIXED_DATA_ARRAY_TYPE,
 
     /* compound */
     MXF_RATIONAL_TYPE,
@@ -182,6 +186,7 @@ typedef enum
     /* interpret */
     MXF_VERSIONTYPE_TYPE,
     MXF_UTF16_TYPE,
+    MXF_UTF8_TYPE,
     MXF_BOOLEAN_TYPE,
     MXF_ISO7_TYPE,
     MXF_LENGTH_TYPE,
@@ -201,6 +206,7 @@ typedef enum
     MXF_WEAKREF_TYPE,
     MXF_ORIENTATION_TYPE,
     MXF_CODED_CONTENT_TYPE_TYPE,
+    MXF_AES3_FIXED_DATA_TYPE,
 
 	/* IEEE-754 singple precision float types */
 	MXF_FLOAT_TYPE,

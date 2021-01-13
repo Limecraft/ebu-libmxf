@@ -31,11 +31,11 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __XML_WRITER_H__
-#define __XML_WRITER_H__
+#ifndef XML_WRITER_H_
+#define XML_WRITER_H_
 
 
-typedef struct _XMLWriter XMLWriter;
+typedef struct XMLWriter XMLWriter;
 
 /* Note: XML writer uses DOS line endings */
 

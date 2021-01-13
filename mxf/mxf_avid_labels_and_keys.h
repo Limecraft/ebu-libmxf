@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_AVID_LABELS_AND_KEYS_H__
-#define __MXF_AVID_LABELS_AND_KEYS_H__
+#ifndef MXF_AVID_LABELS_AND_KEYS_H_
+#define MXF_AVID_LABELS_AND_KEYS_H_
 
 
 #ifdef __cplusplus
@@ -128,11 +128,6 @@ static const mxfUL MXF_EC_L(AvidAAFKLVEssenceContainer) =
     {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0xff, 0x4b, 0x46, 0x41, 0x41, 0x00, 0x0d, 0x4d, 0x4f};
 
 
-/* DV - legacy container label */
-
-static const mxfUL MXF_EC_L(AvidDV25ClipWrappedEssenceContainer) = MXF_AVID_EC_L(0x01, 0x00, 0x00);
-
-
 /* MJPEG */
 
 static const mxfUL MXF_EC_L(AvidMJPEGClipWrapped) = MXF_AVID_EC_L(0x01, 0x00, 0x00);
@@ -167,12 +162,16 @@ static const mxfUL MXF_EC_L(DNxHD1080p1235ClipWrapped)  = MXF_AVID_DNXHD_EC_L(0x
 static const mxfUL MXF_EC_L(DNxHD1080p1237ClipWrapped)  = MXF_AVID_DNXHD_EC_L(0x01, 0x02);
 static const mxfUL MXF_EC_L(DNxHD1080p1238ClipWrapped)  = MXF_AVID_DNXHD_EC_L(0x01, 0x03);
 static const mxfUL MXF_EC_L(DNxHD1080p1253ClipWrapped)  = MXF_AVID_DNXHD_EC_L(0x01, 0x04);
+static const mxfUL MXF_EC_L(DNxHD1080p1259ClipWrapped)  = MXF_AVID_DNXHD_EC_L(0x01, 0x06);
 static const mxfUL MXF_EC_L(DNxHD1080i1241ClipWrapped)  = MXF_AVID_DNXHD_EC_L(0x02, 0x01);
 static const mxfUL MXF_EC_L(DNxHD1080i1242ClipWrapped)  = MXF_AVID_DNXHD_EC_L(0x02, 0x02);
 static const mxfUL MXF_EC_L(DNxHD1080i1243ClipWrapped)  = MXF_AVID_DNXHD_EC_L(0x02, 0x03);
+static const mxfUL MXF_EC_L(DNxHD1080i1244ClipWrapped)  = MXF_AVID_DNXHD_EC_L(0x02, 0x04);
+static const mxfUL MXF_EC_L(DNxHD1080i1260ClipWrapped)  = MXF_AVID_DNXHD_EC_L(0x02, 0x08);
 static const mxfUL MXF_EC_L(DNxHD720p1250ClipWrapped)   = MXF_AVID_DNXHD_EC_L(0x03, 0x01);
 static const mxfUL MXF_EC_L(DNxHD720p1251ClipWrapped)   = MXF_AVID_DNXHD_EC_L(0x03, 0x02);
 static const mxfUL MXF_EC_L(DNxHD720p1252ClipWrapped)   = MXF_AVID_DNXHD_EC_L(0x03, 0x03);
+static const mxfUL MXF_EC_L(DNxHD720p1258ClipWrapped)   = MXF_AVID_DNXHD_EC_L(0x03, 0x04);
 
 
 /* 10-bit uncompressed CDCI */

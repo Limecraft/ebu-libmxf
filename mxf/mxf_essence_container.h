@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_ESSENCE_CONTAINER_H__
-#define __MXF_ESSENCE_CONTAINER_H__
+#ifndef MXF_ESSENCE_CONTAINER_H_
+#define MXF_ESSENCE_CONTAINER_H_
 
 
 #ifdef __cplusplus
@@ -41,7 +41,7 @@ extern "C"
 #endif
 
 
-typedef struct _MXFEssenceElement
+typedef struct MXFEssenceElement
 {
     mxfKey key;
     uint8_t llen;

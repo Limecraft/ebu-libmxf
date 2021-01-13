@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_LABELS_AND_KEYS_H__
-#define __MXF_LABELS_AND_KEYS_H__
+#ifndef MXF_LABELS_AND_KEYS_H_
+#define MXF_LABELS_AND_KEYS_H_
 
 
 
@@ -51,8 +51,8 @@ extern "C"
 
 #define MXF_OP_L(def, name) g_##name##_op_##def##_label
 
-#define MXF_OP_L_LABEL(regver, complexity, byte14, qualifier) \
-    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, regver, 0x0d, 0x01, 0x02, 0x01, complexity, byte14, qualifier, 0x00}
+#define MXF_OP_L_LABEL(regver, byte13, byte14, byte15) \
+    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, regver, 0x0d, 0x01, 0x02, 0x01, byte13, byte14, byte15, 0x00}
 
 
 /* OP-Atom labels */
@@ -66,26 +66,31 @@ static const mxfUL MXF_OP_L(atom, NTracks_1SourceClip)  = MXF_ATOM_OP_L(0x02);
 static const mxfUL MXF_OP_L(atom, NTracks_NSourceClips) = MXF_ATOM_OP_L(0x03);
 
 
-/* OP-1A labels */
+/* Generalized OP labels */
 
-#define MXF_1A_OP_L(qualifier) \
-    MXF_OP_L_LABEL(0x01, 0x01, 0x01, qualifier)
+#define MXF_GEN_OP_L(itemcomp, packagecomp, qualifier) \
+    MXF_OP_L_LABEL(0x01, itemcomp, packagecomp, qualifier)
 
-static const mxfUL MXF_OP_L(1a, UniTrack_Stream_Internal)   = MXF_1A_OP_L(0x01);
-static const mxfUL MXF_OP_L(1a, MultiTrack_Stream_Internal) = MXF_1A_OP_L(0x09);
-static const mxfUL MXF_OP_L(1a, MultiTrack_Stream_External) = MXF_1A_OP_L(0x0b);
+static const mxfUL MXF_OP_L(1a, UniTrack_Stream_Internal)   = MXF_GEN_OP_L(0x01, 0x01, 0x01);
+static const mxfUL MXF_OP_L(1a, MultiTrack_Stream_Internal) = MXF_GEN_OP_L(0x01, 0x01, 0x09);
+static const mxfUL MXF_OP_L(1a, MultiTrack_Stream_External) = MXF_GEN_OP_L(0x01, 0x01, 0x0b);
+
+static const mxfUL MXF_OP_L(1b, UniTrack_Stream_Internal)      = MXF_GEN_OP_L(0x01, 0x02, 0x01);
+static const mxfUL MXF_OP_L(1b, UniTrack_NonStream_External)   = MXF_GEN_OP_L(0x01, 0x02, 0x07);
+static const mxfUL MXF_OP_L(1b, MultiTrack_Stream_Internal)    = MXF_GEN_OP_L(0x01, 0x02, 0x09);
+static const mxfUL MXF_OP_L(1b, MultiTrack_NonStream_External) = MXF_GEN_OP_L(0x01, 0x02, 0x0f);
+
+static const mxfUL MXF_OP_L(2a, UniTrack_Stream_Internal)   = MXF_GEN_OP_L(0x02, 0x01, 0x01);
+static const mxfUL MXF_OP_L(2a, MultiTrack_Stream_Internal) = MXF_GEN_OP_L(0x02, 0x01, 0x09);
+
+static const mxfUL MXF_OP_L(2b, UniTrack_Stream_Internal)   = MXF_GEN_OP_L(0x02, 0x02, 0x01);
+static const mxfUL MXF_OP_L(2b, MultiTrack_Stream_Internal) = MXF_GEN_OP_L(0x02, 0x02, 0x09);
+
+static const mxfUL MXF_OP_L(3b, UniTrack_Stream_Internal)   = MXF_GEN_OP_L(0x03, 0x02, 0x01);
+static const mxfUL MXF_OP_L(3b, MultiTrack_Stream_Internal) = MXF_GEN_OP_L(0x03, 0x02, 0x09);
 
 
-/* OP-1B labels */
-
-#define MXF_1B_OP_L(qualifier) \
-    MXF_OP_L_LABEL(0x01, 0x01, 0x02, qualifier)
-
-static const mxfUL MXF_OP_L(1b, UniTrack_Stream_Internal)       = MXF_1B_OP_L(0x01);
-static const mxfUL MXF_OP_L(1b, UniTrack_NonStream_External)    = MXF_1B_OP_L(0x07);
-static const mxfUL MXF_OP_L(1b, MultiTrack_Stream_Internal)     = MXF_1B_OP_L(0x09);
-static const mxfUL MXF_OP_L(1b, MultiTrack_NonStream_External)  = MXF_1B_OP_L(0x0f);
-
+void mxf_set_generalized_op_label(mxfUL *label, int item_complexity, int package_complexity, int qualifier);
 
 int mxf_is_op_atom(const mxfUL *label);
 int mxf_is_op_1a(const mxfUL *label);
@@ -133,6 +138,9 @@ int mxf_is_sound(const mxfUL *label);
 int mxf_is_timecode(const mxfUL *label);
 int mxf_is_data(const mxfUL *label);
 int mxf_is_descriptive_metadata(const mxfUL *label);
+
+MXFDataDefEnum mxf_get_ddef_enum(const mxfUL *label);
+int mxf_get_ddef_label(MXFDataDefEnum data_def, mxfUL *label);
 
 
 
@@ -193,23 +201,52 @@ static const mxfUL MXF_CMDEF_L(MP4AdvancedRealTimeSimpleL3) = MXF_MPEG4_CMDEV_L(
 static const mxfUL MXF_CMDEF_L(MP4AdvancedRealTimeSimpleL4) = MXF_MPEG4_CMDEV_L(0x02, 0x04);
 
 
-/* AVC Intra-Frame Coding */
+/* MPEG AVC / H264 */
 
-#define MXF_AVCI_CMDEV_L(profile, variant) \
-    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0a, 0x04, 0x01, 0x02, 0x02, 0x01, 0x32, profile, variant}
+#define MXF_AVC_CMDEV_L(version, category, profile, variant) \
+    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, version, 0x04, 0x01, 0x02, 0x02, 0x01, category, profile, variant}
 
-static const mxfUL MXF_CMDEF_L(AVCI_50_1080_60_I)  = MXF_AVCI_CMDEV_L(0x21, 0x01);
-static const mxfUL MXF_CMDEF_L(AVCI_50_1080_50_I)  = MXF_AVCI_CMDEV_L(0x21, 0x02);
-static const mxfUL MXF_CMDEF_L(AVCI_50_1080_30_P)  = MXF_AVCI_CMDEV_L(0x21, 0x03);
-static const mxfUL MXF_CMDEF_L(AVCI_50_1080_25_P)  = MXF_AVCI_CMDEV_L(0x21, 0x04);
-static const mxfUL MXF_CMDEF_L(AVCI_50_720_60_P)   = MXF_AVCI_CMDEV_L(0x21, 0x08);
-static const mxfUL MXF_CMDEF_L(AVCI_50_720_50_P)   = MXF_AVCI_CMDEV_L(0x21, 0x09);
-static const mxfUL MXF_CMDEF_L(AVCI_100_1080_60_I) = MXF_AVCI_CMDEV_L(0x31, 0x01);
-static const mxfUL MXF_CMDEF_L(AVCI_100_1080_50_I) = MXF_AVCI_CMDEV_L(0x31, 0x02);
-static const mxfUL MXF_CMDEF_L(AVCI_100_1080_30_P) = MXF_AVCI_CMDEV_L(0x31, 0x03);
-static const mxfUL MXF_CMDEF_L(AVCI_100_1080_25_P) = MXF_AVCI_CMDEV_L(0x31, 0x04);
-static const mxfUL MXF_CMDEF_L(AVCI_100_720_60_P)  = MXF_AVCI_CMDEV_L(0x31, 0x08);
-static const mxfUL MXF_CMDEF_L(AVCI_100_720_50_P)  = MXF_AVCI_CMDEV_L(0x31, 0x09);
+
+#define MXF_AVC_PRED_CMDEV_L(version, profile, variant) \
+    MXF_AVC_CMDEV_L(version, 0x31, profile, variant)
+
+static const mxfUL MXF_CMDEF_L(AVC_BASELINE)             = MXF_AVC_PRED_CMDEV_L(0x0d, 0x10, 0x01);
+static const mxfUL MXF_CMDEF_L(AVC_CONSTRAINED_BASELINE) = MXF_AVC_PRED_CMDEV_L(0x0d, 0x11, 0x01);
+static const mxfUL MXF_CMDEF_L(AVC_MAIN)                 = MXF_AVC_PRED_CMDEV_L(0x0d, 0x20, 0x01);
+static const mxfUL MXF_CMDEF_L(AVC_EXTENDED)             = MXF_AVC_PRED_CMDEV_L(0x0d, 0x30, 0x01);
+static const mxfUL MXF_CMDEF_L(AVC_HIGH)                 = MXF_AVC_PRED_CMDEV_L(0x0d, 0x40, 0x01);
+static const mxfUL MXF_CMDEF_L(AVC_HIGH_10)              = MXF_AVC_PRED_CMDEV_L(0x0d, 0x50, 0x01);
+static const mxfUL MXF_CMDEF_L(AVC_HIGH_422)             = MXF_AVC_PRED_CMDEV_L(0x0d, 0x60, 0x01);
+static const mxfUL MXF_CMDEF_L(AVC_HIGH_444)             = MXF_AVC_PRED_CMDEV_L(0x0d, 0x70, 0x01);
+
+
+#define MXF_AVC_INTRA_CMDEV_L(version, profile, variant) \
+    MXF_AVC_CMDEV_L(version, 0x32, profile, variant)
+
+static const mxfUL MXF_CMDEF_L(AVC_HIGH_10_INTRA)   = MXF_AVC_INTRA_CMDEV_L(0x0a, 0x20, 0x01);
+static const mxfUL MXF_CMDEF_L(AVC_HIGH_422_INTRA)  = MXF_AVC_INTRA_CMDEV_L(0x0a, 0x30, 0x01);
+static const mxfUL MXF_CMDEF_L(AVC_HIGH_444_INTRA)  = MXF_AVC_INTRA_CMDEV_L(0x0d, 0x40, 0x01);
+static const mxfUL MXF_CMDEF_L(AVC_CAVLC_444_INTRA) = MXF_AVC_INTRA_CMDEV_L(0x0d, 0x50, 0x01);
+
+static const mxfUL MXF_CMDEF_L(AVCI_50_1080_60_I)  = MXF_AVC_INTRA_CMDEV_L(0x0a, 0x21, 0x01);
+static const mxfUL MXF_CMDEF_L(AVCI_50_1080_50_I)  = MXF_AVC_INTRA_CMDEV_L(0x0a, 0x21, 0x02);
+static const mxfUL MXF_CMDEF_L(AVCI_50_1080_30_P)  = MXF_AVC_INTRA_CMDEV_L(0x0a, 0x21, 0x03);
+static const mxfUL MXF_CMDEF_L(AVCI_50_1080_25_P)  = MXF_AVC_INTRA_CMDEV_L(0x0a, 0x21, 0x04);
+static const mxfUL MXF_CMDEF_L(AVCI_50_720_60_P)   = MXF_AVC_INTRA_CMDEV_L(0x0a, 0x21, 0x08);
+static const mxfUL MXF_CMDEF_L(AVCI_50_720_50_P)   = MXF_AVC_INTRA_CMDEV_L(0x0a, 0x21, 0x09);
+static const mxfUL MXF_CMDEF_L(AVCI_100_1080_60_I) = MXF_AVC_INTRA_CMDEV_L(0x0a, 0x31, 0x01);
+static const mxfUL MXF_CMDEF_L(AVCI_100_1080_50_I) = MXF_AVC_INTRA_CMDEV_L(0x0a, 0x31, 0x02);
+static const mxfUL MXF_CMDEF_L(AVCI_100_1080_30_P) = MXF_AVC_INTRA_CMDEV_L(0x0a, 0x31, 0x03);
+static const mxfUL MXF_CMDEF_L(AVCI_100_1080_25_P) = MXF_AVC_INTRA_CMDEV_L(0x0a, 0x31, 0x04);
+static const mxfUL MXF_CMDEF_L(AVCI_100_720_60_P)  = MXF_AVC_INTRA_CMDEV_L(0x0a, 0x31, 0x08);
+static const mxfUL MXF_CMDEF_L(AVCI_100_720_50_P)  = MXF_AVC_INTRA_CMDEV_L(0x0a, 0x31, 0x09);
+static const mxfUL MXF_CMDEF_L(AVCI_200_1080_60_I) = MXF_AVC_INTRA_CMDEV_L(0x0d, 0x32, 0x01);
+static const mxfUL MXF_CMDEF_L(AVCI_200_1080_50_I) = MXF_AVC_INTRA_CMDEV_L(0x0d, 0x32, 0x02);
+static const mxfUL MXF_CMDEF_L(AVCI_200_1080_30_P) = MXF_AVC_INTRA_CMDEV_L(0x0d, 0x32, 0x03);
+static const mxfUL MXF_CMDEF_L(AVCI_200_1080_25_P) = MXF_AVC_INTRA_CMDEV_L(0x0d, 0x32, 0x04);
+static const mxfUL MXF_CMDEF_L(AVCI_200_720_60_P)  = MXF_AVC_INTRA_CMDEV_L(0x0d, 0x32, 0x08);
+static const mxfUL MXF_CMDEF_L(AVCI_200_720_50_P)  = MXF_AVC_INTRA_CMDEV_L(0x0d, 0x32, 0x09);
+
 
 
 /* MPEG-2 Long GOP */
@@ -224,6 +261,12 @@ static const mxfUL MXF_CMDEF_L(MPEG2_MP_H14_LONGGOP) =
     {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x08, 0x04, 0x01, 0x02, 0x02, 0x01, 0x05, 0x03, 0x00};
 
 
+/* VC-2 */
+
+static const mxfUL MXF_CMDEF_L(VC2) =
+    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0d, 0x04, 0x01, 0x02, 0x02, 0x03, 0x03, 0x01, 0x00};
+
+
 /* VC-3 */
 
 #define MXF_VC3_CMDEV_L(variant) \
@@ -235,13 +278,30 @@ static const mxfUL MXF_CMDEF_L(VC3_1080P_1238) = MXF_VC3_CMDEV_L(0x04);
 static const mxfUL MXF_CMDEF_L(VC3_1080I_1241) = MXF_VC3_CMDEV_L(0x07);
 static const mxfUL MXF_CMDEF_L(VC3_1080I_1242) = MXF_VC3_CMDEV_L(0x08);
 static const mxfUL MXF_CMDEF_L(VC3_1080I_1243) = MXF_VC3_CMDEV_L(0x09);
+static const mxfUL MXF_CMDEF_L(VC3_1080I_1244) = MXF_VC3_CMDEV_L(0x0a);
 static const mxfUL MXF_CMDEF_L(VC3_720P_1250)  = MXF_VC3_CMDEV_L(0x10);
 static const mxfUL MXF_CMDEF_L(VC3_720P_1251)  = MXF_VC3_CMDEV_L(0x11);
 static const mxfUL MXF_CMDEF_L(VC3_720P_1252)  = MXF_VC3_CMDEV_L(0x12);
 static const mxfUL MXF_CMDEF_L(VC3_1080P_1253) = MXF_VC3_CMDEV_L(0x13);
+static const mxfUL MXF_CMDEF_L(VC3_720P_1258)  = MXF_VC3_CMDEV_L(0x18);
+static const mxfUL MXF_CMDEF_L(VC3_1080P_1259) = MXF_VC3_CMDEV_L(0x19);
+static const mxfUL MXF_CMDEF_L(VC3_1080I_1260) = MXF_VC3_CMDEV_L(0x1a);
 
 
-/* Uncompressed */
+/* RDD-36 (ProRes) */
+
+#define MXF_RDD36_CMDEV_L(variant) \
+    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0d, 0x04, 0x01, 0x02, 0x02, 0x03, 0x06, variant, 0x00}
+
+static const mxfUL MXF_CMDEF_L(RDD36_422_PROXY) = MXF_RDD36_CMDEV_L(0x01);
+static const mxfUL MXF_CMDEF_L(RDD36_422_LT)    = MXF_RDD36_CMDEV_L(0x02);
+static const mxfUL MXF_CMDEF_L(RDD36_422)       = MXF_RDD36_CMDEV_L(0x03);
+static const mxfUL MXF_CMDEF_L(RDD36_422_HQ)    = MXF_RDD36_CMDEV_L(0x04);
+static const mxfUL MXF_CMDEF_L(RDD36_4444)      = MXF_RDD36_CMDEV_L(0x05);
+static const mxfUL MXF_CMDEF_L(RDD36_4444_XQ)   = MXF_RDD36_CMDEV_L(0x06);
+
+
+/* uncompressed picture coding */
 
 /* fourcc 2vuy */
 static const mxfUL MXF_CMDEF_L(UNC_8B_422_INTERLEAVED) =
@@ -251,6 +311,14 @@ static const mxfUL MXF_CMDEF_L(UNC_8B_422_INTERLEAVED) =
 static const mxfUL MXF_CMDEF_L(UNC_10B_422_INTERLEAVED) =
     {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0a, 0x04, 0x01, 0x02, 0x01, 0x01, 0x02, 0x02, 0x01};
 
+
+/* uncompressed sound coding */
+
+#define MXF_UNC_SOUND_CMDEV_L(regver, byte13, byte14, byte15, byte16) \
+    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, regver, 0x04, 0x02, 0x02, 0x01, byte13, byte14, byte15, byte16}
+
+static const mxfUL MXF_CMDEF_L(ST382_UNC_SOUND) = MXF_UNC_SOUND_CMDEV_L(0x0a, 0x01, 0x00, 0x00, 0x00);
+static const mxfUL MXF_CMDEF_L(UNDEFINED_SOUND) = MXF_UNC_SOUND_CMDEV_L(0x01, 0x7f, 0x00, 0x00, 0x00);
 
 
 /*
@@ -364,6 +432,11 @@ static const mxfUL MXF_EC_L(HD_Unc_720_5994p_422_ClipWrapped)  = MXF_UNC_EC_L(0x
 static const mxfUL MXF_EC_L(HD_Unc_720_60p_422_FrameWrapped)   = MXF_UNC_EC_L(0x01, 0x03, 0x25);
 static const mxfUL MXF_EC_L(HD_Unc_720_60p_422_ClipWrapped)    = MXF_UNC_EC_L(0x01, 0x03, 0x26);
 
+/* non-standard - number of lines and field rate provided by essence descriptor */
+
+static const mxfUL MXF_EC_L(Unc_FrameWrapped)                  = MXF_UNC_EC_L(0x01, 0x7f, 0x01);
+static const mxfUL MXF_EC_L(Unc_ClipWrapped)                   = MXF_UNC_EC_L(0x01, 0x7f, 0x02);
+
 
 /* D-10 mapping */
 
@@ -402,12 +475,19 @@ static const mxfUL MXF_EC_L(ALawCustomWrapped) = MXF_ALAW_EC_L(0x03);
 
 /* MPEG mappings */
 
-/* AVC Intra-Frame Coding */
+/* AVC / H264 */
 
-static const mxfUL MXF_EC_L(AVCIFrameWrapped) = MXF_GENERIC_CONTAINER_LABEL(0x0a, 0x10, 0x60, 0x01);
-static const mxfUL MXF_EC_L(AVCIClipWrapped)  = MXF_GENERIC_CONTAINER_LABEL(0x0a, 0x10, 0x60, 0x02);
+#define MXF_AVC_BYTESTREAM_EC_L(wrapping) \
+    MXF_GENERIC_CONTAINER_LABEL(0x0a, 0x10, 0x60, wrapping) /* stream id 0 */
 
-int mxf_is_mpeg_video_ec(const mxfUL *label, int frame_wrapped);
+static const mxfUL MXF_EC_L(AVCFrameWrapped) = MXF_AVC_BYTESTREAM_EC_L(0x01);
+static const mxfUL MXF_EC_L(AVCClipWrapped)  = MXF_AVC_BYTESTREAM_EC_L(0x02);
+
+/* Legacy naming used in Ingex player */
+static const mxfUL MXF_EC_L(AVCIFrameWrapped) = MXF_AVC_BYTESTREAM_EC_L(0x01);
+static const mxfUL MXF_EC_L(AVCIClipWrapped)  = MXF_AVC_BYTESTREAM_EC_L(0x02);
+
+int mxf_is_avc_ec(const mxfUL *label, int frame_wrapped);
 
 
 /* MPEG ES VideoStream-0 SID */
@@ -415,7 +495,16 @@ int mxf_is_mpeg_video_ec(const mxfUL *label, int frame_wrapped);
 static const mxfUL MXF_EC_L(MPEGES0FrameWrapped) = MXF_GENERIC_CONTAINER_LABEL(0x02, 0x04, 0x60, 0x01);
 static const mxfUL MXF_EC_L(MPEGES0ClipWrapped)  = MXF_GENERIC_CONTAINER_LABEL(0x02, 0x04, 0x60, 0x02);
 
-int mxf_is_avc_ec(const mxfUL *label, int frame_wrapped);
+int mxf_is_mpeg_video_ec(const mxfUL *label, int frame_wrapped);
+
+
+/* VC-2 */
+
+#define MXF_VC2_EC_L(byte15) \
+    MXF_GENERIC_CONTAINER_LABEL(0x0d, 0x15, byte15, 0x00)
+
+static const mxfUL MXF_EC_L(VC2FrameWrapped) = MXF_VC2_EC_L(0x01);
+static const mxfUL MXF_EC_L(VC2ClipWrapped)  = MXF_VC2_EC_L(0x02);
 
 
 /* VC-3 */
@@ -425,6 +514,22 @@ int mxf_is_avc_ec(const mxfUL *label, int frame_wrapped);
 
 static const mxfUL MXF_EC_L(VC3FrameWrapped) = MXF_VC3_EC_L(0x01);
 static const mxfUL MXF_EC_L(VC3ClipWrapped)  = MXF_VC3_EC_L(0x02);
+
+
+/* RDD-36 (ProRes) */
+
+#define MXF_RDD36_EC_L(byte15) \
+    MXF_GENERIC_CONTAINER_LABEL(0x0d, 0x1c, byte15, 0x00)
+
+static const mxfUL MXF_EC_L(RDD36FrameWrapped) = MXF_RDD36_EC_L(0x01);
+
+
+/* Data */
+
+static const mxfUL MXF_EC_L(VBIData) = MXF_GENERIC_CONTAINER_LABEL(0x09, 0x0d, 0x00, 0x00);
+static const mxfUL MXF_EC_L(ANCData) = MXF_GENERIC_CONTAINER_LABEL(0x09, 0x0e, 0x00, 0x00);
+
+static const mxfUL MXF_EC_L(TimedText) = MXF_GENERIC_CONTAINER_LABEL(0x0a, 0x13, 0x01, 0x01);
 
 
 
@@ -458,6 +563,12 @@ static const mxfUL MXF_DM_L(APP_PreservationDescriptiveScheme) =
     {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01, 0x0d, 0x04, 0x01, 0x01, 0x01, 0x01, 0x01, 0x00};
 
 
+/* RP 2057 - Text-Based Metadata Carriage in MXF */
+
+static const mxfUL MXF_DM_L(RP2057) =
+    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0c, 0x0d, 0x01, 0x04, 0x01, 0x04, 0x01, 0x01, 0x00};
+
+
 /*
  *
  * Miscellaneous labels
@@ -473,6 +584,33 @@ static const mxfUL ITUR_BT470_TRANSFER_CH =
 static const mxfUL ITUR_BT709_TRANSFER_CH =
     {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01, 0x04, 0x01, 0x01, 0x01, 0x01, 0x02, 0x00, 0x00};
 
+static const mxfUL SMPTE240M_TRANSFER_CH =
+    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01, 0x04, 0x01, 0x01, 0x01, 0x01, 0x03, 0x00, 0x00};
+
+static const mxfUL SMPTE_274M_296M_TRANSFER_CH =
+    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01, 0x04, 0x01, 0x01, 0x01, 0x01, 0x04, 0x00, 0x00};
+
+static const mxfUL ITU1361_TRANSFER_CH =
+    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x06, 0x04, 0x01, 0x01, 0x01, 0x01, 0x05, 0x00, 0x00};
+
+static const mxfUL LINEAR_TRANSFER_CH =
+    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x06, 0x04, 0x01, 0x01, 0x01, 0x01, 0x06, 0x00, 0x00};
+
+static const mxfUL SMPTE_DCDM_TRANSFER_CH =
+    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x08, 0x04, 0x01, 0x01, 0x01, 0x01, 0x07, 0x00, 0x00};
+
+static const mxfUL IEC6196624_XVYCC_TRANSFER_CH =
+    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0d, 0x04, 0x01, 0x01, 0x01, 0x01, 0x08, 0x00, 0x00};
+
+static const mxfUL ITU2020_TRANSFER_CH =
+    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0e, 0x04, 0x01, 0x01, 0x01, 0x01, 0x09, 0x00, 0x00};
+
+static const mxfUL SMPTE_ST2084_TRANSFER_CH =
+    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0d, 0x04, 0x01, 0x01, 0x01, 0x01, 0x0a, 0x00, 0x00};
+
+static const mxfUL HLG_OETF_TRANSFER_CH =
+    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0d, 0x04, 0x01, 0x01, 0x01, 0x01, 0x0b, 0x00, 0x00};
+
 
 /* Coding equation labels */
 
@@ -482,6 +620,38 @@ static const mxfUL ITUR_BT601_CODING_EQ =
 static const mxfUL ITUR_BT709_CODING_EQ =
     {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01, 0x04, 0x01, 0x01, 0x01, 0x02, 0x02, 0x00, 0x00};
 
+static const mxfUL SMPTE_240M_CODING_EQ =
+    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x06, 0x04, 0x01, 0x01, 0x01, 0x02, 0x03, 0x00, 0x00};
+
+static const mxfUL Y_CG_CO_CODING_EQ =
+    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0d, 0x04, 0x01, 0x01, 0x01, 0x02, 0x04, 0x00, 0x00};
+
+static const mxfUL GBR_CODING_EQ =
+    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0d, 0x04, 0x01, 0x01, 0x01, 0x02, 0x05, 0x00, 0x00};
+
+static const mxfUL ITU2020_NCL_CODING_EQ =
+    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0d, 0x04, 0x01, 0x01, 0x01, 0x02, 0x06, 0x00, 0x00};
+
+
+/* Color primaries labels */
+
+static const mxfUL SMPTE170M_COLOR_PRIM =
+    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x06, 0x04, 0x01, 0x01, 0x01, 0x03, 0x01, 0x00, 0x00};
+
+static const mxfUL ITU470_PAL_COLOR_PRIM =
+    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x06, 0x04, 0x01, 0x01, 0x01, 0x03, 0x02, 0x00, 0x00};
+
+static const mxfUL ITU709_COLOR_PRIM =
+    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x06, 0x04, 0x01, 0x01, 0x01, 0x03, 0x03, 0x00, 0x00};
+
+static const mxfUL ITU2020_COLOR_PRIM =
+    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0d, 0x04, 0x01, 0x01, 0x01, 0x03, 0x04, 0x00, 0x00};
+
+static const mxfUL SMPTE_DCDM_COLOR_PRIM =
+    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0d, 0x04, 0x01, 0x01, 0x01, 0x03, 0x05, 0x00, 0x00};
+
+static const mxfUL P3D65_COLOR_PRIM =
+    {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0d, 0x04, 0x01, 0x01, 0x01, 0x03, 0x06, 0x00, 0x00};
 
 
 /*
@@ -490,7 +660,8 @@ static const mxfUL ITUR_BT709_CODING_EQ =
  *
  */
 
-#define MXF_EE_K(name)  g_##name##_esselement_key
+#define MXF_EE_K(name)          g_##name##_esselement_key
+#define MXF_EE_TRACKNUM(name)   g_##name##_tracknum
 
 
 
@@ -616,6 +787,18 @@ static const mxfKey MXF_EE_K(SDTI_CP_System_Pack) =
 #define MXF_MPEG_PICT_CUSTOM_WRAPPED_EE_TYPE     0x07
 
 
+/* VC-2 mappings */
+
+#define MXF_VC2_EE_K(elecount, eletype, elenum) \
+    MXF_GENERIC_CONTAINER_ELEMENT_KEY(0x01, 0x15, elecount, eletype, elenum)
+
+#define MXF_VC2_TRACK_NUM(elecount, eletype, elenum) \
+    MXF_TRACK_NUM(0x15, elecount, eletype, elenum)
+
+#define MXF_VC2_FRAME_WRAPPED_EE_TYPE      0x10
+#define MXF_VC2_CLIP_WRAPPED_EE_TYPE       0x11
+
+
 /* VC-3 mappings */
 
 #define MXF_VC3_EE_K(elecount, eletype, elenum) \
@@ -628,6 +811,70 @@ static const mxfKey MXF_EE_K(SDTI_CP_System_Pack) =
 #define MXF_VC3_CLIP_WRAPPED_EE_TYPE       0x06
 
 
+/* RDD-36 (ProRes) */
+
+#define MXF_RDD36_EE_K(elecount, eletype, elenum) \
+    MXF_GENERIC_CONTAINER_ELEMENT_KEY(0x01, 0x15, elecount, eletype, elenum)
+
+#define MXF_RDD36_TRACK_NUM(elecount, eletype, elenum) \
+    MXF_TRACK_NUM(0x15, elecount, eletype, elenum)
+
+#define MXF_RDD36_FRAME_WRAPPED_EE_TYPE   0x17
+
+
+/* Data mappings */
+
+static const mxfUL MXF_EE_K(VBIData) = MXF_GENERIC_CONTAINER_ELEMENT_KEY(0x01, 0x17, 0x01, 0x01, 0x01);
+static const mxfUL MXF_EE_K(ANCData) = MXF_GENERIC_CONTAINER_ELEMENT_KEY(0x01, 0x17, 0x01, 0x02, 0x01);
+
+static const uint32_t MXF_EE_TRACKNUM(VBIData) = MXF_TRACK_NUM(0x17, 0x01, 0x01, 0x01);
+static const uint32_t MXF_EE_TRACKNUM(ANCData) = MXF_TRACK_NUM(0x17, 0x01, 0x02, 0x01);
+
+
+static const mxfUL MXF_EE_K(TimedText) = MXF_GENERIC_CONTAINER_ELEMENT_KEY(0x01, 0x17, 0x01, 0x0b, 0x01);
+
+static const uint32_t MXF_EE_TRACKNUM(TimedText) = MXF_TRACK_NUM(0x17, 0x01, 0x0b, 0x01);
+
+
+
+/*
+ *
+ * Generic Stream keys
+ *
+ */
+
+
+#define MXF_GS_DATA_ELEMENT_KEY(data, wrapping) \
+    {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x0c, 0x0d, 0x01, 0x05, data, wrapping, 0x00, 0x00, 0x00}
+
+#define MXF_GS_DATA_BASE        0x01
+#define MXF_GS_DATA_INTRINSIC   0x02
+#define MXF_GS_DATA_LE          0x04
+#define MXF_GS_DATA_BE          0x08
+#define MXF_GS_DATA_BYTES       0x08
+#define MXF_GS_DATA_ENDIAN_UNK  0x0c
+
+#define MXF_GS_WRAP_BASE        0x01
+#define MXF_GS_WRAP_AU_BYTE_1   0x02
+#define MXF_GS_WRAP_AU          0x04
+#define MXF_GS_WRAP_FRAME_SYNC  0x08
+
+
+int mxf_is_gs_data_element(const mxfKey *key);
+
+
+/* RP 2057 - Text-Based Metadata Carriage in MXF */
+
+static const mxfKey MXF_EE_K(RP2057_LE)         = MXF_GS_DATA_ELEMENT_KEY(MXF_GS_DATA_BASE | MXF_GS_DATA_LE,         MXF_GS_WRAP_BASE);
+static const mxfKey MXF_EE_K(RP2057_BE)         = MXF_GS_DATA_ELEMENT_KEY(MXF_GS_DATA_BASE | MXF_GS_DATA_BE,         MXF_GS_WRAP_BASE);
+static const mxfKey MXF_EE_K(RP2057_BYTES)      = MXF_GS_DATA_ELEMENT_KEY(MXF_GS_DATA_BASE | MXF_GS_DATA_BYTES,      MXF_GS_WRAP_BASE);
+static const mxfKey MXF_EE_K(RP2057_ENDIAN_UNK) = MXF_GS_DATA_ELEMENT_KEY(MXF_GS_DATA_BASE | MXF_GS_DATA_ENDIAN_UNK, MXF_GS_WRAP_BASE);
+
+
+/* Timed Text ancillary resources */
+
+static const mxfKey MXF_EE_K(TimedTextAnc)  = MXF_GS_DATA_ELEMENT_KEY(MXF_GS_DATA_BASE | MXF_GS_DATA_BYTES, MXF_GS_WRAP_BASE);
+
 
 /*
  *
@@ -636,6 +883,7 @@ static const mxfKey MXF_EE_K(SDTI_CP_System_Pack) =
  */
 
 #define MXF_PP_K(statusName, kindName)  g_##statusName##_##kindName##_pp_key
+#define MXF_GS_PP_K(kindName)           g_##kindName##_pp_key
 
 #define MXF_PP_KEY(regver, kind, status) \
     {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x05, 0x01, regver, 0x0d, 0x01, 0x02, 0x01, 0x01, kind, status, 0x00}
@@ -649,6 +897,7 @@ static const mxfKey MXF_PP_K(OpenIncomplete, Body)     = MXF_PP_KEY(0x01, 0x03, 
 static const mxfKey MXF_PP_K(ClosedIncomplete, Body)   = MXF_PP_KEY(0x01, 0x03, 0x02);
 static const mxfKey MXF_PP_K(OpenComplete, Body)       = MXF_PP_KEY(0x01, 0x03, 0x03);
 static const mxfKey MXF_PP_K(ClosedComplete, Body)     = MXF_PP_KEY(0x01, 0x03, 0x04);
+static const mxfKey MXF_GS_PP_K(GenericStream)         = MXF_PP_KEY(0x01, 0x03, 0x11);
 static const mxfKey MXF_PP_K(OpenIncomplete, Footer)   = MXF_PP_KEY(0x01, 0x04, 0x01);
 static const mxfKey MXF_PP_K(ClosedIncomplete, Footer) = MXF_PP_KEY(0x01, 0x04, 0x02);
 static const mxfKey MXF_PP_K(OpenComplete, Footer)     = MXF_PP_KEY(0x01, 0x04, 0x03);
@@ -700,5 +949,3 @@ static const mxfKey g_IndexTableSegment_key =
 
 
 #endif
-
-

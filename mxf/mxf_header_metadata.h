@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_HEADER_METADATA_H__
-#define __MXF_HEADER_METADATA_H__
+#ifndef MXF_HEADER_METADATA_H_
+#define MXF_HEADER_METADATA_H_
 
 
 #ifdef __cplusplus
@@ -48,22 +48,21 @@ typedef struct
     int isPersistent;
     uint16_t length;
     uint8_t *value;
-    struct _MXFMetadataSet *set;
+    struct MXFMetadataSet *set;
     
     uint64_t offset_in_file;
-
 } MXFMetadataItem;
 
-typedef struct _MXFMetadataSet
+typedef struct MXFMetadataSet
 {
     mxfKey key;
     mxfUUID instanceUID;
     MXFList items;
-    struct _MXFHeaderMetadata *headerMetadata;
+    struct MXFHeaderMetadata *headerMetadata;
     uint64_t fixedSpaceAllocation;
 } MXFMetadataSet;
 
-typedef struct _MXFHeaderMetadata
+typedef struct MXFHeaderMetadata
 {
     MXFDataModel *dataModel;
     MXFPrimerPack *primerPack;
@@ -168,10 +167,15 @@ void mxf_get_position(const uint8_t *value, mxfPosition *result);
 void mxf_get_boolean(const uint8_t *value, mxfBoolean *result);
 void mxf_get_product_version(const uint8_t *value, mxfProductVersion *result);
 void mxf_get_rgba_layout(const uint8_t *value, mxfRGBALayout *result);
+void mxf_get_aes3_fixed_data(const uint8_t *value, mxfAES3FixedData *result);
 void mxf_get_array_header(const uint8_t *value, uint32_t *arrayLen, uint32_t *arrayItemLen);
 uint16_t mxf_get_utf16string_size(const uint8_t *value, uint16_t valueLen);
 void mxf_get_utf16string(const uint8_t *value, uint16_t valueLen, mxfUTF16Char *result);
 void mxf_get_fixed_item_length_utf16string(const uint8_t *value, uint16_t valueLen, uint16_t *result);
+uint16_t mxf_get_utf8string_size(const uint8_t *value, uint16_t valueLen);
+void mxf_get_utf8string(const uint8_t *value, uint16_t valueLen, char *result);
+uint16_t mxf_get_iso7string_size(const uint8_t *value, uint16_t valueLen);
+void mxf_get_iso7string(const uint8_t *value, uint16_t valueLen, char *result);
 
 int mxf_get_strongref(MXFHeaderMetadata *headerMetadata, const uint8_t *value, MXFMetadataSet **set);
 int mxf_get_weakref(MXFHeaderMetadata *headerMetadata, const uint8_t *value, MXFMetadataSet **set);
@@ -202,8 +206,12 @@ void mxf_set_auid(const mxfAUID *value, uint8_t *result);
 void mxf_set_umid(const mxfUMID *value, uint8_t *result);
 void mxf_set_timestamp(const mxfTimestamp *value, uint8_t *result);
 uint16_t mxf_get_external_utf16string_size(const mxfUTF16Char *value);
-void mxf_set_utf16string(const mxfUTF16Char *value, uint8_t *result);
-void mxf_set_fixed_size_utf16string(const mxfUTF16Char *value, uint16_t size, uint8_t *result);
+void mxf_set_utf16string(const mxfUTF16Char *value, uint8_t *result, uint16_t resultSize);
+void mxf_set_fixed_size_utf16string(const mxfUTF16Char *value, uint16_t valueSize, uint8_t *result);
+uint16_t mxf_get_external_utf8string_size(const char *value);
+void mxf_set_utf8string(const char *value, uint8_t *result, uint16_t resultSize);
+uint16_t mxf_get_external_iso7string_size(const char *value);
+void mxf_set_iso7string(const char *value, uint8_t *result, uint16_t resultSize);
 void mxf_set_strongref(const MXFMetadataSet *value, uint8_t *result);
 void mxf_set_weakref(const MXFMetadataSet *value, uint8_t *result);
 void mxf_set_rational(const mxfRational *value, uint8_t *result);
@@ -212,9 +220,12 @@ void mxf_set_length(mxfLength value, uint8_t *result);
 void mxf_set_boolean(mxfBoolean value, uint8_t *result);
 void mxf_set_product_version(const mxfProductVersion *value, uint8_t *result);
 void mxf_set_rgba_layout(const mxfRGBALayout *value, uint8_t *result);
+void mxf_set_aes3_fixed_data(const mxfAES3FixedData *value, uint8_t *result);
 void mxf_set_array_header(uint32_t arrayLen, uint32_t arrayElementLen, uint8_t *result);
 
 
+int mxf_alloc_item_value(MXFMetadataItem *item, uint16_t len, uint8_t **value);
+int mxf_complete_item_value(MXFMetadataItem *item, uint16_t len);
 int mxf_set_item_value(MXFMetadataItem *item, const uint8_t *value, uint16_t len);
 
 int mxf_set_item(MXFMetadataSet *set, const mxfKey *itemKey, const uint8_t *value, uint16_t len);
@@ -237,7 +248,9 @@ int mxf_set_umid_item(MXFMetadataSet *set, const mxfKey *itemKey, const mxfUMID 
 int mxf_set_timestamp_item(MXFMetadataSet *set, const mxfKey *itemKey, const mxfTimestamp *value);
 int mxf_set_utf16string_item(MXFMetadataSet *set, const mxfKey *itemKey, const mxfUTF16Char *value);
 int mxf_set_fixed_size_utf16string_item(MXFMetadataSet *set, const mxfKey *itemKey,
-                                        const mxfUTF16Char *value, uint16_t size);
+                                        const mxfUTF16Char *value, uint16_t valueSize);
+int mxf_set_utf8string_item(MXFMetadataSet *set, const mxfKey *itemKey, const char *value);
+int mxf_set_iso7string_item(MXFMetadataSet *set, const mxfKey *itemKey, const char *value);
 int mxf_set_strongref_item(MXFMetadataSet *set, const mxfKey *itemKey, const MXFMetadataSet *value);
 int mxf_set_weakref_item(MXFMetadataSet *set, const mxfKey *itemKey, const MXFMetadataSet *value);
 int mxf_set_rational_item(MXFMetadataSet *set, const mxfKey *itemKey, const mxfRational *value);
@@ -275,6 +288,10 @@ int mxf_get_umid_item(MXFMetadataSet *set, const mxfKey *itemKey, mxfUMID *value
 int mxf_get_timestamp_item(MXFMetadataSet *set, const mxfKey *itemKey, mxfTimestamp *value);
 int mxf_get_utf16string_item_size(MXFMetadataSet *set, const mxfKey *itemKey, uint16_t *size);
 int mxf_get_utf16string_item(MXFMetadataSet *set, const mxfKey *itemKey, mxfUTF16Char *value);
+int mxf_get_utf8string_item_size(MXFMetadataSet *set, const mxfKey *itemKey, uint16_t *size);
+int mxf_get_utf8string_item(MXFMetadataSet *set, const mxfKey *itemKey, char *value);
+int mxf_get_iso7string_item_size(MXFMetadataSet *set, const mxfKey *itemKey, uint16_t *size);
+int mxf_get_iso7string_item(MXFMetadataSet *set, const mxfKey *itemKey, char *value);
 int mxf_get_strongref_item(MXFMetadataSet *set, const mxfKey *itemKey, MXFMetadataSet **value);
 int mxf_get_strongref_item_light(MXFMetadataSet *set, const mxfKey *itemKey, MXFMetadataSet **value);
 int mxf_get_weakref_item(MXFMetadataSet *set, const mxfKey *itemKey, MXFMetadataSet **value);

@@ -130,8 +130,6 @@ typedef struct
 
 static const mxfKey g_SysItemElementKey = MXF_SS1_ELEMENT_KEY(0x01, 0x00);
 
-static const uint32_t g_timecodeElementLen = 28;
-
 
 
 static void get_content_package_len(Reader *reader)
@@ -241,7 +239,7 @@ static void report_actual_frame_count(Reader *reader)
         if (reader->headerPartition->footerPartition == 0 ||
             essenceStartPos + frameCount * reader->contentPackageLen < (int64_t)reader->headerPartition->footerPartition)
         {
-            mxf_log_warn("%"PRId64" complete frames are present in the MXF file\n", frameCount);
+            mxf_log_warn("%" PRId64 " complete frames are present in the MXF file\n", frameCount);
         }
         else
         {
@@ -608,7 +606,7 @@ static int get_infax_data(Reader *reader, InfaxData *infaxData)
     return 1;
 }
 
-static int get_info(Reader *reader, int showPSEFailures, int showVTRErrors, int showDigiBetaDropouts,
+static int get_info(Reader *reader, int checkIssues, int showPSEFailures, int showVTRErrors, int showDigiBetaDropouts,
                     int showTimecodeBreaks)
 {
     mxfKey key;
@@ -645,7 +643,7 @@ static int get_info(Reader *reader, int showPSEFailures, int showVTRErrors, int 
     {
         mxf_log_warn("Header partition is incomplete" LOG_LOC_FORMAT, LOG_LOC_PARAMS);
     }
-    CHK_ORET(mxf_read_partition(reader->mxfFile, &key, &reader->headerPartition));
+    CHK_ORET(mxf_read_partition(reader->mxfFile, &key, len, &reader->headerPartition));
 
 
     /* check the operational pattern is OP 1A */
@@ -685,14 +683,14 @@ static int get_info(Reader *reader, int showPSEFailures, int showVTRErrors, int 
 
 
     /* read the header metadata in the footer is showing PSE failures, etc */
-    if (showPSEFailures || showVTRErrors || showDigiBetaDropouts || showTimecodeBreaks)
+    if (checkIssues || showPSEFailures || showVTRErrors || showDigiBetaDropouts || showTimecodeBreaks)
     {
         if (fileIsComplete)
         {
             CHK_ORET(mxf_file_seek(reader->mxfFile, reader->headerPartition->footerPartition, SEEK_SET));
             CHK_ORET(mxf_read_next_nonfiller_kl(reader->mxfFile, &key, &llen, &len));
             CHK_ORET(mxf_is_footer_partition_pack(&key));
-            CHK_ORET(mxf_read_partition(reader->mxfFile, &key, &reader->footerPartition));
+            CHK_ORET(mxf_read_partition(reader->mxfFile, &key, len, &reader->footerPartition));
             headerByteCount = reader->footerPartition->headerByteCount;
 
             if (!mxf_partition_is_closed(&key))
@@ -890,6 +888,17 @@ static int get_info(Reader *reader, int showPSEFailures, int showVTRErrors, int 
             CHK_ORET(mxf_get_strongref_item(reader->sourcePackageTrackSet, &MXF_ITEM_K(GenericTrack, Sequence), &reader->sequenceSet));
             if (mxf_is_subclass_of(reader->headerMetadata->dataModel, &reader->sequenceSet->key, &MXF_SET_K(Sequence)))
             {
+                /* first check required property exists to workaround bug in writer */
+                if (!mxf_have_item(reader->sequenceSet, &MXF_ITEM_K(Sequence, StructuralComponents)))
+                {
+                    mxf_log_error("Descriptive metadata track's Sequence set is missing the required StructuralComponents property\n");
+                    if (checkIssues)
+                    {
+                        return 0;
+                    }
+                    continue;
+                }
+
                 CHK_ORET(mxf_get_array_item_count(reader->sequenceSet, &MXF_ITEM_K(Sequence, StructuralComponents), &sequenceComponentCount));
                 if (sequenceComponentCount > 0)
                 {
@@ -1089,7 +1098,7 @@ static void write_vtr_errors(Reader *reader, int noSourceTimecode)
         while (mxf_next_list_iter_element(&iter))
         {
             vtrError = (VTRErrorAtPos*)mxf_get_iter_element(&iter);
-            printf("    %10"PRId64":%10"PRId64, count, vtrError->position);
+            printf("    %10" PRId64 ":%10" PRId64, count, vtrError->position);
             if (!noSourceTimecode)
             {
                 read_time_string_at_position(reader, vtrError->position, vitcStr, sizeof(vitcStr), ltcStr, sizeof(ltcStr));
@@ -1180,7 +1189,7 @@ static void write_digibeta_dropouts(Reader *reader, int noSourceTimecode)
         while (mxf_next_list_iter_element(&iter))
         {
             digiBetaDropout = (DigiBetaDropout*)mxf_get_iter_element(&iter);
-            printf("    %10"PRId64":%10"PRId64, count, digiBetaDropout->position);
+            printf("    %10" PRId64 ":%10" PRId64, count, digiBetaDropout->position);
             if (!noSourceTimecode)
             {
                 read_time_string_at_position(reader, digiBetaDropout->position, vitcStr, sizeof(vitcStr), ltcStr, sizeof(ltcStr));
@@ -1221,7 +1230,7 @@ static void write_timecode_breaks(Reader *reader, int noSourceTimecode)
         while (mxf_next_list_iter_element(&iter))
         {
             timecodeBreak = (TimecodeBreak*)mxf_get_iter_element(&iter);
-            printf("    %10"PRId64":%10"PRId64, count, timecodeBreak->position);
+            printf("    %10" PRId64 ":%10" PRId64, count, timecodeBreak->position);
             if (!noSourceTimecode)
             {
                 read_time_string_at_position(reader, timecodeBreak->position, vitcStr, sizeof(vitcStr), ltcStr, sizeof(ltcStr));
@@ -1253,7 +1262,7 @@ static void write_infax_data(InfaxData *infaxData)
            infaxData->stockDate.day);
     printf("    Spool descriptor: %s\n", infaxData->spoolDesc);
     printf("    Memo: %s\n", infaxData->memo);
-    printf("    Duration: %02"PRId64":%02"PRId64":%02"PRId64"\n",
+    printf("    Duration: %02" PRId64 ":%02" PRId64 ":%02" PRId64 "\n",
            infaxData->duration / (60 * 60),
            (infaxData->duration % (60 * 60)) / 60,
            (infaxData->duration % (60 * 60)) % 60);
@@ -1362,7 +1371,7 @@ static int write_info(Reader *reader, int showPSEFailures, int showVTRErrors, in
     {
         printf(" (bits: %d, rate: %s)\n", reader->audioQuantizationBits, audioSamplingRateStr);
     }
-    printf("    duration is %"PRId64" frames at %s fps (%02u:%02u:%02u:%02u)\n",
+    printf("    duration is %" PRId64 " frames at %s fps (%02u:%02u:%02u:%02u)\n",
            reader->duration,
            rateStr,
            (uint16_t)(  reader->duration / (roundedRate * 60 * 60)),
@@ -1434,7 +1443,7 @@ static int write_info(Reader *reader, int showPSEFailures, int showVTRErrors, in
             while (mxf_next_list_iter_element(&iter))
             {
                 pseFailure = (PSEFailure*)mxf_get_iter_element(&iter);
-                printf("    %10"PRId64": %10"PRId64, count, pseFailure->position);
+                printf("    %10" PRId64 ": %10" PRId64, count, pseFailure->position);
                 if (!noSourceTimecode)
                 {
                     read_time_string_at_position(reader, pseFailure->position, vitcStr, sizeof(vitcStr), ltcStr, sizeof(ltcStr));
@@ -1541,7 +1550,7 @@ static int write_summary(Reader *reader, int showPSEFailures, int showVTRErrors,
     printf("Magazine prefix: %s\n", infaxData->magPrefix);
     printf("Programme number: %s\n", infaxData->progNo);
     printf("Production code: %s\n", infaxData->prodCode);
-    printf("Duration: %02"PRId64":%02"PRId64":%02"PRId64"\n",
+    printf("Duration: %02" PRId64 ":%02" PRId64 ":%02" PRId64 "\n",
            infaxData->duration / (60 * 60),
            (infaxData->duration % (60 * 60)) / 60,
            (infaxData->duration % (60 * 60)) % 60);
@@ -1684,6 +1693,7 @@ static void usage(const char *cmd)
     fprintf(stderr, "  -b, --show-tc-breaks     show detailed timecode breaks\n");
     fprintf(stderr, "  -s, --summary-info       show summary (omit detail)\n");
     fprintf(stderr, "  -t, --no-src-tc          don't search for source VITC and LTC timecodes\n");
+    fprintf(stderr, "  --check-issues           exit with error if file contains known issues\n");
 }
 
 int main(int argc, const char *argv[])
@@ -1697,6 +1707,7 @@ int main(int argc, const char *argv[])
     int cmdlnIndex = 1;
     const char *mxfFilename = NULL;
     int noSourceTimecode = 0;
+    int checkIssues = 0;
 
     if (argc == 2 &&
         (strcmp(argv[cmdlnIndex], "-h") == 0 ||
@@ -1750,6 +1761,11 @@ int main(int argc, const char *argv[])
             noSourceTimecode = 1;
             cmdlnIndex += 1;
         }
+        else if (strcmp(argv[cmdlnIndex], "--check-issues") == 0)
+        {
+            checkIssues = 1;
+            cmdlnIndex += 1;
+        }
         else
         {
             usage(argv[0]);
@@ -1791,7 +1807,7 @@ int main(int argc, const char *argv[])
         }
     }
 
-    if (!get_info(reader, showPSEFailures, showVTRErrors, showDigiBetaDropouts, showTimecodeBreaks))
+    if (!get_info(reader, checkIssues, showPSEFailures, showVTRErrors, showDigiBetaDropouts, showTimecodeBreaks))
     {
         mxf_log_error("Failed to extract info from '%s'\n", mxfFilename);
         goto fail;

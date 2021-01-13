@@ -432,7 +432,7 @@ size_t mxf_mem_file_get_num_chunks(MXFMemoryFile *mxfMemFile)
 unsigned char* mxf_mem_file_get_chunk_data(MXFMemoryFile *mxfMemFile, size_t chunkIndex)
 {
     if (chunkIndex >= mxfMemFile->mxfFile->sysData->numChunks) {
-        mxf_log_error("Invalid chunk index value %"PRIszt""LOG_LOC_FORMAT, chunkIndex, LOG_LOC_PARAMS);
+        mxf_log_error("Invalid chunk index value %" PRIszt ""LOG_LOC_FORMAT, chunkIndex, LOG_LOC_PARAMS);
         return NULL;
     }
 
@@ -442,7 +442,7 @@ unsigned char* mxf_mem_file_get_chunk_data(MXFMemoryFile *mxfMemFile, size_t chu
 int64_t mxf_mem_file_get_chunk_size(MXFMemoryFile *mxfMemFile, size_t chunkIndex)
 {
     if (chunkIndex >= mxfMemFile->mxfFile->sysData->numChunks) {
-        mxf_log_error("Invalid chunk index value %"PRIszt""LOG_LOC_FORMAT, chunkIndex, LOG_LOC_PARAMS);
+        mxf_log_error("Invalid chunk index value %" PRIszt ""LOG_LOC_FORMAT, chunkIndex, LOG_LOC_PARAMS);
         return 0;
     }
 

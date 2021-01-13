@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_LIST_H__
-#define __MXF_LIST_H__
+#ifndef MXF_LIST_H_
+#define MXF_LIST_H_
 
 
 #ifdef __cplusplus
@@ -44,9 +44,9 @@ extern "C"
 typedef void (*free_func_type)(void *data);
 typedef int (*eq_func_type)(void *data, void *info);
 
-typedef struct _MXFListElement
+typedef struct MXFListElement
 {
-    struct _MXFListElement *next;
+    struct MXFListElement *next;
     void *data;
 } MXFListElement;
 
@@ -92,6 +92,7 @@ void mxf_free_list_element_data(MXFList *list, void *data);
 
 void mxf_initialise_list_iter(MXFListIterator *iter, const MXFList *list);
 void mxf_initialise_list_iter_at(MXFListIterator *iter, const MXFList *list, size_t index);
+void mxf_copy_list_iter(const MXFListIterator *fromIter, MXFListIterator *toIter);
 int mxf_next_list_iter_element(MXFListIterator *iter);
 void* mxf_get_iter_element(MXFListIterator *iter);
 size_t mxf_get_list_iter_index(MXFListIterator *iter);

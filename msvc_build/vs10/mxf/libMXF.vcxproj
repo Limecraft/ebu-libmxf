@@ -178,15 +178,20 @@
     <ClCompile Include="..\..\..\mxf\mxf_partition.c" />
     <ClCompile Include="..\..\..\mxf\mxf_primer.c" />
     <ClCompile Include="..\..\..\mxf\mxf_rw_intl_file.c" />
+    <ClCompile Include="..\..\..\mxf\mxf_stream_file.c" />
+    <ClCompile Include="..\..\..\mxf\mxf_tree.c" />
     <ClCompile Include="..\..\..\mxf\mxf_utils.c" />
     <ClCompile Include="..\..\..\mxf\mxf_uu_metadata.c" />
     <ClCompile Include="..\..\..\mxf\mxf_version.c" />
     <ClCompile Include="..\..\..\mxf\mxf_win32_file.c" />
+    <ClCompile Include="..\..\..\mxf\mxf_win32_mmap.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\inttypes.h" />
-    <ClInclude Include="..\..\..\mxf_scm_version.h" />
     <ClInclude Include="..\..\..\mxf\mxf.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_app.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_app_extensions_data_model.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_app_types.h" />
     <ClInclude Include="..\..\..\mxf\mxf_avid.h" />
     <ClInclude Include="..\..\..\mxf\mxf_avid_dictionary.h" />
     <ClInclude Include="..\..\..\mxf\mxf_avid_dictionary_data.h" />
@@ -211,11 +216,14 @@
     <ClInclude Include="..\..\..\mxf\mxf_partition.h" />
     <ClInclude Include="..\..\..\mxf\mxf_primer.h" />
     <ClInclude Include="..\..\..\mxf\mxf_rw_intl_file.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_stream_file.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_tree.h" />
     <ClInclude Include="..\..\..\mxf\mxf_types.h" />
     <ClInclude Include="..\..\..\mxf\mxf_utils.h" />
     <ClInclude Include="..\..\..\mxf\mxf_uu_metadata.h" />
     <ClInclude Include="..\..\..\mxf\mxf_version.h" />
     <ClInclude Include="..\..\..\mxf\mxf_win32_file.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_win32_mmap.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -51,10 +51,6 @@
 /* (2^16 - 8) / 16*/
 #define MAX_STRONG_REF_ARRAY_COUNT      4095
 
-/* the maximum number of VTR errors in which a check is made that a timeode can be
-   converted to a position. If not, then no errors are stored and a warning is given */
-#define MAXIMUM_ERROR_CHECK             100
-
 /* we expect the URL to be the filename used on the LTO tape which is around 16 characters */
 /* the value is much larger here to allow for unforseen changes or for testing purposes */
 /* note that the filename will always be truncated if it exceeds this length (-1) */
@@ -81,7 +77,7 @@ typedef struct
     int audioNum;
 } EssWriteState;
 
-struct _ArchiveMXFWriter
+struct ArchiveMXFWriter
 {
     mxfRational frameRate;
     int numAudioTracks;
@@ -1441,7 +1437,7 @@ int complete_archive_mxf_file(ArchiveMXFWriter **outputRef, const InfaxData *sou
     TimecodeIndexSearcher vitcIndexSearcher;
     TimecodeIndexSearcher ltcIndexSearcher;
     int64_t errorPosition;
-    int locatedAtLeastOneVTRError;
+    long numVTRErrorsLocated = 0;
     long errorIndex;
     long failureIndex;
     long digiBetaDropoutIndex;
@@ -1450,6 +1446,7 @@ int complete_archive_mxf_file(ArchiveMXFWriter **outputRef, const InfaxData *sou
     int vitcIndexIsNull;
     int ltcIndexIsNull;
     int useVTRLTC = 1;
+    int setUseVTRLTC = 0;
 
     vitcIndexIsNull = is_null_timecode_index(&output->vitcIndex);
     ltcIndexIsNull = is_null_timecode_index(&output->ltcIndex);
@@ -1548,7 +1545,7 @@ int complete_archive_mxf_file(ArchiveMXFWriter **outputRef, const InfaxData *sou
     {
         /* if num PSE failures exceeds MAX_STRONG_REF_ARRAY_COUNT then the failures are
            written in > 1 tracks */
-        numTracks = 1 + numPSEFailures / MAX_STRONG_REF_ARRAY_COUNT;
+        numTracks = (numPSEFailures + MAX_STRONG_REF_ARRAY_COUNT - 1) / MAX_STRONG_REF_ARRAY_COUNT;
         for (i = 0; i < numTracks; i++)
         {
             /* Preface - ContentStorage - SourcePackage - DM Event Track */
@@ -1574,11 +1571,8 @@ int complete_archive_mxf_file(ArchiveMXFWriter **outputRef, const InfaxData *sou
         initialise_timecode_index_searcher(&output->vitcIndex, &vitcIndexSearcher);
         initialise_timecode_index_searcher(&output->ltcIndex, &ltcIndexSearcher);
 
-        /* check we can at least find one VTR error position in the first MAXIMUM_ERROR_CHECK */
-        /* if we can't then somethng is badly wrong with the rs-232 or SDI links
-           and we decide to store nothing */
-        locatedAtLeastOneVTRError = 0;
-        for (j = 0; j < MAXIMUM_ERROR_CHECK && j < numVTRErrors; j++)
+        /* count the number of VTR errors that can be matched to a track position */
+        for (j = 0; j < numVTRErrors; j++)
         {
             vtrError = (const VTRError*)&vtrErrors[j];
 
@@ -1591,45 +1585,50 @@ int complete_archive_mxf_file(ArchiveMXFWriter **outputRef, const InfaxData *sou
             {
                 if (find_position(&ltcIndexSearcher, &vtrError->ltcTimecode, &errorPosition))
                 {
-                    locatedAtLeastOneVTRError = 1;
-                    break;
+                    numVTRErrorsLocated++;
                 }
             }
             else if (ltcIndexIsNull)
             {
                 if (find_position(&vitcIndexSearcher, &vtrError->vitcTimecode, &errorPosition))
                 {
-                    locatedAtLeastOneVTRError = 1;
-                    break;
+                    numVTRErrorsLocated++;
                 }
             }
             else
             {
-                if (find_position(&ltcIndexSearcher, &vtrError->ltcTimecode, &errorPosition))
+                if ((!setUseVTRLTC || useVTRLTC) &&
+                    find_position(&ltcIndexSearcher, &vtrError->ltcTimecode, &errorPosition))
                 {
-                    locatedAtLeastOneVTRError = 1;
-                    useVTRLTC = 1;
-                    break;
+                    numVTRErrorsLocated++;
+                    if (!setUseVTRLTC)
+                    {
+                        useVTRLTC = 1;
+                        setUseVTRLTC = 1;
+                    }
                 }
-                else if (find_position(&vitcIndexSearcher, &vtrError->vitcTimecode, &errorPosition))
+                else if ((!setUseVTRLTC || !useVTRLTC) &&
+                         find_position(&vitcIndexSearcher, &vtrError->vitcTimecode, &errorPosition))
                 {
-                    locatedAtLeastOneVTRError = 1;
-                    useVTRLTC = 0;
-                    break;
+                    numVTRErrorsLocated++;
+                    if (!setUseVTRLTC)
+                    {
+                        useVTRLTC = 0;
+                        setUseVTRLTC = 1;
+                    }
                 }
             }
         }
 
-        if (!locatedAtLeastOneVTRError)
+        if (numVTRErrorsLocated <= 0)
         {
-            mxf_log_warn("Failed to find the position of at least one VTR error in first %d "
-                         "- not recording any errors" LOG_LOC_FORMAT, MAXIMUM_ERROR_CHECK, LOG_LOC_PARAMS);
+            mxf_log_warn("Failed to find the position of any the %ld VTR errors" LOG_LOC_FORMAT, numVTRErrors, LOG_LOC_PARAMS);
         }
         else
         {
-            /* if numVTRErrors exceeds MAX_STRONG_REF_ARRAY_COUNT then the errors are
+            /* if numVTRErrorsLocated exceeds MAX_STRONG_REF_ARRAY_COUNT then the errors are
                written in > 1 tracks */
-            numTracks = 1 + numVTRErrors / MAX_STRONG_REF_ARRAY_COUNT;
+            numTracks = (numVTRErrorsLocated + MAX_STRONG_REF_ARRAY_COUNT - 1) / MAX_STRONG_REF_ARRAY_COUNT;
             for (j = 0; j < numTracks; j++)
             {
                 /* Preface - ContentStorage - SourcePackage - DM Event Track */
@@ -1657,7 +1656,7 @@ int complete_archive_mxf_file(ArchiveMXFWriter **outputRef, const InfaxData *sou
     {
         /* if num dropouts exceeds MAX_STRONG_REF_ARRAY_COUNT then the failures are
            written in > 1 tracks */
-        numTracks = 1 + numDigiBetaDropouts / MAX_STRONG_REF_ARRAY_COUNT;
+        numTracks = (numDigiBetaDropouts + MAX_STRONG_REF_ARRAY_COUNT - 1) / MAX_STRONG_REF_ARRAY_COUNT;
         for (i = 0; i < numTracks; i++)
         {
             /* Preface - ContentStorage - SourcePackage - DM Event Track */
@@ -1682,7 +1681,7 @@ int complete_archive_mxf_file(ArchiveMXFWriter **outputRef, const InfaxData *sou
     {
         /* if num breaks exceeds MAX_STRONG_REF_ARRAY_COUNT then the failures are
            written in > 1 tracks */
-        numTracks = 1 + numTimecodeBreaks / MAX_STRONG_REF_ARRAY_COUNT;
+        numTracks = (numTimecodeBreaks + MAX_STRONG_REF_ARRAY_COUNT - 1) / MAX_STRONG_REF_ARRAY_COUNT;
         for (i = 0; i < numTracks; i++)
         {
             /* Preface - ContentStorage - SourcePackage - DM Event Track */
@@ -2203,7 +2202,7 @@ int update_archive_mxf_file_2(MXFFile **mxfFileIn, const char *newFilename, cons
         mxf_log_error("Could not find header partition pack key" LOG_LOC_FORMAT, LOG_LOC_PARAMS);
         return 0;
     }
-    CHK_OFAIL(mxf_read_partition(mxfFile, &key, &headerPartition));
+    CHK_OFAIL(mxf_read_partition(mxfFile, &key, len, &headerPartition));
 
     CHK_OFAIL(update_header_metadata(mxfFile, headerPartition->headerByteCount, ltoInfaxData, newFilename));
 
@@ -2219,7 +2218,7 @@ int update_archive_mxf_file_2(MXFFile **mxfFileIn, const char *newFilename, cons
         mxf_log_error("Could not find footer partition pack key" LOG_LOC_FORMAT, LOG_LOC_PARAMS);
         return 0;
     }
-    CHK_OFAIL(mxf_read_partition(mxfFile, &key, &footerPartition));
+    CHK_OFAIL(mxf_read_partition(mxfFile, &key, len, &footerPartition));
 
     CHK_OFAIL(update_header_metadata(mxfFile, footerPartition->headerByteCount, ltoInfaxData, newFilename));
 
@@ -2397,7 +2396,7 @@ uint32_t get_archive_mxf_content_package_size(const mxfRational *frameRate, uint
 { \
     if (endField - startField > 0) \
     { \
-        CHK_ORET(sscanf(startField, "%"PRId64"", &member) == 1); \
+        CHK_ORET(sscanf(startField, "%" PRId64 "", &member) == 1); \
     } \
     else \
     { \

@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_AVID_METADICTIONARY_H__
-#define __MXF_AVID_METADICTIONARY_H__
+#ifndef MXF_AVID_METADICTIONARY_H_
+#define MXF_AVID_METADICTIONARY_H_
 
 
 #ifdef __cplusplus
@@ -41,7 +41,7 @@ extern "C"
 #endif
 
 
-typedef struct _AvidMetaDictionary AvidMetaDictionary;
+typedef struct AvidMetaDictionary AvidMetaDictionary;
 
 
 int mxf_avid_is_metadictionary(MXFDataModel *dataModel, const mxfKey *setKey);

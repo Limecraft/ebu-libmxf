@@ -29,8 +29,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_APP_TYPES_H__
-#define __MXF_APP_TYPES_H__
+#ifndef MXF_APP_TYPES_H_
+#define MXF_APP_TYPES_H_
 
 
 #include <mxf/mxf_types.h>

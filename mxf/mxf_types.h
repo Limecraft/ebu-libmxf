@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_TYPES_H__
-#define __MXF_TYPES_H__
+#ifndef MXF_TYPES_H_
+#define MXF_TYPES_H_
 
 #include <wchar.h>
 #include <inttypes.h>
@@ -87,6 +87,47 @@ typedef enum
 
 typedef uint8_t MXFColorSiting;
 
+typedef enum
+{
+    MXF_AVC_UNKNOWN_CODED_CONTENT_TYPE          = 0x00,
+    MXF_AVC_PROGRESSIVE_FRAME_PICTURE           = 0x01,
+    MXF_AVC_INTERLACED_FIELD_PICTURE            = 0x02,
+    MXF_AVC_INTERLACED_FRAME_PICTURE            = 0x03,
+    MXF_AVC_INTERLACED_FRAME_AND_FIELD_PICTURE  = 0x04,
+} MXFAVCCodedContentTypeEnum;
+
+typedef uint8_t MXFAVCCodedContentType;
+
+typedef enum
+{
+    MXF_VC2_WAVELET_DESLAURIERS_DUBUC_9_7       = 0x00,
+    MXF_VC2_WAVELET_LEGALL_5_3                  = 0x01,
+    MXF_VC2_WAVELET_DESLAURIERS_DUBUC_13_7      = 0x02,
+    MXF_VC2_WAVELET_HAAR_NO_SHIFT               = 0x03,
+    MXF_VC2_WAVELET_HAAR_SINGLE_SHIFT_PER_LEVEL = 0x04,
+    MXF_VC2_WAVELET_FIDELITY_FILTER             = 0x05,
+    MXF_VC2_WAVELET_DAUBECHIES_9_7_INT_APPROX   = 0x06,
+} MXFVC2WaveletFilterEnum;
+
+typedef uint8_t MXFVC2WaveletFilterType;
+
+/* software-only enumerations corresponding to data definition SMPTE labels */
+typedef enum
+{
+    MXF_UNKNOWN_DDEF,
+    MXF_PICTURE_DDEF,
+    MXF_SOUND_DDEF,
+    MXF_TIMECODE_DDEF,
+    MXF_DATA_DDEF,
+    MXF_DM_DDEF,
+} MXFDataDefEnum;
+
+typedef enum
+{
+    MXF_UNKNOWN_WRAPPING_TYPE,
+    MXF_FRAME_WRAPPED,
+    MXF_CLIP_WRAPPED,
+} MXFEssenceWrappingType;
 
 typedef struct
 {
@@ -204,7 +245,6 @@ typedef int64_t mxfLength;
 
 typedef uint8_t mxfBoolean;
 
-
 typedef struct
 {
     uint16_t major;
@@ -214,7 +254,6 @@ typedef struct
     uint16_t release;
 } mxfProductVersion;
 
-
 typedef struct
 {
     struct
@@ -223,6 +262,11 @@ typedef struct
         uint8_t depth;
     } components[8];
 } mxfRGBALayout;
+
+typedef struct
+{
+    unsigned char bytes[24];
+} mxfAES3FixedData;
 
 
 
@@ -243,6 +287,7 @@ typedef struct
 #define mxfBoolean_extlen               1
 #define mxfProductVersion_extlen        10
 #define mxfRGBALayout_extlen            16
+#define mxfAES3FixedData_extlen         24
 
 
 static const mxfUUID g_Null_UUID =

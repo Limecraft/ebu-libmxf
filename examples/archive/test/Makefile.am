@@ -4,10 +4,10 @@ check_PROGRAMS = test_timecode_index
 endif
 
 test_write_archive_mxf_SOURCES = test_write_archive_mxf.c
-test_write_archive_mxf_LDADD = ../write/libwritearchivemxf-@LIBMXF_MAJORMINOR@.la $(LIBMXF_LDADDLIBS)
+test_write_archive_mxf_LDADD = $(top_builddir)/examples/archive/write/libwritearchivemxf-@LIBMXF_MAJORMINOR@.la $(LIBMXF_LDADDLIBS)
 
 test_timecode_index_SOURCES = test_timecode_index.c
-test_timecode_index_LDADD = ../write/libwritearchivemxf-@LIBMXF_MAJORMINOR@.la $(LIBMXF_LDADDLIBS)
+test_timecode_index_LDADD = $(top_builddir)/examples/archive/write/libwritearchivemxf-@LIBMXF_MAJORMINOR@.la $(LIBMXF_LDADDLIBS)
 
 
 if ENABLE_ARCHIVE

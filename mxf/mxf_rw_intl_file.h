@@ -29,8 +29,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_RW_INTL_FILE_H__
-#define __MXF_RW_INTL_FILE_H__
+#ifndef MXF_RW_INTL_FILE_H_
+#define MXF_RW_INTL_FILE_H_
 
 
 #include <mxf/mxf_file.h>

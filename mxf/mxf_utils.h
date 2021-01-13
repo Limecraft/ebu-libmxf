@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __MXF_UTILS_H__
-#define __MXF_UTILS_H__
+#ifndef MXF_UTILS_H_
+#define MXF_UTILS_H_
 
 
 #include <stdarg.h>
@@ -63,6 +63,8 @@ typedef void (*mxf_generate_key_func)(mxfKey *key);
 
 void mxf_snprintf(char *str, size_t size, const char *format, ...);
 void mxf_vsnprintf(char *str, size_t size, const char *format, va_list ap);
+
+char* mxf_strerror(int errnum, char *buf, size_t size);
 
 
 void mxf_print_key(const mxfKey *key);
@@ -104,6 +106,11 @@ int mxf_equals_ext_umid(const mxfExtendedUMID *extUMIDA, const mxfExtendedUMID *
 int mxf_equals_rgba_layout(const mxfRGBALayout *layoutA, const mxfRGBALayout *layoutB);
 
 int mxf_is_ul(const mxfUID *uid);
+int mxf_is_swapped_ul(const mxfUID *uid);
+void mxf_swap_uid(mxfUID *swap_uid, const mxfUID *uid);
+
+
+MXFEssenceWrappingType mxf_get_essence_wrapping_type(const mxfUL *label);
 
 
 size_t mxf_utf16_to_utf8(char *u8_str, const mxfUTF16Char *u16_str, size_t u8_size);

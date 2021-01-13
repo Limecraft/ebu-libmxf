@@ -57,7 +57,7 @@ typedef struct
     mxfPosition startPosition; /* frame number corresponding to first content package */
 } PartitionIndexEntry;
 
-struct _FileIndex
+struct FileIndex
 {
     uint32_t indexSID;
     uint32_t bodySID;
@@ -151,7 +151,7 @@ fail:
     return 0;
 }
 
-static int add_partition_index_entry(MXFFile *mxfFile, FileIndex *index, const mxfKey *key,
+static int add_partition_index_entry(MXFFile *mxfFile, FileIndex *index, const mxfKey *key, uint64_t len,
     int append, PartitionIndexEntry **entry)
 {
     MXFPartition *partition = NULL;
@@ -164,7 +164,7 @@ static int add_partition_index_entry(MXFFile *mxfFile, FileIndex *index, const m
 
     /* read the partition pack */
     CHK_ORET(mxf_is_partition_pack(key));
-    CHK_ORET(mxf_read_partition(mxfFile, key, &partition));
+    CHK_ORET(mxf_read_partition(mxfFile, key, len, &partition));
 
     /* create entry */
     CHK_OFAIL(create_partition_index_entry(mxfFile, &partition, 1, &newEntry));
@@ -329,7 +329,7 @@ static int move_to_next_partition_with_essence(MXFFile *mxfFile, FileIndex *inde
         /* else index this new partition */
         else
         {
-            CHK_ORET(add_partition_index_entry(mxfFile, index, &index->nextKey, 1, &entry));
+            CHK_ORET(add_partition_index_entry(mxfFile, index, &index->nextKey, index->nextLen, 1, &entry));
             index->currentPartition++;
         }
 
@@ -355,7 +355,7 @@ static int move_to_next_partition_with_essence(MXFFile *mxfFile, FileIndex *inde
             }
 
             /* create partition index entry */
-            CHK_ORET(add_partition_index_entry(mxfFile, index, &key, 1, &entry));
+            CHK_ORET(add_partition_index_entry(mxfFile, index, &key, len, 1, &entry));
             index->currentPartition++;
         }
 
@@ -507,6 +507,11 @@ int create_index(MXFFile *mxfFile, MXFList *partitions, uint32_t indexSID, uint3
     /* complete the index */
     CHK_OFAIL(complete_partition_index(mxfFile, newIndex));
 
+    /* position file at the start */
+    newIndex->currentPartition = -1;
+    newIndex->currentPosition = -1;
+    CHK_OFAIL(move_to_next_partition_with_essence(mxfFile, newIndex));
+    newIndex->currentPosition = 0;
 
     *index = newIndex;
     return 1;
@@ -756,7 +761,8 @@ int64_t ix_get_last_written_frame_number(MXFFile *mxfFile, FileIndex *index, int
 
 int end_of_essence(FileIndex *index)
 {
-    return index->currentPosition < 0 || !mxf_equals_key(&index->nextKey, &index->startContentPackageKey);
+    return index->currentPosition < 0 ||
+           (index->isComplete && index->currentPosition >= index->indexedDuration);
 }
 
 void set_next_kl(FileIndex *index, const mxfKey *key, uint8_t llen, uint64_t len)

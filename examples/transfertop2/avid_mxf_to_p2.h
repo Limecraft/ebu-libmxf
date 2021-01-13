@@ -31,8 +31,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __AVID_MXF_TO_P2_H__
-#define __AVID_MXF_TO_P2_H__
+#ifndef AVID_MXF_TO_P2_H_
+#define AVID_MXF_TO_P2_H_
 
 #ifdef __cplusplus
 extern "C"
