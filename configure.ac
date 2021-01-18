@@ -25,10 +25,6 @@ AC_CONFIG_SRCDIR([mxf/mxf.h])
 AC_CONFIG_HEADER([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
-dnl [TODO] check these changes that were merged from BBC
-dnl AM_INIT_AUTOMAKE([-Wall -Werror  -Wno-extra-portability])
-dnl m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
-
 AM_INIT_AUTOMAKE([1.11 -Wall parallel-tests tar-ustar])
 AM_SILENT_RULES([yes])
 

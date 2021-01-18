@@ -65,8 +65,8 @@
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Debug\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Debug\</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Debug\</IntDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Release\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Release\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">..\..\..\..\bin</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\..\..\bin</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Release\</IntDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Release\</IntDir>
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
@@ -188,8 +188,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\inttypes.h" />
-    <ClInclude Include="..\..\..\mxf_scm_version.h" />
     <ClInclude Include="..\..\..\mxf\mxf.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_app.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_app_extensions_data_model.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_app_types.h" />
     <ClInclude Include="..\..\..\mxf\mxf_avid.h" />
     <ClInclude Include="..\..\..\mxf\mxf_avid_dictionary.h" />
     <ClInclude Include="..\..\..\mxf\mxf_avid_dictionary_data.h" />
@@ -214,11 +216,14 @@
     <ClInclude Include="..\..\..\mxf\mxf_partition.h" />
     <ClInclude Include="..\..\..\mxf\mxf_primer.h" />
     <ClInclude Include="..\..\..\mxf\mxf_rw_intl_file.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_stream_file.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_tree.h" />
     <ClInclude Include="..\..\..\mxf\mxf_types.h" />
     <ClInclude Include="..\..\..\mxf\mxf_utils.h" />
     <ClInclude Include="..\..\..\mxf\mxf_uu_metadata.h" />
     <ClInclude Include="..\..\..\mxf\mxf_version.h" />
     <ClInclude Include="..\..\..\mxf\mxf_win32_file.h" />
+    <ClInclude Include="..\..\..\mxf\mxf_win32_mmap.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

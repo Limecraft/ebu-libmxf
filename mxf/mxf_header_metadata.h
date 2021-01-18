@@ -51,7 +51,6 @@ typedef struct
     struct MXFMetadataSet *set;
     
     uint64_t offset_in_file;
-
 } MXFMetadataItem;
 
 typedef struct MXFMetadataSet
@@ -172,11 +171,11 @@ void mxf_get_aes3_fixed_data(const uint8_t *value, mxfAES3FixedData *result);
 void mxf_get_array_header(const uint8_t *value, uint32_t *arrayLen, uint32_t *arrayItemLen);
 uint16_t mxf_get_utf16string_size(const uint8_t *value, uint16_t valueLen);
 void mxf_get_utf16string(const uint8_t *value, uint16_t valueLen, mxfUTF16Char *result);
+void mxf_get_fixed_item_length_utf16string(const uint8_t *value, uint16_t valueLen, uint16_t *result);
 uint16_t mxf_get_utf8string_size(const uint8_t *value, uint16_t valueLen);
 void mxf_get_utf8string(const uint8_t *value, uint16_t valueLen, char *result);
 uint16_t mxf_get_iso7string_size(const uint8_t *value, uint16_t valueLen);
 void mxf_get_iso7string(const uint8_t *value, uint16_t valueLen, char *result);
-void mxf_get_fixed_item_length_utf16string(const uint8_t *value, uint16_t valueLen, uint16_t *result);
 
 int mxf_get_strongref(MXFHeaderMetadata *headerMetadata, const uint8_t *value, MXFMetadataSet **set);
 int mxf_get_weakref(MXFHeaderMetadata *headerMetadata, const uint8_t *value, MXFMetadataSet **set);
