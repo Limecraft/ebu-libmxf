@@ -208,10 +208,16 @@ typedef enum
     MXF_CODED_CONTENT_TYPE_TYPE,
     MXF_AES3_FIXED_DATA_TYPE,
 
-	/* IEEE-754 singple precision float types */
+	/* IEEE-754 single precision float types */
 	MXF_FLOAT_TYPE,
 	MXF_FLOATARRAY_TYPE,
     MXF_FLOATBATCH_TYPE,
+
+    /* IEEE-754 half precision float types */
+    MXF_HALFFLOAT_TYPE,
+    MXF_HALFFLOAT_LENSSERIAL_TYPE,
+    MXF_HALFFLOATARRAY_TYPE,
+    MXF_HALFFLOATBATCH_TYPE,
 
     MXF_EXTENSION_TYPE /* extension types must have integer value >= this */
 
