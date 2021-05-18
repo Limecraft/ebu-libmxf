@@ -83,15 +83,20 @@ struct MXFFileSysData
 static int check_file_is_seekable(FILE *file, int *isSeekable)
 {
     int fileId;
-    struct stat buf;
     char errorBuf[128];
 
 #if defined(_WIN32)
+	struct __stat64 buf;
     fileId = _fileno(file);
 #else
-    fileId = fileno(file);
+	struct stat buf;
+	fileId = fileno(file);
 #endif
-    if (fstat(fileId, &buf) != 0) {
+#if defined(_WIN32)
+    if (_fstat64(fileId, &buf) != 0) {
+#else
+	if (fstat(fileId, &buf) != 0) {
+#endif
         mxf_log_error("unexpected fstat error when checking seek support: %s\n",
                       mxf_strerror(errno, errorBuf, sizeof(errorBuf)));
         return 0;
