@@ -956,6 +956,99 @@ fail:
     return 0;
 }
 
+int mxf_read_and_return_isolated_set(MXFFile *mxfFile, const mxfKey *key, uint64_t len,
+	MXFHeaderMetadata *headerMetadata, /*int addToHeaderMetadata, */MXFMetadataSet **set)
+{
+    MXFMetadataSet *newSet = NULL;
+    MXFSetDef *setDef = NULL;
+    uint64_t totalLen = 0;
+    mxfLocalTag itemTag;
+    uint16_t itemLen;
+	int haveInstanceUID = 0;
+    mxfKey itemKey;
+    MXFItemDef *itemDef = NULL;
+    MXFMetadataItem *newItem;
+	int skip = 0;
+
+    /* only read sets with known definitions */
+    if (mxf_find_set_def(headerMetadata->dataModel, key, &setDef))
+    {
+        CHK_ORET(create_empty_set(key, &newSet));
+
+        /* read each item in the set*/
+        do
+        {
+            CHK_OFAIL(mxf_read_item_tl(mxfFile, &itemTag, &itemLen));
+            /* check the item tag is registered in the primer */
+            if (mxf_get_item_key(headerMetadata->primerPack, itemTag, &itemKey))
+            {
+				/* only read items with known definition */
+				if (mxf_find_item_def_in_set_def(&itemKey, setDef, &itemDef))
+				{
+					CHK_OFAIL(mxf_create_item(newSet, &itemKey, itemTag, &newItem));
+					newItem->isPersistent = 1;
+					CHK_OFAIL(mxf_read_item(mxfFile, newItem, itemLen));
+					if (mxf_equals_key(&MXF_ITEM_K(InterchangeObject, InstanceUID), &itemKey))
+					{
+						mxf_get_uuid(newItem->value, &newSet->instanceUID);
+						haveInstanceUID = 1;
+					}
+				}
+				/* skip items with unknown definition */
+				else
+				{
+					CHK_OFAIL(mxf_skip(mxfFile, (int64_t)itemLen));
+				}
+            }
+            /* skip items not registered in the primer. Log warning because the file is invalid */
+            else
+            {
+                mxf_log_warn("Encountered item with tag %d not registered in the primer"
+                             LOG_LOC_FORMAT, itemTag, LOG_LOC_PARAMS);
+                CHK_OFAIL(mxf_skip(mxfFile, (int64_t)itemLen));
+            }
+
+            totalLen += 4 + itemLen;
+        }
+        while (totalLen < len);
+
+        if (totalLen != len)
+        {
+            mxf_log_error("Incorrect metadata set length encountered" LOG_LOC_FORMAT, LOG_LOC_PARAMS);
+            goto fail;
+        }
+		if (!haveInstanceUID)
+		{
+			//mxf_log_error("Metadata set does not have InstanceUID item" LOG_LOC_FORMAT, LOG_LOC_PARAMS);
+			//goto fail;
+			// we make an InstanceUID if it has none.
+			//mxfUUID newInstanceID;
+			//mxf_generate_uuid(&newInstanceID);
+			mxf_generate_uuid(&newSet->instanceUID);
+			//CHK_OFAIL(mxf_set_uuid_item(newSet, &MXF_ITEM_K(InterchangeObject, InstanceUID), &newInstanceID));
+		}
+
+		/* ok to add set */
+		//if (addToHeaderMetadata)
+		{
+			CHK_OFAIL(mxf_add_set(headerMetadata, newSet));
+		}
+
+
+        *set = newSet;
+        return 1;
+    }
+
+    /* skip the set if the def is unknown */
+    CHK_ORET(mxf_skip(mxfFile, (int64_t)len));
+    *set = NULL;
+    return 2;
+
+fail:
+    mxf_free_set(&newSet);
+    return 0;
+}
+
 int mxf_read_item_tl(MXFFile *mxfFile, mxfLocalTag *itemTag, uint16_t *itemLen)
 {
     CHK_ORET(mxf_read_local_tag(mxfFile, itemTag));

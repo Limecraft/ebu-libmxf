@@ -135,6 +135,8 @@ int mxf_read_and_return_set(MXFFile *mxfFile, const mxfKey *key, uint64_t len,
                             MXFHeaderMetadata *headerMetadata, int addToHeaderMetadata, MXFMetadataSet **set);
 int mxf_read_filtered_and_return_set(MXFFile *mxfFile, MXFReadFilter *filter, const mxfKey *key, uint64_t len,
                             MXFHeaderMetadata *headerMetadata, int addToHeaderMetadata, MXFMetadataSet **set);
+int mxf_read_and_return_isolated_set(MXFFile *mxfFile, const mxfKey *key, uint64_t len,
+	MXFHeaderMetadata *headerMetadata, MXFMetadataSet **set);
 int mxf_read_item_tl(MXFFile *mxfFile, mxfLocalTag *itemTag, uint16_t *itemLen);
 int mxf_read_item(MXFFile *mxfFile, MXFMetadataItem *item, uint16_t len);
 
